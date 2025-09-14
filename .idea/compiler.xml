@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.34/ec547ef414ab1d2c040118fb9c1c265ada63af14/lombok-1.18.34.jar" />
+        </processorPath>
+        <module name="system-microservice-share-documents.UserService.main" />
+        <module name="system-microservice-share-documents.APIGatewayService.main" />
+        <module name="system-microservice-share-documents.AuthAccessControlService.main" />
+        <module name="system-microservice-share-documents.WatermarkWorkerService.main" />
+        <module name="system-microservice-share-documents.AuditLogService.main" />
+        <module name="system-microservice-share-documents.DocumentService.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="17">
+      <module name="APIGatewayService" target="17" />
+      <module name="APIGatewayService.main" target="17" />
+      <module name="APIGatewayService.test" target="17" />
+      <module name="AuditLogService" target="17" />
+      <module name="AuditLogService.main" target="17" />
+      <module name="AuditLogService.test" target="17" />
+      <module name="AuthAccessControlService" target="17" />
+      <module name="AuthAccessControlService.main" target="17" />
+      <module name="AuthAccessControlService.test" target="17" />
+      <module name="DocumentService" target="17" />
+      <module name="DocumentService.main" target="17" />
+      <module name="DocumentService.test" target="17" />
+      <module name="EurekaService" target="17" />
+      <module name="EurekaService.main" target="17" />
+      <module name="EurekaService.test" target="17" />
+      <module name="microservices-system.APIGatewayService" target="17" />
+      <module name="microservices-system.APIGatewayService.main" target="17" />
+      <module name="microservices-system.APIGatewayService.test" target="17" />
+      <module name="microservices-system.AuditLogService" target="17" />
+      <module name="microservices-system.AuditLogService.main" target="17" />
+      <module name="microservices-system.AuditLogService.test" target="17" />
+      <module name="microservices-system.AuthAccessControlService" target="17" />
+      <module name="microservices-system.AuthAccessControlService.main" target="17" />
+      <module name="microservices-system.AuthAccessControlService.test" target="17" />
+      <module name="microservices-system.CloudConfigServerService" target="17" />
+      <module name="microservices-system.CloudConfigServerService.main" target="17" />
+      <module name="microservices-system.CloudConfigServerService.test" target="17" />
+      <module name="microservices-system.DocumentService" target="17" />
+      <module name="microservices-system.DocumentService.main" target="17" />
+      <module name="microservices-system.DocumentService.test" target="17" />
+      <module name="microservices-system.EurekaService" target="17" />
+      <module name="microservices-system.EurekaService.main" target="17" />
+      <module name="microservices-system.EurekaService.test" target="17" />
+      <module name="microservices-system.UserService" target="17" />
+      <module name="microservices-system.UserService.main" target="17" />
+      <module name="microservices-system.UserService.test" target="17" />
+      <module name="UserService" target="17" />
+      <module name="UserService.main" target="17" />
+      <module name="UserService.test" target="17" />
+      <module name="WatermarkWorkerService" target="17" />
+      <module name="WatermarkWorkerService.main" target="17" />
+      <module name="WatermarkWorkerService.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

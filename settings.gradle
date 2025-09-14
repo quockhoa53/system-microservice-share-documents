@@ -1,0 +1,10 @@
+rootProject.name = 'system-microservice-share-documents'
+
+include 'EurekaService'
+include 'APIGatewayService'
+include 'UserService'
+include 'DocumentService'
+include 'AuthAccessControlService'
+include 'AuditLogService'
+include 'CloudConfigServerService'
+include 'WatermarkWorkerService'

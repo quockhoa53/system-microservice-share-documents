@@ -60,4 +60,32 @@
       <module name="WatermarkWorkerService.test" target="17" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="system-microservice-share-documents.APIGatewayService" options="-parameters" />
+      <module name="system-microservice-share-documents.APIGatewayService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.APIGatewayService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.AuditLogService" options="-parameters" />
+      <module name="system-microservice-share-documents.AuditLogService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.AuditLogService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.AuthAccessControlService" options="-parameters" />
+      <module name="system-microservice-share-documents.AuthAccessControlService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.AuthAccessControlService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.CloudConfigServerService" options="-parameters" />
+      <module name="system-microservice-share-documents.CloudConfigServerService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.CloudConfigServerService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.DocumentService" options="-parameters" />
+      <module name="system-microservice-share-documents.DocumentService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.DocumentService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.EurekaService" options="-parameters" />
+      <module name="system-microservice-share-documents.EurekaService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.EurekaService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.UserService" options="-parameters" />
+      <module name="system-microservice-share-documents.UserService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.UserService.test" options="-parameters" />
+      <module name="system-microservice-share-documents.WatermarkWorkerService" options="-parameters" />
+      <module name="system-microservice-share-documents.WatermarkWorkerService.main" options="-parameters" />
+      <module name="system-microservice-share-documents.WatermarkWorkerService.test" options="-parameters" />
+    </option>
+  </component>
 </project>

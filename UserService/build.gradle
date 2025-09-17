@@ -24,6 +24,7 @@ dependencies {
 	// Security cho JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.1'
 	// Actuator cho giám sát
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -40,6 +41,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
 }
 
 dependencyManagement {

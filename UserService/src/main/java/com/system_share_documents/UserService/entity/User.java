@@ -6,6 +6,11 @@ import lombok.*;
 import java.sql.Timestamp;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,5 +43,6 @@ public class User {
     Timestamp updatedAt; // thời điểm cập nhật gần nhất
 
     @Column(columnDefinition = "jsonb")
-    String profile; // dữ liệu profile
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> profile;
 }

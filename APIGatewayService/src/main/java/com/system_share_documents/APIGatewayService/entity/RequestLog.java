@@ -2,7 +2,6 @@ package com.system_share_documents.APIGatewayService.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 
@@ -11,7 +10,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "request_log")
 public class RequestLog {

@@ -12,9 +12,9 @@ spring:
   application:
     name: api-gateway
   datasource:
-    url: jdbc:postgresql://localhost:5432/gateway_db
-    username: postgres
-    password: 1234
+    url:  jdbc:postgresql://ep-solitary-forest-adhhauxm-pooler.c-2.us-east-1.aws.neon.tech:5432/gateway_db?user=neondb_owner&password=npg_xdHw4FNo1XRC&sslmode=require
+    username: neondb_owner
+    password: npg_xdHw4FNo1XRC
   jpa:
     hibernate:
       ddl-auto: create

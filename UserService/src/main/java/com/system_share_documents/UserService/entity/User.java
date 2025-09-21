@@ -6,9 +6,7 @@ import lombok.*;
 import java.sql.Timestamp;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 @Getter

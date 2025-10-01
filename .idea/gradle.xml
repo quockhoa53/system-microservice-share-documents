@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/APIGatewayService" />
+            <option value="$PROJECT_DIR$/AppCommonService" />
             <option value="$PROJECT_DIR$/AuditLogService" />
             <option value="$PROJECT_DIR$/AuthAccessControlService" />
             <option value="$PROJECT_DIR$/CloudConfigServerService" />

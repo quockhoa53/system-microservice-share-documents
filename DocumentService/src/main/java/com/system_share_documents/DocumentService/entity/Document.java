@@ -38,7 +38,7 @@ public class Document {
     private String checksum; // hash SHA-256 để kiểm chứng toàn vẹn dữ liệu
 
     @Column(name = "storage_object_key", nullable = false, columnDefinition = "text")
-    private String storageObjectKey; // object key trong storage (không ràng buộc công nghệ)
+    private String storageObjectKey; // object key trong storage Minio
 
     @Column(name = "storage_class", length = 32)
     private String storageClass = "standard"; // phân loại lưu trữ: standard, archive, etc.

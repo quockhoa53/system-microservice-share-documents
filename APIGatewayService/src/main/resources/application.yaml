@@ -34,7 +34,7 @@ spring:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/auth/**,/api/keys/**
           filters:
             - PreserveHostHeader
 

@@ -2,9 +2,10 @@ package com.system_share_documents.UserService.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -40,7 +41,8 @@ public class UserKey {
     Boolean isPrimary = false; // key chính của user (dùng mặc định để ký/mã hóa)
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    Timestamp createdAt; // thời điểm tạo key
+    @CreationTimestamp
+    private Timestamp createdAt;// thời điểm tạo key
 
     @Column(name = "revoked_at")
     Timestamp revokedAt; // nếu key bị thu hồi, lưu thời điểm revoke

@@ -13,4 +13,7 @@ public interface UserKeyRepository extends JpaRepository<UserKey, UUID> {
     List<UserKey> findByUser_Id(UUID userId);
     Optional<UserKey> findByUser_IdAndIsPrimaryTrue(UUID userId);
     boolean existsByUser_IdAndKeyFingerprint(UUID userId, String fpActual);
+    List<UserKey> findByUser_IdAndRevokedAtIsNull(UUID userId);
+    Optional<UserKey> findFirstByUser_IdAndKeyTypeIgnoreCaseAndIsPrimaryTrueAndRevokedAtIsNull(
+            UUID userId, String keyType);
 }

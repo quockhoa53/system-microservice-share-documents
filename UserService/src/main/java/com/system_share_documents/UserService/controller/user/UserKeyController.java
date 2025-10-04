@@ -48,4 +48,36 @@ public class UserKeyController {
         return ApiResponse.success("OK", "Key revoked", null);
     }
 
+    @GetMapping("/public/{userId}")
+    public ApiResponse<List<PublicKeyResponse>> publicKeysById(@PathVariable UUID userId) {
+        var keys = userKeyService.getPublicKeysOfUser(userId);
+        return ApiResponse.success("OK", "User public keys", keys);
+    }
+
+    @GetMapping("/public/{userId}/primary")
+    public ApiResponse<PublicKeyResponse> publicPrimaryById(
+            @PathVariable UUID userId,
+            @RequestParam String keyType
+    ) {
+        return userKeyService.getPublicPrimaryKey(userId, keyType)
+                .map(k -> ApiResponse.success("OK", "Primary public key", k))
+                .orElseGet(() -> ApiResponse.success("OK", "No primary key", null));
+    }
+
+    @GetMapping("/public/by-username/{username}")
+    public ApiResponse<List<PublicKeyResponse>> publicKeysByUsername(@PathVariable String username) {
+        var keys = userKeyService.getPublicKeysByUsername(username);
+        return ApiResponse.success("OK", "User public keys by username", keys);
+    }
+
+    @GetMapping("/public/by-username/{username}/primary")
+    public ApiResponse<PublicKeyResponse> publicPrimaryByUsername(
+            @PathVariable String username,
+            @RequestParam String keyType
+    ) {
+        return userKeyService.getPublicPrimaryKeyByUsername(username, keyType)
+                .map(k -> ApiResponse.success("OK", "Primary public key", k))
+                .orElseGet(() -> ApiResponse.success("OK", "No primary key", null));
+    }
+
 }

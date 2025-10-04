@@ -32,7 +32,7 @@ public class UserKeyServiceImpl implements UserKeyService {
     private final UserKeyRepository userKeyRepository;
     private final UserKeyMapper userKeyMapper;
 
-    // ===================== Public APIs =====================
+    // Public APIs
 
     @Override
     @Transactional
@@ -107,6 +107,37 @@ public class UserKeyServiceImpl implements UserKeyService {
     }
 
     @Transactional
+    @Override
+    public List<PublicKeyResponse> getPublicKeysOfUser(UUID userId) {
+        var keys = userKeyRepository.findByUser_IdAndRevokedAtIsNull(userId);
+        return keys.stream().map(userKeyMapper::toResponse).toList();
+    }
+
+    @Transactional
+    @Override
+    public Optional<PublicKeyResponse> getPublicPrimaryKey(UUID userId, String keyType) {
+        return userKeyRepository
+                .findFirstByUser_IdAndKeyTypeIgnoreCaseAndIsPrimaryTrueAndRevokedAtIsNull(userId, keyType)
+                .map(userKeyMapper::toResponse);
+    }
+
+    @Transactional
+    @Override
+    public List<PublicKeyResponse> getPublicKeysByUsername(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return getPublicKeysOfUser(user.getId());
+    }
+
+    @Transactional
+    @Override
+    public Optional<PublicKeyResponse> getPublicPrimaryKeyByUsername(String username, String keyType) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return getPublicPrimaryKey(user.getId(), keyType);
+    }
+
+    @Transactional
     public void setPrimary(UUID keyId, Authentication auth) {
         UUID userId = requireCurrentUserId(auth);
         UserKey key = userKeyRepository.findById(keyId)
@@ -133,7 +164,7 @@ public class UserKeyServiceImpl implements UserKeyService {
         // Optionally: key.setIsPrimary(false);
     }
 
-    // ===================== Helpers =====================
+    //  Helpers
 
     private void validateKeyType(String keyType) {
         if (!"openpgp-ed25519".equalsIgnoreCase(keyType)
@@ -257,7 +288,6 @@ public class UserKeyServiceImpl implements UserKeyService {
         return true;
     }
 
-    /** Lấy KeyFlags từ chữ ký subpacket (nếu có). Không có → trả 0. */
     private int getKeyFlags(PGPPublicKey k) {
         try {
             @SuppressWarnings("unchecked")

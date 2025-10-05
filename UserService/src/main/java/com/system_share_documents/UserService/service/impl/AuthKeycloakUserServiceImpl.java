@@ -8,6 +8,7 @@ import com.system_share_documents.UserService.exception.errorcode.SystemError;
 import com.system_share_documents.UserService.mapper.UserMapper;
 import com.system_share_documents.UserService.repository.UserRepository;
 import com.system_share_documents.UserService.service.AuthKeycloakUserService;
+import com.system_share_documents.UserService.service.UserKeyService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,9 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserKeyService userKeyService;
 
     @Override
     @Transactional

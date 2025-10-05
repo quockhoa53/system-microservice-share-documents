@@ -70,7 +70,6 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
     @Override
     @Transactional
     public InitUploadResponse initUpload(InitUploadRequest request, String ownerId) throws Exception {
-        // Create Document
         Document doc = Document.builder()
                 .id(UUID.randomUUID())
                 .ownerId(ownerId)
@@ -84,7 +83,6 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                 .build();
         documentRepository.save(doc);
 
-        // Create Document Version
         DocumentVersion version = DocumentVersion.builder()
                 .id(UUID.randomUUID())
                 .document(doc)
@@ -94,7 +92,6 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                 .build();
         documentVersionRepository.save(version);
 
-        // Sinh CEK (Content Encryption Key) và wrap trước cho recipients
         List<String> recipients = request.getRecipients();
         SecretKey cek = cryptoService.generateAesKey();
         byte[] cekBytes = cek.getEncoded();
@@ -120,11 +117,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
             }
         }
 
-        // Đẩy file upload lên Minio
         String objectKey = String.format("staging/%s/v%d/%s", doc.getId(), version.getVersionNumber(), UUID.randomUUID());
         String preSignedUrl = minioStorageRest.generatePreSignedPutUrl(objectKey, presignExpiryMinutes);
 
-        // Response
         UploadUrlsResponse urls = new UploadUrlsResponse(objectKey, preSignedUrl, null);
         return new InitUploadResponse(doc.getId(), version.getVersionNumber(), urls, true);
     }

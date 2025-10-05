@@ -36,6 +36,11 @@ dependencies {
 	//Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	// Config Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
+	// spring-dotenv (nạp .env)
+	implementation "me.paulschwarz:spring-dotenv:3.0.0"
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

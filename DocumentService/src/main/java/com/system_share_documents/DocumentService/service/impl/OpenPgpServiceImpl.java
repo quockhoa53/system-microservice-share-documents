@@ -24,7 +24,7 @@ public class OpenPgpServiceImpl implements OpenPgpService {
     }
 
     /**
-     * Hàm này thực hiện việc "wrap" (mã hóa) Content Encryption Key (CEK) bằng public key của người nhận,
+     * Phương thức này thực hiện việc "wrap" (mã hóa) Content Encryption Key (CEK) bằng public key của người nhận,
      * sử dụng chuẩn OpenPGP (BouncyCastle).
      *
      * Cơ chế:

@@ -22,15 +22,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
 	// Lombok
 	implementation 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
-
 	// Minio
 	implementation 'io.minio:minio:8.5.17'
+	// spring-dotenv (nạp .env)
+	implementation "me.paulschwarz:spring-dotenv:3.0.0"
 }
 
 tasks.named('test') {

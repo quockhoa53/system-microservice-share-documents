@@ -21,39 +21,35 @@ dependencies {
 	// Core cho API Gateway
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
 	// Security cho JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.1'
 	implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.1'
-
 	// Actuator cho giám sát
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
 	// JPA và PostgreSQL cho log
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.postgresql:postgresql'
-
 	// Lombok
 	implementation 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
-
 	//Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
-
 	// Minio
 	implementation 'io.minio:minio:8.5.17'
-
 	// OpenPGP
-	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-	implementation("org.bouncycastle:bcpg-jdk15on:1.70")
-
+	implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+	implementation 'org.bouncycastle:bcpg-jdk18on:1.78.1'
+	// Config Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
+	// spring-dotenv (nạp .env)
+	implementation "me.paulschwarz:spring-dotenv:3.0.0"
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 	//Source common
 	implementation project(':AppCommonService')
 }

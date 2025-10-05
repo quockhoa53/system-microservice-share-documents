@@ -1,6 +1,5 @@
-version: "3.8"
-
 services:
+  # 🔐 Keycloak (OIDC)
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.2
     command: start-dev --http-port=9090 --spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true
@@ -9,7 +8,10 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "9090:9090"
+    networks:
+      - system-net
 
+  # 📦 MinIO (S3 storage)
   minio:
     image: quay.io/minio/minio:latest
     container_name: minio
@@ -18,10 +20,31 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"   # API (S3 compatible)
-      - "9001:9001"   # Web UI console
+      - "9000:9000"   # API (S3)
+      - "9001:9001"   # Web UI
     volumes:
       - minio_data:/data
+    networks:
+      - system-net
+
+  # 🔑 Vault (Secret Manager)
+  vault:
+    image: hashicorp/vault:1.14
+    container_name: vault
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root-token"
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    command: "server -dev -dev-root-token-id=root-token"
+    networks:
+      - system-net
+
+networks:
+  system-net:
+    driver: bridge
 
 volumes:
   minio_data:

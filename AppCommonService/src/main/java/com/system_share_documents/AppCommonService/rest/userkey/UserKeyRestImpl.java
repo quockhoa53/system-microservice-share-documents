@@ -19,7 +19,7 @@ public class UserKeyRestImpl implements UserKeyRest {
      * Gọi sang UserService để lấy public key primary cho user.
      *
      * @param userId id của user nhận tài liệu
-     * @return public key armored string hoặc null nếu không tìm thấy
+     * @return public key string hoặc null nếu không tìm thấy
      */
     @Override
     public String getUserPublicKeyForUser(String userId) {

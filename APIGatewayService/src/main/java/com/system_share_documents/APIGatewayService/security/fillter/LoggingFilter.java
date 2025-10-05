@@ -1,8 +1,12 @@
-package com.system_share_documents.APIGatewayService.service;
+package com.system_share_documents.APIGatewayService.security.fillter;
 
 import com.system_share_documents.APIGatewayService.entity.RequestLog;
 import com.system_share_documents.APIGatewayService.repository.RequestLogRepository;
+import com.system_share_documents.APIGatewayService.service.BufferingServerHttpResponseDecorator;
+import com.system_share_documents.APIGatewayService.service.DuplicateLogCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.route.Route;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -26,11 +30,13 @@ public class LoggingFilter implements WebFilter {
     @Autowired
     private RequestLogRepository requestLogRepository;
 
+    @Autowired
+    private DuplicateLogCache duplicateLogCache;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().value();
 
-        // Bỏ qua log cho public paths và websocket
         if (isPublicOrWebsocketPath(path)) {
             return chain.filter(exchange);
         }
@@ -38,8 +44,25 @@ public class LoggingFilter implements WebFilter {
         long startTime = System.currentTimeMillis();
         String method = exchange.getRequest().getMethod().toString();
 
-        return DataBufferUtils.join(exchange.getRequest().getBody())
-                .defaultIfEmpty(exchange.getResponse().bufferFactory().wrap(new byte[0]))
+        // Lấy traceId từ header hoặc sinh mới
+        String traceId = exchange.getRequest().getHeaders().getFirst("X-Trace-Id");
+        if (traceId == null) {
+            traceId = UUID.randomUUID().toString();
+        }
+        String finalTraceId = traceId;
+
+        // Gắn traceId vào request trước khi forward
+        ServerHttpRequest requestWithTraceId = exchange.getRequest()
+                .mutate()
+                .header("X-Trace-Id", finalTraceId)
+                .build();
+
+        ServerWebExchange exchangeWithTraceId = exchange.mutate()
+                .request(requestWithTraceId)
+                .build();
+
+        return DataBufferUtils.join(exchangeWithTraceId.getRequest().getBody())
+                .defaultIfEmpty(exchangeWithTraceId.getResponse().bufferFactory().wrap(new byte[0]))
                 .flatMap(dataBuffer -> {
                     byte[] bodyBytes = new byte[dataBuffer.readableByteCount()];
                     dataBuffer.read(bodyBytes);
@@ -47,9 +70,9 @@ public class LoggingFilter implements WebFilter {
                     String requestBody = new String(bodyBytes, StandardCharsets.UTF_8);
 
                     Flux<DataBuffer> cachedFlux = Flux.defer(() ->
-                            Mono.just(exchange.getResponse().bufferFactory().wrap(bodyBytes)));
+                            Mono.just(exchangeWithTraceId.getResponse().bufferFactory().wrap(bodyBytes)));
 
-                    ServerHttpRequestDecorator mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
+                    ServerHttpRequestDecorator mutatedRequest = new ServerHttpRequestDecorator(exchangeWithTraceId.getRequest()) {
                         @Override
                         public Flux<DataBuffer> getBody() {
                             return cachedFlux;
@@ -57,9 +80,9 @@ public class LoggingFilter implements WebFilter {
                     };
 
                     BufferingServerHttpResponseDecorator decoratedResponse =
-                            new BufferingServerHttpResponseDecorator(exchange.getResponse());
+                            new BufferingServerHttpResponseDecorator(exchangeWithTraceId.getResponse());
 
-                    ServerWebExchange mutatedExchange = exchange.mutate()
+                    ServerWebExchange finalExchange = exchangeWithTraceId.mutate()
                             .request(mutatedRequest)
                             .response(decoratedResponse)
                             .build();
@@ -67,7 +90,7 @@ public class LoggingFilter implements WebFilter {
                     return ReactiveSecurityContextHolder.getContext()
                             .map(ctx -> ctx.getAuthentication() != null ? ctx.getAuthentication().getName() : "anonymous")
                             .defaultIfEmpty("anonymous")
-                            .flatMap(userId -> chain.filter(mutatedExchange)
+                            .flatMap(userId -> chain.filter(finalExchange)
                                     .then(Mono.defer(() -> {
                                         long endTime = System.currentTimeMillis();
                                         Long responseTime = endTime - startTime;
@@ -76,26 +99,29 @@ public class LoggingFilter implements WebFilter {
                                                 : 500;
                                         String responseBody = decoratedResponse.getFullBody();
 
-                                        // Lấy IP, User-Agent, TraceId
-                                        ServerHttpRequest req = exchange.getRequest();
+                                        // Thông tin thêm
+                                        ServerHttpRequest req = finalExchange.getRequest();
                                         String ip = req.getRemoteAddress() != null
                                                 ? req.getRemoteAddress().getAddress().getHostAddress()
                                                 : "unknown";
                                         String userAgent = req.getHeaders().getFirst("User-Agent");
-                                        String traceId = req.getHeaders().getFirst("X-Trace-Id");
-                                        if (traceId == null) {
-                                            traceId = UUID.randomUUID().toString();
+
+                                        // Chống duplicate
+                                        String duplicateKey = method + "|" + path + "|" + userId;
+                                        if (duplicateLogCache.isDuplicate(duplicateKey)) {
+                                            return Mono.empty();
                                         }
 
-                                        // Service name có thể hardcode hoặc đọc từ config
-                                        String serviceName = "APIGatewayService";
+                                        // Lấy service name từ Gateway Route
+                                        Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
+                                        String serviceName = (route != null) ? route.getId() : "UNKNOWN";
 
                                         RequestLog log = RequestLog.builder()
                                                 .method(method)
                                                 .path(path)
                                                 .status(status)
                                                 .userId(userId)
-                                                .traceId(traceId)
+                                                .traceId(finalTraceId)
                                                 .ipAddress(ip)
                                                 .userAgent(userAgent)
                                                 .serviceName(serviceName)

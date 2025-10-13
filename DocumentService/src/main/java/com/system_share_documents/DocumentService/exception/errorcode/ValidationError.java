@@ -5,7 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ValidationError implements ErrorCode {
-    VALIDATION_FAILED("VALIDATION_FAILED", "Validation failed", HttpStatus.BAD_REQUEST);
+    VALIDATION_FAILED("VALIDATION_FAILED", "Validation failed", HttpStatus.BAD_REQUEST),
+    SIGNATURE_INVALID("SIGNATURE_INVALID", "Signature invalid", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

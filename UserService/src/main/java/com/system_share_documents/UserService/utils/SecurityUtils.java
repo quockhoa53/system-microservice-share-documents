@@ -1,4 +1,4 @@
-package com.system_share_documents.UserService.util;
+package com.system_share_documents.UserService.utils;
 
 // hoặc package nơi AuthError của bạn nằm
 import com.system_share_documents.UserService.entity.User;

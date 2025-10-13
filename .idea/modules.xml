@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CloudConfigServerService/system-microservice-share-documents.CloudConfigServerService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CloudConfigServerService/system-microservice-share-documents.CloudConfigServerService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.test.iml" filepath="$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/WatermarkWorkerService/system-microservice-share-documents.WatermarkWorkerService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/WatermarkWorkerService/system-microservice-share-documents.WatermarkWorkerService.main.iml" />
     </modules>
   </component>

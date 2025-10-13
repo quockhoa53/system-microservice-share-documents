@@ -2,9 +2,13 @@ package com.system_share_documents.DocumentService.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -37,9 +41,6 @@ public class Document {
     @Column(name = "checksum", length = 128)
     private String checksum; // hash SHA-256 để kiểm chứng toàn vẹn dữ liệu
 
-    @Column(name = "storage_object_key", nullable = false, columnDefinition = "text")
-    private String storageObjectKey; // object key trong storage Minio
-
     @Column(name = "storage_class", length = 32)
     private String storageClass = "standard"; // phân loại lưu trữ: standard, archive, etc.
 
@@ -49,15 +50,18 @@ public class Document {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt; // thời điểm cập nhật metadata cuối cùng
 
-    @Column(name = "metadata", columnDefinition = "jsonb")
-    private String metadata; // metadata mở rộng (tags, mô tả, category…)
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> metadata;
 
     // Quan hệ 1-N với DocumentVersion
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DocumentVersion> versions = new ArrayList<>();
 
     // Quan hệ 1-N với Signature
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Signature> signatures = new ArrayList<>();
 }
 

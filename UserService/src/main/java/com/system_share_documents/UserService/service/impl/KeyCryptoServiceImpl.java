@@ -3,7 +3,7 @@ package com.system_share_documents.UserService.service.impl;
 import com.system_share_documents.UserService.exception.AppException;
 import com.system_share_documents.UserService.exception.errorcode.KeyErrorCode;
 import com.system_share_documents.UserService.service.KeyCryptoService;
-import com.system_share_documents.UserService.util.HexUtils;
+import com.system_share_documents.UserService.utils.HexUtils;
 import org.bouncycastle.bcpg.PublicKeyAlgorithmTags;
 import org.bouncycastle.bcpg.sig.KeyFlags;
 import org.bouncycastle.openpgp.*;

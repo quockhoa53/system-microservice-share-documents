@@ -1,4 +1,4 @@
-package com.system_share_documents.UserService.util;
+package com.system_share_documents.UserService.utils;
 
 import lombok.experimental.UtilityClass;
 

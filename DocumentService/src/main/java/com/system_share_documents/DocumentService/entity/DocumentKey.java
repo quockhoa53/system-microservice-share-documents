@@ -15,7 +15,9 @@ import java.util.UUID;
 public class DocumentKey {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
+    @org.hibernate.annotations.GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(updatable = false, nullable = false)
     private UUID id;
     /*
      * Khóa chính cho bảng document_keys.

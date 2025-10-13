@@ -4,6 +4,8 @@ import com.system_share_documents.DocumentService.enums.VersionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +27,10 @@ public class DocumentVersion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "document_id", nullable = false)
     private Document document; // tham chiếu tới tài liệu gốc
+
+    @OneToMany(mappedBy = "documentVersion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DocumentKey> documentKeys = new ArrayList<>();
 
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber; // số phiên bản (1 = bản đầu tiên, 2,3,...)

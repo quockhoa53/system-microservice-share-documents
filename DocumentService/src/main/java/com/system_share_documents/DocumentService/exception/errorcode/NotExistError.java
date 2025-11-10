@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum NotExistError implements ErrorCode {
     DOCUMENT_NOT_FOUND("DOCUMENT_NOT_FOUND", "Document not found", HttpStatus.BAD_REQUEST),
-    VERSION_NOT_FOUND("VERSION_NOT_FOUND", "Document version not found", HttpStatus.BAD_REQUEST),;
+    VERSION_NOT_FOUND("VERSION_NOT_FOUND", "Document version not found", HttpStatus.BAD_REQUEST),
+    DOCUMENT_KEY_NOT_FOUND("DOCUMENT_KEY_NOT_FOUND", "Document key not found", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

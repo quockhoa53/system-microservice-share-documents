@@ -56,4 +56,7 @@ public class DocumentVersion {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt; // thời điểm tạo phiên bản
+
+    @Column(name = "updated_at", updatable = false)
+    private Timestamp updatedAt; // thời điểm tạo phiên bản
 }

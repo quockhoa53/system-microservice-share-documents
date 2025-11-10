@@ -1,0 +1,73 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
+
+plugins {
+	id 'java'
+	id 'application'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Flink core
+	implementation 'org.apache.flink:flink-streaming-java:1.18.1'
+	implementation 'org.apache.flink:flink-clients:1.18.1'
+
+	// Kafka connector for Flink
+	implementation 'org.apache.flink:flink-connector-kafka:3.0.1-1.18'
+
+	// JDBC connector for Flink 1.18
+	implementation 'org.apache.flink:flink-connector-jdbc:3.1.2-1.18'
+
+	// Jackson for JSON deserialization
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+
+	// Spring Web for RestTemplate and HTTP handling
+	implementation 'org.springframework:spring-web:6.1.12'
+
+	// PostgreSQL JDBC
+	implementation 'org.postgresql:postgresql:42.7.3'
+
+	// Lombok
+	implementation 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+	// Redis
+	implementation('org.springframework.data:spring-data-redis:3.3.2') {
+		exclude group: 'redis.clients', module: 'jedis'
+	}
+	implementation 'redis.clients:jedis:5.2.0'
+}
+
+application {
+	mainClass = 'system_microservice_share_documents.UpdateDocumentData.UpdateDocumentDataApplication'
+}
+
+tasks.named('shadowJar') {
+	manifest {
+		attributes 'Main-Class': 'system_microservice_share_documents.UpdateDocumentData.UpdateDocumentDataApplication'
+	}
+	zip64 true
+	mergeServiceFiles()
+
+	transform(AppendingTransformer) { resource = 'reference.conf' }
+
+	exclude 'META-INF/*.RSA'
+	exclude 'META-INF/*.SF'
+	exclude 'META-INF/*.DSA'
+}
+
+tasks.withType(Test).configureEach {
+	jvmArgs = jvmArgs + ['--add-opens=java.base/java.util=ALL-UNNAMED']
+}

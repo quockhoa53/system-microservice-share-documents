@@ -8,6 +8,7 @@ spring:
       retry:
         initial-interval: 1000
         max-attempts: 6
+      enabled: false # Tắt để sử dụng file application.yaml
 
 logging:
   level:

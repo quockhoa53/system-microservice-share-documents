@@ -1,6 +1,7 @@
 package com.system_share_documents.DocumentService.service.impl;
 
 import com.system_share_documents.DocumentService.service.OpenPgpService;
+import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
@@ -51,22 +52,6 @@ public class OpenPgpServiceImpl implements OpenPgpService {
         });
     }
 
-    /**
-     * Wrap CEK (Content Encryption Key) bằng public key PGP của recipient.
-     * 1. Xác thực input CEK và public key.
-     * 2. Lấy PGPPublicKey từ cache hoặc parse từ armored key.
-     * 3. Khởi tạo PGPEncryptedDataGenerator (AES-256, integrity check, SecureRandom).
-     * 4. Ghi CEK vào PGP literal data → CEK được mã hóa.
-     * 5. Trả về CEK đã wrap để lưu vào DocumentKey.
-     * Lưu ý:
-     *   - CEK không lưu plaintext, bảo mật end-to-end.
-     *   - Cache public key giúp tăng hiệu năng.
-     *
-     * @param cekBytes CEK cần wrap
-     * @param recipientPublicKeyArmored Public key PGP recipient
-     * @return byte[] CEK đã được PGP encrypt
-     */
-
     @Override
     public byte[] wrapCekWithRecipientPublicKey(byte[] cekBytes, String recipientPublicKeyArmored) {
         try {
@@ -105,35 +90,76 @@ public class OpenPgpServiceImpl implements OpenPgpService {
         if (detachedSignature == null || detachedSignature.length == 0) throw new IllegalArgumentException("Signature must not be empty");
         if (publicKeyArmored == null || publicKeyArmored.isBlank()) throw new IllegalArgumentException("Public key must not be empty");
 
-        try (InputStream sigIn = new ByteArrayInputStream(detachedSignature);
-             InputStream keyIn = new ByteArrayInputStream(publicKeyArmored.getBytes(StandardCharsets.UTF_8))) {
+        Security.addProvider(new BouncyCastleProvider());
 
-            PGPPublicKeyRingCollection pgpPubRingCollection = new PGPPublicKeyRingCollection(
-                    PGPUtil.getDecoderStream(keyIn),
-                    new JcaKeyFingerprintCalculator()
-            );
-
-            PGPSignatureList sigList;
-            try (InputStream decoder = PGPUtil.getDecoderStream(sigIn)) {
-                PGPObjectFactory pgpFact = new PGPObjectFactory(decoder, new JcaKeyFingerprintCalculator());
-                Object obj = pgpFact.nextObject();
-                if (obj instanceof PGPSignatureList) {
-                    sigList = (PGPSignatureList) obj;
-                } else if (obj instanceof PGPSignature) {
-                    sigList = new PGPSignatureList((PGPSignature) obj);
-                } else {
-                    throw new IllegalArgumentException("Invalid detached signature format");
-                }
-            }
-
+        try (
+                InputStream keyIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(publicKeyArmored.getBytes(StandardCharsets.UTF_8)));
+                InputStream sigIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(detachedSignature))
+        ) {
+            PGPPublicKeyRingCollection pgpPubRingCollection = new PGPPublicKeyRingCollection(keyIn, new JcaKeyFingerprintCalculator());
+            PGPObjectFactory pgpFact = new PGPObjectFactory(sigIn, new JcaKeyFingerprintCalculator());
+            Object obj = pgpFact.nextObject();
+            PGPSignatureList sigList = (obj instanceof PGPSignatureList)
+                    ? (PGPSignatureList) obj
+                    : new PGPSignatureList((PGPSignature) obj);
             PGPSignature sig = sigList.get(0);
+
             PGPPublicKey key = pgpPubRingCollection.getPublicKey(sig.getKeyID());
+            if (key == null)
+                throw new IllegalArgumentException("Public key for signature not found in keyring");
 
             sig.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), key);
             sig.update(data);
-
             return sig.verify();
         }
     }
 
+    @Override
+    public byte[] signDetached(byte[] data, String privateKeyArmored, char[] passphrase) throws Exception {
+        if (data == null || data.length == 0)
+            throw new IllegalArgumentException("Data must not be empty");
+        if (privateKeyArmored == null || privateKeyArmored.isBlank())
+            throw new IllegalArgumentException("Private key must not be empty");
+
+        try (InputStream keyIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(privateKeyArmored.getBytes(StandardCharsets.UTF_8)))) {
+            PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(keyIn, new JcaKeyFingerprintCalculator());
+
+            PGPSecretKey secretKey = null;
+            for (PGPSecretKeyRing keyRing : pgpSec) {
+                for (PGPSecretKey key : keyRing) {
+                    if (key.isSigningKey()) {
+                        secretKey = key;
+                        break;
+                    }
+                }
+                if (secretKey != null) break;
+            }
+
+            if (secretKey == null)
+                throw new IllegalArgumentException("No signing key found in private key");
+
+            PGPPrivateKey privateKey = secretKey.extractPrivateKey(
+                    new org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder()
+                            .setProvider("BC")
+                            .build(passphrase)
+            );
+
+            PGPSignatureGenerator sigGen = new PGPSignatureGenerator(
+                    new org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder(
+                            secretKey.getPublicKey().getAlgorithm(),
+                            PGPUtil.SHA256
+                    ).setProvider("BC")
+            );
+
+            sigGen.init(PGPSignature.BINARY_DOCUMENT, privateKey);
+            sigGen.update(data);
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try (ArmoredOutputStream armorOut = new ArmoredOutputStream(out)) {
+                sigGen.generate().encode(armorOut);
+            }
+
+            return out.toByteArray();
+        }
+    }
 }

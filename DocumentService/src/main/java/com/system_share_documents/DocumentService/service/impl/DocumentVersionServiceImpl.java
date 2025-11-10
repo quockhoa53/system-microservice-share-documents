@@ -29,7 +29,6 @@ public class DocumentVersionServiceImpl implements DocumentVersionService {
                 .watermarked(false)
                 .createdAt(Timestamp.from(Instant.now()))
                 .build();
-        documentVersionRepository.saveAndFlush(version);
-        return version;
+        return documentVersionRepository.saveAndFlush(version);
     }
 }

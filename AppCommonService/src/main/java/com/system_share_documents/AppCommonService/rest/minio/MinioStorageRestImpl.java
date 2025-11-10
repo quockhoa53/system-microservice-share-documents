@@ -3,11 +3,14 @@ package com.system_share_documents.AppCommonService.rest.minio;
 import com.system_share_documents.AppCommonService.config.properties.MinioProperties;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class MinioStorageRestImpl implements MinioStorageRest {
@@ -25,7 +28,7 @@ public class MinioStorageRestImpl implements MinioStorageRest {
                         .bucket(minioProperties.getBucket())
                         .object(objectKey)
                         .method(io.minio.http.Method.PUT)
-                        .expiry(expirySeconds)
+                        .expiry(expirySeconds, TimeUnit.MINUTES)
                         .build()
         );
     }
@@ -37,7 +40,7 @@ public class MinioStorageRestImpl implements MinioStorageRest {
                         .bucket(minioProperties.getBucket())
                         .object(objectKey)
                         .method(io.minio.http.Method.GET)
-                        .expiry(expirySeconds)
+                        .expiry(expirySeconds, TimeUnit.MINUTES)
                         .build()
         );
     }
@@ -58,6 +61,30 @@ public class MinioStorageRestImpl implements MinioStorageRest {
             }
             return buffer.toByteArray();
         }
+    }
+
+    @Override
+    public void putObjectBytes(String objectKey, byte[] data, String contentType) throws Exception {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(data)) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(minioProperties.getBucket())
+                            .object(objectKey)
+                            .contentType(contentType)
+                            .stream(inputStream, data.length, -1)
+                            .build()
+            );
+        }
+    }
+
+    @Override
+    public InputStream getObjectStream(String objectKey) throws Exception {
+        return minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(minioProperties.getBucket())
+                        .object(objectKey)
+                        .build()
+        );
     }
 }
 

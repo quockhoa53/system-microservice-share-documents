@@ -1,5 +1,6 @@
 package com.system_share_documents.UserService.service;
 
+import com.system_share_documents.UserService.dto.request.GetPublicKeyRequest;
 import com.system_share_documents.UserService.dto.request.UploadKeyRequest;
 import com.system_share_documents.UserService.dto.response.PublicKeyResponse;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,8 @@ public interface UserKeyService {
 
     /** Public: lấy các public keys còn hiệu lực (revokedAt=null) theo userId. */
     List<PublicKeyResponse> getPublicKeysOfUser(UUID userId);
+
+    Optional<PublicKeyResponse> getPublicEncryptionKey(GetPublicKeyRequest request);
 
     /** Public: lấy primary public key còn hiệu lực theo userId + keyType. */
     Optional<PublicKeyResponse> getPublicPrimaryKey(UUID userId, String keyType);

@@ -84,6 +84,43 @@ services:
     networks:
       - app-net
 
+  flink-jobmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile.flink-java17
+    image: flink-jobmanager-custom
+    container_name: flink-jobmanager
+    ports:
+      - "8181:8081"
+      - "6123:6123"
+    command: jobmanager
+    volumes:
+      - ../jars:/jars
+      - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+    networks:
+      - app-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  flink-taskmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile.flink-java17
+    image: flink-taskmanager-custom
+    container_name: flink-taskmanager
+    depends_on:
+      flink-jobmanager:
+        condition: service_healthy
+    command: taskmanager
+    volumes:
+      - ../jars:/jars
+      - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+    networks:
+      - app-net
+
 networks:
   system-net:
     driver: bridge

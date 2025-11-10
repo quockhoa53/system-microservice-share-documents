@@ -5,18 +5,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuditLogEvent {
+public class AuditLogEvent implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String requestId;
     private String userId;
     private String action;
     private String documentId;
     private String objectType;
     private String status;
+    private String errorReason;
     private String ip;
     private String userAgent;
     private String request;

@@ -1,0 +1,16 @@
+jobmanager.rpc.address: flink-jobmanager
+taskmanager.bind-host: 0.0.0.0
+
+jobmanager.memory.process.size: 1400m
+taskmanager.memory.process.size: 4000m
+
+taskmanager.numberOfTaskSlots: 10
+
+heartbeat.timeout: 120000
+heartbeat.interval: 10000
+
+rest.port: 8081
+blob.server.port: 6124
+query.server.port: 6125
+
+env.java.opts: --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens java.base/java.time=ALL-UNNAMED

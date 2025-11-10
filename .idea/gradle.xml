@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/CloudConfigServerService" />
             <option value="$PROJECT_DIR$/DocumentService" />
             <option value="$PROJECT_DIR$/EurekaService" />
+            <option value="$PROJECT_DIR$/UpdateDocumentData" />
             <option value="$PROJECT_DIR$/UserService" />
             <option value="$PROJECT_DIR$/WatermarkWorkerService" />
           </set>

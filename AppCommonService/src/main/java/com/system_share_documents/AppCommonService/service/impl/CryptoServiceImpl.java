@@ -1,8 +1,7 @@
-package com.system_share_documents.DocumentService.service.impl;
+package com.system_share_documents.AppCommonService.service.impl;
 
-import com.system_share_documents.DocumentService.exception.AppException;
-import com.system_share_documents.DocumentService.exception.errorcode.BusinessError;
-import com.system_share_documents.DocumentService.service.CryptoService;
+import com.system_share_documents.AppCommonService.service.CryptoService;
+import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -32,7 +31,7 @@ public class CryptoServiceImpl implements CryptoService {
             keyGen.init(256);
             return keyGen.generateKey();
         } catch (NoSuchAlgorithmException e) {
-            throw new AppException(BusinessError.FAILED_GENERATE_AES);
+            throw new RuntimeException(e);
         }
     }
 
@@ -45,9 +44,9 @@ public class CryptoServiceImpl implements CryptoService {
             while ((bytesRead = in.read(buffer)) != -1) {
                 digest.update(buffer, 0, bytesRead);
             }
-            return "sha256:" + Base64.getEncoder().encodeToString(digest.digest());
+            return "sha256:" + Hex.encodeHexString(digest.digest());
         } catch (Exception e) {
-            throw new AppException(BusinessError.FAILED_CHECKSUM);
+            throw new RuntimeException(e);
         }
     }
 

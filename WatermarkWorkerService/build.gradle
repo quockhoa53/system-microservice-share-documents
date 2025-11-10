@@ -18,9 +18,7 @@ repositories {
 }
 
 dependencies {
-	// Core cho API Gateway
-	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// Security cho JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.1'
@@ -41,10 +39,19 @@ dependencies {
 	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
 	// spring-dotenv (nạp .env)
 	implementation "me.paulschwarz:spring-dotenv:3.0.0"
+	// PDF
+	implementation 'org.apache.pdfbox:pdfbox:2.0.30'
+	// kafka
+	implementation 'org.apache.kafka:kafka-clients:3.8.0'
+	implementation 'org.springframework.kafka:spring-kafka:3.2.2'
+	// Resilience4j
+	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	//Source common
+	implementation project(':AppCommonService')
 }
 
 dependencyManagement {

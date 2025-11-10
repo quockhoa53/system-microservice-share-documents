@@ -19,7 +19,6 @@ import org.hibernate.type.SqlTypes;
 public class User {
 
     @Id
-    @GeneratedValue
     UUID id; // định danh duy nhất của user (UUID)
 
     @Column(nullable = false, unique = true, length = 128)

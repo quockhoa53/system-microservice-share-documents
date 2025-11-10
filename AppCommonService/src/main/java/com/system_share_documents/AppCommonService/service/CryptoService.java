@@ -1,4 +1,4 @@
-package com.system_share_documents.DocumentService.service;
+package com.system_share_documents.AppCommonService.service;
 
 import javax.crypto.SecretKey;
 import java.io.InputStream;

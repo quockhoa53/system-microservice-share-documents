@@ -7,6 +7,6 @@ import com.system_share_documents.DocumentService.dto.response.InitUploadRespons
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface UploadDocumentService {
-    InitUploadResponse initUpload(InitUploadRequest request, String ownerId, HttpServletRequest httpRequest) throws Exception;
+    InitUploadResponse initUpload(InitUploadRequest request, String ownerId, HttpServletRequest httpRequest);
     CompleteUploadResponse completeUpload(CompleteUploadRequest request, HttpServletRequest httpRequest) throws Exception;
 }

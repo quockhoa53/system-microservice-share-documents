@@ -19,7 +19,21 @@ public class RestTemplateConfig {
 
     @Bean(name = "userKeyRestTemplate")
     @LoadBalanced
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    public RestTemplate userKeyrestTemplate(RestTemplateBuilder builder) {
+        ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
+            String token = keycloakTokenRest.getAccessToken();
+            request.getHeaders().setBearerAuth(token);
+            return execution.execute(request, body);
+        };
+
+        return builder
+                .additionalInterceptors(List.of(authInterceptor))
+                .build();
+    }
+
+    @Bean(name = "documentKeyRestTemplate")
+    @LoadBalanced
+    public RestTemplate documentKeyrestTemplate(RestTemplateBuilder builder) {
         ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
             String token = keycloakTokenRest.getAccessToken();
             request.getHeaders().setBearerAuth(token);

@@ -1,5 +1,6 @@
 package com.system_share_documents.UserService.service.impl;
 
+import com.system_share_documents.UserService.dto.request.GetPublicKeyRequest;
 import com.system_share_documents.UserService.dto.request.UploadKeyRequest;
 import com.system_share_documents.UserService.dto.response.PublicKeyResponse;
 import com.system_share_documents.UserService.entity.User;
@@ -109,6 +110,21 @@ public class UserKeyServiceImpl implements UserKeyService {
     public List<PublicKeyResponse> getPublicKeysOfUser(UUID userId) {
         var keys = userKeyRepository.findByUser_IdAndRevokedAtIsNull(userId);
         return keys.stream().map(userKeyMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public Optional<PublicKeyResponse> getPublicEncryptionKey(GetPublicKeyRequest request) {
+        if (request.getKeyType().equals("openpgp-ed25519")) {
+            return userKeyRepository
+                    .findFirstByUser_IdAndKeyTypeIgnoreCaseAndIsPrimaryTrueAndRevokedAtIsNull(request.getUserId(), request.getKeyType())
+                    .map(userKeyMapper::toResponse);
+        } else if (request.getKeyType().equals("openpgp-cv25519")) {
+            return userKeyRepository
+                    .findFirstByUser_IdAndKeyTypeIgnoreCaseAndRevokedAtIsNull(request.getUserId(), request.getKeyType())
+                    .map(userKeyMapper::toResponse);
+        }
+        return Optional.empty();
     }
 
     /** Public: lấy primary public key (revokedAt = null) theo userId + keyType. */

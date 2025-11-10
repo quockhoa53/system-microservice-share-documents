@@ -18,9 +18,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiResponse<Void>> handleAppException(AppException ex) {
         ErrorCode error = ex.getErrorCode();
+        String message = error.getMessage();
+        if (ex.getMessage() != null && !ex.getMessage().isBlank()) {
+            message += ": " + ex.getMessage();
+        }
         return ResponseEntity
                 .status(error.getStatus())
-                .body(ApiResponse.error(error.getCode(), error.getMessage()));
+                .body(ApiResponse.error(error.getCode(), message));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

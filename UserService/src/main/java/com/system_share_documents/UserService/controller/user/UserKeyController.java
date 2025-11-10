@@ -1,6 +1,7 @@
 package com.system_share_documents.UserService.controller.user;
 
 import com.system_share_documents.UserService.dto.ApiResponse;
+import com.system_share_documents.UserService.dto.request.GetPublicKeyRequest;
 import com.system_share_documents.UserService.dto.request.UploadKeyRequest;
 import com.system_share_documents.UserService.dto.response.PublicKeyResponse;
 import com.system_share_documents.UserService.service.UserKeyService;
@@ -9,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -52,6 +54,12 @@ public class UserKeyController {
     public ApiResponse<List<PublicKeyResponse>> publicKeysById(@PathVariable UUID userId) {
         var keys = userKeyService.getPublicKeysOfUser(userId);
         return ApiResponse.success("OK", "User public keys", keys);
+    }
+
+    @PostMapping("/public-key/get")
+    public ApiResponse<Optional<PublicKeyResponse>> getPublicKeysByUserId(@RequestBody GetPublicKeyRequest request) {
+        var keys = userKeyService.getPublicEncryptionKey(request);
+        return ApiResponse.success("OK", "Get public key for user successfully", keys);
     }
 
     @GetMapping("/public/{userId}/primary")

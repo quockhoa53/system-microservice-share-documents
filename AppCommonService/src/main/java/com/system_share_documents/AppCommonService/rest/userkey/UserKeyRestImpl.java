@@ -5,9 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system_share_documents.AppCommonService.config.properties.UserKeyProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Repository
 public class UserKeyRestImpl implements UserKeyRest {
@@ -30,9 +37,14 @@ public class UserKeyRestImpl implements UserKeyRest {
     @Override
     public String getUserPublicPrimaryKeyForUser(String userId, String keyType) {
         try {
-            String prefix = userKeyProperties.getGetPublicKey().replace("{userId}", userId);
-            String url = userKeyProperties.getUrl() + prefix + "?keyType=" + keyType;
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            String url = userKeyProperties.getUrl() + userKeyProperties.getGetPublicKey();
+            Map<String, Object> body = new HashMap<>();
+            body.put("userId", UUID.fromString(userId));
+            body.put("keyType", keyType);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
             String responseBody = response.getBody();
             if (responseBody != null) {
                 ObjectMapper mapper = new ObjectMapper();
@@ -43,11 +55,10 @@ public class UserKeyRestImpl implements UserKeyRest {
                 }
             }
             return null;
+
         } catch (Exception e) {
             System.err.println("Error calling UserService: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
-
 }

@@ -32,6 +32,9 @@ public class AuditLog {
     @Column(name = "status", length = 32)
     private String status; // trạng thái: ok, fail
 
+    @Column(name = "errorReason", length = 256)
+    private String errorReason; // Lý do lỗi (nếu có)
+
     @Column(name = "ip", length = 64)
     private String ip; // IP thực hiện hành động
 

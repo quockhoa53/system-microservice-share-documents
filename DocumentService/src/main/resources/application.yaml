@@ -38,6 +38,12 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+
 minio:
   url: ${MINIO_URL}
   access-key: ${MINIO_ACCESS_KEY}
@@ -47,7 +53,7 @@ minio:
 user-key:
   service-name: user-service
   url: lb://user-service
-  get-public-key: /api/keys/public/{userId}/primary
+  get-public-key: /api/keys/public-key/get
 
 keycloak:
   token-base-url: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token

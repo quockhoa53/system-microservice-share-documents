@@ -19,14 +19,14 @@ public class UploadDocumentController {
     private UploadDocumentService uploadDocumentService;
 
     @PostMapping("/init-upload")
-    public ApiResponse<InitUploadResponse> initUpload(@RequestBody InitUploadRequest request, Authentication auth, HttpServletRequest httpRequest) throws Exception {
+    public ApiResponse<InitUploadResponse> initUploadController(@RequestBody InitUploadRequest request, Authentication auth, HttpServletRequest httpRequest) throws Exception {
         String ownerId = auth.getName();
         InitUploadResponse response = uploadDocumentService.initUpload(request, ownerId, httpRequest);
         return ApiResponse.success("OK", "Init upload document success", response);
     }
 
     @PostMapping("/complete-upload")
-    public ApiResponse<CompleteUploadResponse> completeUpload(@RequestBody CompleteUploadRequest request, HttpServletRequest httpRequest) throws Exception {
+    public ApiResponse<CompleteUploadResponse> completeUploadController(@RequestBody CompleteUploadRequest request, HttpServletRequest httpRequest) throws Exception {
         CompleteUploadResponse response = uploadDocumentService.completeUpload(request, httpRequest);
         return ApiResponse.success("OK", "Complete upload document success", response);
     }

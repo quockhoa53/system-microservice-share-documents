@@ -1,0 +1,26 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/quockhoa53/system-microservice-share-documents-config.git
+          username: ${GIT_USERNAME}
+          password: ${GIT_PASSWORD}
+          clone-on-start: true
+          default-label: main
+        vault:
+          host: ${VAULT_HOST}
+          port: ${VAULT_PORT}
+          scheme: http
+          kv-version: 2
+          backend: secret
+          token: ${VAULT_TOKEN}
+
+  profiles:
+    active: git,vault

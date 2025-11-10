@@ -24,7 +24,7 @@ dependencies {
 	// Security cho JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.1'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.1'
 	// Actuator cho giám sát
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -32,17 +32,29 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.postgresql:postgresql'
 	// Lombok
-	implementation 'org.projectlombok:lombok:1.18.34'
+	compileOnly 'org.projectlombok:lombok:1.18.34'
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
-	//Eureka
+	// Lombok + MapStruct binding
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	// MapStruct
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	// Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	// Config Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
+	// spring-dotenv (nạp .env)
+	implementation "me.paulschwarz:spring-dotenv:3.0.0"
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-
+    // Bouncy Castle
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+    implementation 'org.bouncycastle:bcpg-jdk18on:1.78.1'
 }
 
 dependencyManagement {
@@ -53,4 +65,8 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	options.annotationProcessorPath = configurations.annotationProcessor
 }

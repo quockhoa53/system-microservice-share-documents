@@ -1,8 +1,11 @@
 package com.system_share_documents.DocumentService.entity;
 
+import com.system_share_documents.DocumentService.enums.VersionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -11,7 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "document_versions")
+@Table(name = "document_versions",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"document_id", "version_number"})})
 public class DocumentVersion {
 
     @Id
@@ -24,8 +28,19 @@ public class DocumentVersion {
     @JoinColumn(name = "document_id", nullable = false)
     private Document document; // tham chiếu tới tài liệu gốc
 
+    @OneToMany(mappedBy = "documentVersion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DocumentKey> documentKeys = new ArrayList<>();
+
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber; // số phiên bản (1 = bản đầu tiên, 2,3,...)
+
+    @Column(name="status", length=32)
+    @Enumerated(EnumType.STRING)
+    private VersionStatus status;
+
+    @Column(name="iv", length=64)
+    private String ivHex; // optional AES-GCM IV (hex/base64)
 
     @Column(name = "storage_object_key", nullable = false, columnDefinition = "text")
     private String storageObjectKey; // object key của file mã hóa phiên bản này
@@ -36,6 +51,12 @@ public class DocumentVersion {
     @Column(name = "checksum", length = 128)
     private String checksum; // hash SHA-256 để kiểm chứng phiên bản này
 
+    @Column(name = "watermarked", nullable = false)
+    private Boolean watermarked = false; // đã qua watermark hay chưa
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt; // thời điểm tạo phiên bản
+
+    @Column(name = "updated_at", updatable = false)
+    private Timestamp updatedAt; // thời điểm tạo phiên bản
 }

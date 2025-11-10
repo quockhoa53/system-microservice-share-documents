@@ -5,30 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/AdminController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/MeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/UserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/security/KeycloakGrantedAuthoritiesConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/UserProvisioningService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/8.10/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.10/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,6 +48,9 @@
         <task path="$PROJECT_DIR$/APIGatewayService">
           <activation />
         </task>
+        <task path="$PROJECT_DIR$/UpdateDocumentData">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
@@ -80,7 +61,34 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
+                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="application" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="shadow" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -92,8 +100,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
+        <option value="Enum" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -129,6 +138,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
     "Gradle.Build EurekaService.executor": "Run",
     "Gradle.Build system-microservice-share-documents.executor": "Run",
     "Gradle.system-microservice-share-documents [build].executor": "Run",
@@ -142,29 +152,39 @@
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.ApiGatewayServiceApplication.executor": "Run",
     "Spring Boot.AuditLogServiceApplication.executor": "Run",
     "Spring Boot.AuthAccessControlServiceApplication.executor": "Run",
+    "Spring Boot.CloudConfigServerServiceApplication.executor": "Run",
     "Spring Boot.DocumentServiceApplication.executor": "Run",
     "Spring Boot.EurekaServiceApplication.executor": "Run",
     "Spring Boot.UserServiceApplication.executor": "Run",
     "Spring Boot.WatermarkWorkerServiceApplication.executor": "Run",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "dev__api__upload__document",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/MWG/MWGApp",
+    "last_opened_file_path": "/work/Projects/system-microservice-share-documents/UserService/src/main/java/com/system_share_documents/UserService",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "run.configurations.included.in.services": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService" />
+      <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto" />
+    </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.system_share_documents.UserService.entity" />
+      <recent name="com.system_share_documents.UserService.controller.user" />
+      <recent name="com.system_share_documents.APIGatewayService.config" />
       <recent name="com.system_share_documents.APIGatewayService.repository" />
     </key>
   </component>
@@ -178,7 +198,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.system-microservice-share-documents:APIGatewayService [build]">
+  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration name="system-microservice-share-documents [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -191,28 +211,6 @@
         <option name="taskNames">
           <list>
             <option value="build" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="system-microservice-share-documents [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="clean" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -289,20 +287,16 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="system-microservice-share-documents" />
+    <configuration name="ApiGatewayServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="system-microservice-share-documents.APIGatewayService.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.APIGatewayService.ApiGatewayServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="system-microservice-share-documents" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
-    <configuration name="ApiGatewayServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="system-microservice-share-documents.APIGatewayService.main" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.APIGatewayService.ApiGatewayServiceApplication" />
+    <configuration name="AppCommonServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="system-microservice-share-documents.AppCommonService.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.AppCommonService.AppCommonServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -356,21 +350,51 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+      <item itemvalue="Gradle.system-microservice-share-documents [build]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [bootJar]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [build]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [clean]" />
+      <item itemvalue="Spring Boot.AppCommonServiceApplication" />
+      <item itemvalue="Spring Boot.UserServiceApplication" />
+      <item itemvalue="Spring Boot.ApiGatewayServiceApplication" />
+      <item itemvalue="Spring Boot.AuditLogServiceApplication" />
+      <item itemvalue="Spring Boot.AuthAccessControlServiceApplication" />
+      <item itemvalue="Spring Boot.CloudConfigServerServiceApplication" />
+      <item itemvalue="Spring Boot.DocumentServiceApplication" />
+      <item itemvalue="Spring Boot.EurekaServiceApplication" />
+      <item itemvalue="Spring Boot.WatermarkWorkerServiceApplication" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
         <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [build]" />
         <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [clean]" />
         <item itemvalue="Gradle.system-microservice-share-documents:APIGatewayService [bootJar]" />
         <item itemvalue="Gradle.system-microservice-share-documents [build]" />
-        <item itemvalue="Gradle.system-microservice-share-documents [clean]" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.25659.59" />
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.25659.59" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-js-predefined-d6986cc7102b-e03c56caf84a-JavaScript-IU-252.23892.409" />
       </set>
     </attachedChunks>
   </component>
@@ -389,6 +413,14 @@
       <workItem from="1757848367175" duration="3070000" />
       <workItem from="1757851497578" duration="3729000" />
       <workItem from="1757900161534" duration="12000" />
+      <workItem from="1758198949645" duration="9048000" />
+      <workItem from="1758246939000" duration="27000" />
+      <workItem from="1758348452012" duration="11094000" />
+      <workItem from="1758388799339" duration="2279000" />
+      <workItem from="1758444592845" duration="17000" />
+      <workItem from="1759480093053" duration="73000" />
+      <workItem from="1759552441796" duration="2094000" />
+      <workItem from="1759672371107" duration="2107000" />
     </task>
     <servers />
   </component>

@@ -30,6 +30,9 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+	// Cloud Config
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
 }
 
 tasks.named('test') {

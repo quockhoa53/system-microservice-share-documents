@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: document-service
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+      enabled: false # Tắt để sử dụng file application.yaml
+
+logging:
+  level:
+    org.springframework.cloud: DEBUG

@@ -1,5 +1,6 @@
 server:
-  port: 8085
+  port: 8084
+
 eureka:
   client:
     service-url:
@@ -8,17 +9,51 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: false
+
 spring:
   application:
     name: watermark-worker-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/watermark_db
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/watermark_db?user=${DB_USERNAME}&password=${DB_PASSWORD}&sslmode=${DB_SSL_MODE}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    consumer:
+      group-id: watermark-workers
+      enable-auto-commit: false
+      max-poll-records: 50
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "com.system_share_documents.AppCommonService.event"
+        spring.json.value.default.type: "com.system_share_documents.AppCommonService.event.WatermarkJobEvent"
+
+watermark:
+  stripes: 128
+  localRetries: 3
+
+minio:
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}
+
+document-key:
+  service-name: document-service
+  url: lb://document-service
+  create-document-key: /api/documents/key/create
+
+keycloak:
+  token-base-url: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token
+  client-id: ${KEYCLOAK_TOKEN_CLIENT_ID}
+  client-secret: ${KEYCLOAK_TOKEN_CLIENT_SECRET}

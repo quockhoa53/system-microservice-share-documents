@@ -9,11 +9,13 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/APIGatewayService" />
+            <option value="$PROJECT_DIR$/AppCommonService" />
             <option value="$PROJECT_DIR$/AuditLogService" />
             <option value="$PROJECT_DIR$/AuthAccessControlService" />
             <option value="$PROJECT_DIR$/CloudConfigServerService" />
             <option value="$PROJECT_DIR$/DocumentService" />
             <option value="$PROJECT_DIR$/EurekaService" />
+            <option value="$PROJECT_DIR$/UpdateDocumentData" />
             <option value="$PROJECT_DIR$/UserService" />
             <option value="$PROJECT_DIR$/WatermarkWorkerService" />
           </set>

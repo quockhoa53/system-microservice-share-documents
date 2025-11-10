@@ -32,16 +32,22 @@ public class AuditLog {
     @Column(name = "status", length = 32)
     private String status; // trạng thái: ok, fail
 
+    @Column(name = "errorReason", length = 256)
+    private String errorReason; // Lý do lỗi (nếu có)
+
     @Column(name = "ip", length = 64)
     private String ip; // IP thực hiện hành động
 
     @Column(name = "user_agent", columnDefinition = "text")
     private String userAgent; // user-agent của client
 
+    @Column(name = "request", columnDefinition = "TEXT")
+    private String request;
+
+    @Column(name = "metadata", columnDefinition = "TEXT")
+    private String metadata; // thông tin bổ sung dạng JSON
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt; // thời điểm tạo log
-
-    @Column(name = "metadata", columnDefinition = "jsonb")
-    private String metadata; // thông tin bổ sung dạng JSON
 }
 

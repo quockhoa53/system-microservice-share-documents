@@ -1,0 +1,49 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Ignore all .env files (and variants)
+.env
+.env.*
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build
+build/
+target/
+out/
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Spring Boot
+application-*.yml
+application-*.yaml
+application-*.properties
+!application.yml
+!application.yaml
+!application.properties
+
+# Sensitive config files
+config/application-*.yml
+config/application-*.yaml
+config/application-*.properties

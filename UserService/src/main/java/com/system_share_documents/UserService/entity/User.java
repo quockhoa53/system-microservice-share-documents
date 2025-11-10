@@ -6,9 +6,7 @@ import lombok.*;
 import java.sql.Timestamp;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 @Getter
@@ -21,7 +19,6 @@ import org.hibernate.type.SqlTypes;
 public class User {
 
     @Id
-    @GeneratedValue
     UUID id; // định danh duy nhất của user (UUID)
 
     @Column(nullable = false, unique = true, length = 128)

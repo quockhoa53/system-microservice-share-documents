@@ -46,4 +46,7 @@ public class Acl {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
     // Thời điểm tạo ACL entry
+
+    @Column(name = "updated_at")
+    private Timestamp updatedAt; // thời điểm cập nhật quyền
 }

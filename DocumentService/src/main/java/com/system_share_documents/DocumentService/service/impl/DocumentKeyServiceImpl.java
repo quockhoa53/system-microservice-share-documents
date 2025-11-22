@@ -1,6 +1,9 @@
 package com.system_share_documents.DocumentService.service.impl;
 
 import com.system_share_documents.AppCommonService.dto.request.CreateDocumentKeyRequest;
+import com.system_share_documents.AppCommonService.enums.ActionLog;
+import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
 import com.system_share_documents.AppCommonService.rest.userkey.UserKeyRest;
 import com.system_share_documents.DocumentService.entity.DocumentKey;
 import com.system_share_documents.DocumentService.entity.DocumentVersion;
@@ -24,6 +27,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static com.system_share_documents.AppCommonService.constant.KeysConstant.*;
+import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.DOCUMENT_VERSION;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
 
 @Service
 public class DocumentKeyServiceImpl implements DocumentKeyService {
@@ -40,14 +46,20 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
     @Autowired
     private DocumentVersionRepository documentVersionRepository;
 
+    @Autowired
+    private AuditLogProducer auditLogProducer;
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createAndSaveKey(CreateDocumentKeyRequest request, HttpServletRequest httpRequest) throws Exception {
+        String status = "OK";
+        String errorReason = null;
+        DocumentVersion version = null;
         try {
             String publicKey = userKeyRepository.getUserPublicPrimaryKeyForUser(request.getRecipientId(), OPENPGP_CV25519);
             if (publicKey == null) {
-                throw new AppException(ValidationError.USER_PUBLIC_KEY_EMPTY);
+                throw new AppException(NotExistError.USER_PUBLIC_KEY_EMPTY);
             }
-            DocumentVersion version = documentVersionRepository.findById(request.getDocumentVersionId())
+            version = documentVersionRepository.findById(request.getDocumentVersionId())
                     .orElseThrow(() -> new AppException(NotExistError.VERSION_NOT_FOUND));
 
             byte[] wrapped = openPgpService.wrapCekWithRecipientPublicKey(request.getRawCek(), publicKey);
@@ -59,10 +71,32 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
                     .documentVersion(version)
                     .build();
             documentKeyRepository.save(key);
-        } catch(AppException e) {
+        } catch (AppException e) {
+            status = "FAIL";
+            errorReason = e.getMessage();
             throw e;
         } catch (Exception e) {
-            throw new AppException(BusinessError.FAILED_CREATE_KEY);
+            status = "FAIL";
+            errorReason = e.getMessage();
+            throw new AppException(BusinessError.FAILED_CREATE_KEY, e.getMessage());
+        } finally {
+            if (version != null) {
+                AuditLogEvent logEvent = AuditLogEvent.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .userId(String.valueOf(request.getRecipientId()))
+                        .action(String.valueOf(ActionLog.COMPLETE_UPLOAD))
+                        .documentId(String.valueOf(version.getDocument().getId()))
+                        .objectType(DOCUMENT_VERSION)
+                        .status(status)
+                        .errorReason(errorReason)
+                        .ip(getClientIp(httpRequest))
+                        .userAgent(getUserAgent(httpRequest))
+                        .metadata(null)
+                        .request(String.valueOf(request))
+                        .build();
+
+                auditLogProducer.sendAuditLog(logEvent, String.valueOf(version.getDocument().getId()));
+            }
         }
     }
 

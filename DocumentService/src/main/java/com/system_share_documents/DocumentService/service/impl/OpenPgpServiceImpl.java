@@ -1,5 +1,9 @@
 package com.system_share_documents.DocumentService.service.impl;
 
+import com.system_share_documents.DocumentService.exception.AppException;
+import com.system_share_documents.DocumentService.exception.errorcode.BusinessError;
+import com.system_share_documents.DocumentService.exception.errorcode.NotExistError;
+import com.system_share_documents.DocumentService.exception.errorcode.ValidationError;
 import com.system_share_documents.DocumentService.service.OpenPgpService;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -45,9 +49,9 @@ public class OpenPgpServiceImpl implements OpenPgpService {
                         if (k.isEncryptionKey()) return k;
                     }
                 }
-                throw new IllegalArgumentException("No encryption key found in recipient public key");
+                throw new AppException(NotExistError.ENCRYPTION_KEY_NOT_FOUND);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new AppException(BusinessError.FAILED_GET_ENCRYPTION, e.getMessage());
             }
         });
     }
@@ -56,9 +60,9 @@ public class OpenPgpServiceImpl implements OpenPgpService {
     public byte[] wrapCekWithRecipientPublicKey(byte[] cekBytes, String recipientPublicKeyArmored) {
         try {
             if (cekBytes == null || cekBytes.length == 0)
-                throw new IllegalArgumentException("CEK bytes must not be null or empty");
+                throw new AppException(ValidationError.CEK_BYTE_EMPTY);
             if (recipientPublicKeyArmored == null || recipientPublicKeyArmored.isBlank())
-                throw new IllegalArgumentException("Recipient public key must not be null or empty");
+                throw new AppException(ValidationError.RECIPIENT_PUBLIC_KEY_EMPTY);
 
             PGPPublicKey encKey = getEncryptionKey(recipientPublicKeyArmored, recipientPublicKeyArmored);
 
@@ -80,15 +84,18 @@ public class OpenPgpServiceImpl implements OpenPgpService {
 
             return out.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to wrap CEK with recipient public key", e);
+            throw new AppException(BusinessError.FAILED_WRAP_CEK, e.getMessage());
         }
     }
 
     @Override
     public boolean verifyDetachedSignature(byte[] data, byte[] detachedSignature, String publicKeyArmored) throws Exception {
-        if (data == null || data.length == 0) throw new IllegalArgumentException("Data must not be empty");
-        if (detachedSignature == null || detachedSignature.length == 0) throw new IllegalArgumentException("Signature must not be empty");
-        if (publicKeyArmored == null || publicKeyArmored.isBlank()) throw new IllegalArgumentException("Public key must not be empty");
+        if (data == null || data.length == 0)
+            throw new AppException(ValidationError.CEK_BYTE_EMPTY);
+        if (detachedSignature == null || detachedSignature.length == 0)
+            throw new AppException(ValidationError.SIGNATURE_EMPTY);
+        if (publicKeyArmored == null || publicKeyArmored.isBlank())
+            throw new AppException(ValidationError.RECIPIENT_PUBLIC_KEY_EMPTY);
 
         Security.addProvider(new BouncyCastleProvider());
 
@@ -106,7 +113,7 @@ public class OpenPgpServiceImpl implements OpenPgpService {
 
             PGPPublicKey key = pgpPubRingCollection.getPublicKey(sig.getKeyID());
             if (key == null)
-                throw new IllegalArgumentException("Public key for signature not found in keyring");
+                throw new AppException(NotExistError.PUBLIC_KEY_SIGNATURE_NOT_FOUND);
 
             sig.init(new JcaPGPContentVerifierBuilderProvider().setProvider("BC"), key);
             sig.update(data);
@@ -117,7 +124,7 @@ public class OpenPgpServiceImpl implements OpenPgpService {
     @Override
     public byte[] signDetached(byte[] data, String privateKeyArmored, char[] passphrase) throws Exception {
         if (data == null || data.length == 0)
-            throw new IllegalArgumentException("Data must not be empty");
+            throw new AppException(ValidationError.CEK_BYTE_EMPTY);
         if (privateKeyArmored == null || privateKeyArmored.isBlank())
             throw new IllegalArgumentException("Private key must not be empty");
 

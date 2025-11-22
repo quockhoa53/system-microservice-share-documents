@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +17,7 @@ public class AuditLogEvent implements Serializable {
     private static final long serialVersionUID = 1L;
     private String requestId;
     private String userId;
+    private String affectedUsers;
     private String action;
     private String documentId;
     private String objectType;

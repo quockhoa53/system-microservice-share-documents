@@ -34,7 +34,7 @@ spring:
         - id: auth-access-control-service
           uri: lb://auth-access-control-service
           predicates:
-            - Path=/api/access-control/**
+            - Path=/api/document-access/**
           filters:
             - PreserveHostHeader
         - id: audit-log-service

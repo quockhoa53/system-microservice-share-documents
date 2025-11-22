@@ -109,7 +109,7 @@ public class UpdateDocumentDataApplication {
 				)
 		);
 
-		env.execute("update-data-after-watermark-documents-safe");
+		env.execute("update-data-after-watermark-documents");
 	}
 
 	private static Properties loadProperties(String filename) throws Exception {

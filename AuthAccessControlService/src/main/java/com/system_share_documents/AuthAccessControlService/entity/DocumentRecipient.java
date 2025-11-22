@@ -1,5 +1,6 @@
 package com.system_share_documents.AuthAccessControlService.entity;
 
+import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
@@ -33,8 +34,9 @@ public class DocumentRecipient {
     @Column(name = "encrypted_cek", nullable = false)
     private byte[] encryptedCek; // CEK đã được mã hóa bằng public key của recipient
 
-    @Column(name = "access_role", nullable = false, length = 32)
-    private String accessRole = "reader"; // quyền: reader, editor...
+    @Enumerated(EnumType.STRING)
+    @Column(name = "access_role", nullable = false, length = 10)
+    private DocumentAccessRole accessRole = DocumentAccessRole.VIEWER;
 
     @Column(name = "expires_at")
     private Timestamp expiresAt; // ngày hết hạn quyền truy cập (có thể null)
@@ -42,7 +44,13 @@ public class DocumentRecipient {
     @Column(name = "can_download")
     private Boolean canDownload = true; // có cho phép download không
 
+    @Column(name = "is_revoke")
+    private Boolean isRevoke = false; // Đã thu hồi quyền hay chưa
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt; // thời điểm được cấp quyền
+
+    @Column(name = "updated_at")
+    private Timestamp updatedAt; // thời điểm cập nhật quyền
 }
 

@@ -34,6 +34,7 @@ import java.util.Base64;
 import java.util.UUID;
 
 import static com.system_share_documents.AppCommonService.constant.KeysConstant.OPENPGP_ED25519;
+import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.DOCUMENT;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
 
@@ -114,7 +115,7 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                         .userId(ownerId)
                         .action(String.valueOf(ActionLog.INIT_UPLOAD))
                         .documentId(doc.getId().toString())
-                        .objectType("document")
+                        .objectType(DOCUMENT)
                         .status(status)
                         .errorReason(errorReason)
                         .ip(getClientIp(httpRequest))
@@ -160,13 +161,13 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
 
             String singerPublicKey = userKeyRest.getUserPublicPrimaryKeyForUser(request.getSignerUserId().toString(), OPENPGP_ED25519);
             if(singerPublicKey == null) {
-                throw new AppException(ValidationError.SINGER_PUBLIC_KEY_EMPTY);
+                throw new AppException(NotExistError.SINGER_PUBLIC_KEY_EMPTY);
             }
 
             byte[] detachedSignature = Base64.getDecoder().decode(request.getSignature());
             byte[] fileBytes = minioStorageRest.getObjectBytes(request.getUploadObjectKey());
             if(fileBytes == null){
-                throw new AppException(ValidationError.FILE_BYTE_EMPTY);
+                throw new AppException(NotExistError.FILE_BYTE_EMPTY);
             }
             boolean validSignature = openPgpService.verifyDetachedSignature(fileBytes, detachedSignature, singerPublicKey);
             if (!validSignature) {
@@ -200,6 +201,14 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                     .build();
             watermarkJobProducer.sendWatermarkJob(jobEvent, doc.getId().toString());
 
+            return new CompleteUploadResponse(
+                    doc.getId(),
+                    version.getId(),
+                    request.getUploadObjectKey(),
+                    request.getChecksum(),
+                    version.getSizeBytes(),
+                    version.getStatus().toString()
+            );
         } catch (AppException e) {
             status = "FAIL";
             errorReason = e.getMessage();
@@ -215,7 +224,7 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                         .userId(String.valueOf(request.getSignerUserId()))
                         .action(String.valueOf(ActionLog.COMPLETE_UPLOAD))
                         .documentId(doc.getId().toString())
-                        .objectType("document")
+                        .objectType(DOCUMENT)
                         .status(status)
                         .errorReason(errorReason)
                         .ip(getClientIp(httpRequest))
@@ -227,14 +236,5 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                 auditLogProducer.sendAuditLog(logEvent, doc.getId().toString());
             }
         }
-
-        return new CompleteUploadResponse(
-                doc.getId(),
-                version.getId(),
-                request.getUploadObjectKey(),
-                request.getChecksum(),
-                version.getSizeBytes(),
-                version.getStatus().toString()
-        );
     }
 }

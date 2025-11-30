@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" />

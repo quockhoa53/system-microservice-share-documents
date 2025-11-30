@@ -20,6 +20,9 @@ public class AuditLog {
     @Column(name = "user_id", length = 36)
     private String userId; // ID người thực hiện hành động (String UUID)
 
+    @Column(name = "affected_users", columnDefinition = "TEXT")
+    private String affectedUsers; // Id danh sách user bị tác động
+
     @Column(name = "action", nullable = false, length = 64)
     private String action; // hành động: upload, download, decrypt, verify,...
 

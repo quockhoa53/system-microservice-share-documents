@@ -6,21 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserResponse {
+public class GroupDetailResponse {
     private UUID id;
-    private String username;
-    private String email;
-    private String fullName;
-    private Short status;
+    private String name;
+    private String description;
+    private Short visibility;
+    private UUID ownerId;
     private Timestamp createdAt;
-    private Timestamp updatedAt;
-    private Map<String, Object> profile;
-    private String accessToken;
+    private Long memberCount;
+    private String myRole; // "owner" | "admin" | "member" | null
 }

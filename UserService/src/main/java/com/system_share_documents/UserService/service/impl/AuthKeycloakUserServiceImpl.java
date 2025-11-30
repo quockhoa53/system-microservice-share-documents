@@ -41,30 +41,43 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
             if (auth == null || !(auth.getPrincipal() instanceof Jwt jwt)) {
                 throw new AppException(AuthError.UNAUTHORIZED);
             }
+
             String username = jwt.getClaimAsString(PREFERRED_USERNAME);
             String email = jwt.getClaimAsString(EMAIL);
             String fullName = jwt.getClaimAsString(NAME);
+            String token = jwt.getTokenValue();
+
             if (username == null || username.isBlank()) {
                 throw new AppException(AuthError.INVALID_JWT);
             }
+
             Optional<User> existingUser = userRepository.findByUsername(username);
+
+            User userEntity;
             if (existingUser.isPresent()) {
-                return userMapper.toResponse(existingUser.get());
+                userEntity = existingUser.get();
+            } else {
+                userEntity = User.builder()
+                        .username(username)
+                        .email(email != null ? email : (jwt.getSubject() + "@unknown.local"))
+                        .fullName(fullName)
+                        .status(ACTIVE)
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .updatedAt(Timestamp.from(Instant.now()))
+                        .build();
+                userEntity = userRepository.save(userEntity);
             }
-            User newUser = User.builder()
-                    .username(username)
-                    .email(email != null ? email : (jwt.getSubject() + "@unknown.local"))
-                    .fullName(fullName)
-                    .status(ACTIVE)
-                    .createdAt(Timestamp.from(Instant.now()))
-                    .updatedAt(Timestamp.from(Instant.now()))
-                    .build();
-            User savedUser = userRepository.save(newUser);
-            return userMapper.toResponse(savedUser);
+
+            UserResponse userResponse = userMapper.toResponse(userEntity);
+            userResponse.setAccessToken(token);
+
+            return userResponse;
+
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
             throw new AppException(SystemError.INTERNAL_ERROR);
         }
     }
+
 }

@@ -22,7 +22,7 @@ spring:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/keys/**
+            - Path=/api/auth/**, /api/users/**, /api/keys/**,/api/groups/**, /internal/users/**
           filters:
             - PreserveHostHeader
         - id: document-service
@@ -40,7 +40,7 @@ spring:
         - id: audit-log-service
           uri: lb://audit-log-service
           predicates:
-            - Path=/api/audit/**
+            - Path=/api/audit/**, /internal/audit/**
           filters:
             - PreserveHostHeader
   datasource:

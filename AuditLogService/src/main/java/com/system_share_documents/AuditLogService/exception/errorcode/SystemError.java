@@ -1,4 +1,4 @@
-package com.system_share_documents.UserService.exception.errorcode;
+package com.system_share_documents.AuditLogService.exception.errorcode;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

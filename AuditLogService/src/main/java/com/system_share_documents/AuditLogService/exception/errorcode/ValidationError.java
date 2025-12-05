@@ -1,0 +1,19 @@
+package com.system_share_documents.AuditLogService.exception.errorcode;
+
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public enum ValidationError implements ErrorCode {
+    VALIDATION_FAILED("VALIDATION_FAILED", "Validation failed", HttpStatus.BAD_REQUEST);
+
+    private final String code;
+    private final String message;
+    private final HttpStatus status;
+
+    ValidationError(String code, String message, HttpStatus status) {
+        this.code = code;
+        this.message = message;
+        this.status = status;
+    }
+}

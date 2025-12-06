@@ -14,6 +14,6 @@ import java.util.UUID;
 public class CreateDocumentKeyRequest {
     private UUID documentVersionId;
     private String recipientId;
-    private byte[] rawCek;
+    private byte[] wrappedByVault;
     private String algorithm;
 }

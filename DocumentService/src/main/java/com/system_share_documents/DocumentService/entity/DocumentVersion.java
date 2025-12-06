@@ -35,6 +35,15 @@ public class DocumentVersion {
     @Column(name = "version_number", nullable = false)
     private Integer versionNumber; // số phiên bản (1 = bản đầu tiên, 2,3,...)
 
+    @Column(name="name", length=512)
+    private String name;
+
+    @Column(name="description", columnDefinition = "text")
+    private String description;
+
+    @Column(name="download_count")
+    private Long downloadCount = 0L;
+
     @Column(name="status", length=32)
     @Enumerated(EnumType.STRING)
     private VersionStatus status;
@@ -53,6 +62,10 @@ public class DocumentVersion {
 
     @Column(name = "watermarked", nullable = false)
     private Boolean watermarked = false; // đã qua watermark hay chưa
+
+    @Lob
+    @Column(name = "wrapped_cek_master")
+    private String wrappedCEKMaster;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt; // thời điểm tạo phiên bản

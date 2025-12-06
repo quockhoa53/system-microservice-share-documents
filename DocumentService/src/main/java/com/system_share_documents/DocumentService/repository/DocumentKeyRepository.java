@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface DocumentKeyRepository extends JpaRepository<DocumentKey, UUID> {
     Optional<DocumentKey> findByDocumentVersionIdAndRecipientId(UUID versionId, String recipientId);
+    Boolean existsByDocumentVersionIdAndRecipientId(UUID versionId, String recipientId);
 }

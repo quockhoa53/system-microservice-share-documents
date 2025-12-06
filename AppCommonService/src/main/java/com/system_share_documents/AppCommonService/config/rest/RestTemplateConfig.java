@@ -6,6 +6,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +24,7 @@ public class RestTemplateConfig {
         ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
             String token = keycloakTokenRest.getAccessToken();
             request.getHeaders().setBearerAuth(token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             return execution.execute(request, body);
         };
 
@@ -37,6 +39,22 @@ public class RestTemplateConfig {
         ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
             String token = keycloakTokenRest.getAccessToken();
             request.getHeaders().setBearerAuth(token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            return execution.execute(request, body);
+        };
+
+        return builder
+                .additionalInterceptors(List.of(authInterceptor))
+                .build();
+    }
+
+    @Bean(name = "grantAccessRestTemplate")
+    @LoadBalanced
+    public RestTemplate grantAccessrestTemplate(RestTemplateBuilder builder) {
+        ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
+            String token = keycloakTokenRest.getAccessToken();
+            request.getHeaders().setBearerAuth(token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             return execution.execute(request, body);
         };
 

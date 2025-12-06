@@ -20,6 +20,7 @@ import com.system_share_documents.DocumentService.exception.errorcode.BusinessEr
 import com.system_share_documents.DocumentService.exception.errorcode.NotExistError;
 import com.system_share_documents.DocumentService.exception.errorcode.ValidationError;
 import com.system_share_documents.DocumentService.repository.DocumentRepository;
+import com.system_share_documents.DocumentService.repository.DocumentVersionRepository;
 import com.system_share_documents.DocumentService.service.*;
 import com.system_share_documents.DocumentService.utils.HexUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,8 +36,10 @@ import java.util.UUID;
 
 import static com.system_share_documents.AppCommonService.constant.KeysConstant.OPENPGP_ED25519;
 import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.DOCUMENT;
+import static com.system_share_documents.AppCommonService.utils.AuthenticationUtils.getUsername;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
+import static com.system_share_documents.AppCommonService.utils.ProcessJsonUtils.convertJson;
 
 @Service
 public class UploadDocumentServiceImpl implements UploadDocumentService {
@@ -51,6 +54,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
     private DocumentRepository documentRepository;
 
     @Autowired
+    private DocumentVersionRepository documentVersionRepository;
+
+    @Autowired
     private UserKeyRest userKeyRest;
 
     @Autowired
@@ -62,7 +68,7 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
     @Autowired
     private WatermarkJobProducer watermarkJobProducer;
 
-    private final int presignExpiryMinutes = 15;
+    private final int presignExpiryMinutes = 30;
 
     /**
      * Khởi tạo quy trình upload tài liệu:
@@ -74,36 +80,68 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
      */
     @Override
     @Transactional
-    public InitUploadResponse initUpload(InitUploadRequest request, String ownerId, HttpServletRequest httpRequest) {
+    public InitUploadResponse initUpload(InitUploadRequest request, String ownerId, HttpServletRequest httpRequest) throws Exception{
         String status = "OK";
         String errorReason = null;
         Document doc = null;
         DocumentVersion version = null;
         UploadUrlsResponse urls = null;
         try {
-            String objectKey = String.format("staging/%s/v%d/%s", UUID.randomUUID(), 1, UUID.randomUUID());
+            if (request.getDocumentId() != null) {
+                doc = documentRepository.findById(UUID.fromString(request.getDocumentId()))
+                        .orElseThrow(() -> new AppException(NotExistError.DOCUMENT_NOT_FOUND));
 
-            doc = Document.builder()
-                    .ownerId(ownerId)
-                    .originalFilename(request.getOriginalFilename())
-                    .contentType(request.getContentType())
-                    .sizeBytes(request.getSizeBytes())
-                    .storageClass(request.getStorageClass() == null ? "standard" : request.getStorageClass())
-                    .metadata(request.getMetadata())
-                    .createdAt(Timestamp.from(Instant.now()))
-                    .updatedAt(Timestamp.from(Instant.now()))
-                    .build();
-            documentRepository.save(doc);
+                boolean changed = false;
 
-            version =  documentVersionService.createDocumentVersion(doc, objectKey, request.getSizeBytes());
+                if (request.getOriginalFilename() != null && !request.getOriginalFilename().equals(doc.getOriginalFilename())) {
+                    doc.setOriginalFilename(request.getOriginalFilename());
+                    changed = true;
+                }
+
+                if (request.getContentType() != null && !request.getContentType().equals(doc.getContentType())) {
+                    doc.setContentType(request.getContentType());
+                    changed = true;
+                }
+
+                if (request.getSizeBytes() != null && !request.getSizeBytes().equals(doc.getSizeBytes())) {
+                    doc.setSizeBytes(request.getSizeBytes());
+                    changed = true;
+                }
+
+                if (request.getMetadata() != null) {
+                    doc.setMetadata(request.getMetadata());
+                    changed = true;
+                }
+
+                if (changed) {
+                    doc.setUpdatedAt(Timestamp.from(Instant.now()));
+                    documentRepository.save(doc);
+                }
+            } else {
+                doc = Document.builder()
+                        .ownerId(ownerId)
+                        .originalFilename(request.getOriginalFilename())
+                        .contentType(request.getContentType())
+                        .sizeBytes(request.getSizeBytes())
+                        .storageClass(request.getStorageClass() == null ? "standard" : request.getStorageClass())
+                        .metadata(request.getMetadata())
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .updatedAt(Timestamp.from(Instant.now()))
+                        .build();
+                documentRepository.save(doc);
+            }
+
+            long versionCount = documentVersionRepository.findLatestVersionNumber(doc.getId());
+            int newVersionNumber = (int) versionCount + 1;
+
+            String objectKey = String.format("staging/%s/v%d/%s", UUID.randomUUID(), newVersionNumber, UUID.randomUUID());
+
+            documentVersionService.createDocumentVersion(doc, newVersionNumber, objectKey, request.getSizeBytes());
 
             urls = new UploadUrlsResponse(objectKey, minioStorageRest.generatePreSignedPutUrl(objectKey, presignExpiryMinutes), null);
 
-            return new InitUploadResponse(doc.getId(), version.getVersionNumber(), urls, true);
-        } catch (AppException e) {
-            status = "FAIL";
-            errorReason = e.getMessage();
-            throw e;
+            return new InitUploadResponse(doc.getId(), newVersionNumber, urls, true);
+
         } catch (Exception e) {
             status = "FAIL";
             errorReason = e.getMessage();
@@ -121,12 +159,13 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                         .ip(getClientIp(httpRequest))
                         .userAgent(getUserAgent(httpRequest))
                         .metadata(null)
-                        .request(String.valueOf(request))
+                        .request(convertJson(request))
                         .build();
                 auditLogProducer.sendAuditLog(logEvent, doc.getId().toString());
             }
         }
     }
+
 
     /**
      * Hoàn tất upload tài liệu và khởi tạo watermarking:
@@ -185,21 +224,23 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                 throw new AppException(ValidationError.CHECKSUM_MISMATCH);
             }
 
-            version.setStatus(VersionStatus.WATERMARKING);
-            version.setUpdatedAt(Timestamp.from(Instant.now()));
-            documentRepository.save(doc);
+            if (version.getStatus() == VersionStatus.UPLOADING) {
+                version.setStatus(VersionStatus.WATERMARKING);
+                version.setUpdatedAt(Timestamp.from(Instant.now()));
+                documentRepository.save(doc);
 
-            WatermarkJobEvent jobEvent = WatermarkJobEvent.builder()
-                    .requestId(UUID.randomUUID().toString())
-                    .documentId(String.valueOf(doc.getId()))
-                    .versionId(String.valueOf(version.getId()))
-                    .uploadObjectKey(request.getUploadObjectKey())
-                    .contentType(doc.getContentType())
-                    .ownerId(doc.getOwnerId())
-                    .recipients(request.getRecipients())
-                    .checksum(request.getChecksum())
-                    .build();
-            watermarkJobProducer.sendWatermarkJob(jobEvent, doc.getId().toString());
+                WatermarkJobEvent jobEvent = WatermarkJobEvent.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .documentId(String.valueOf(doc.getId()))
+                        .versionId(String.valueOf(version.getId()))
+                        .uploadObjectKey(request.getUploadObjectKey())
+                        .contentType(doc.getContentType())
+                        .ownerId(doc.getOwnerId())
+                        .recipients(request.getRecipients())
+                        .checksum(request.getChecksum())
+                        .build();
+                watermarkJobProducer.sendWatermarkJob(jobEvent, doc.getId().toString());
+            }
 
             return new CompleteUploadResponse(
                     doc.getId(),
@@ -209,10 +250,6 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                     version.getSizeBytes(),
                     version.getStatus().toString()
             );
-        } catch (AppException e) {
-            status = "FAIL";
-            errorReason = e.getMessage();
-            throw e;
         } catch (Exception e) {
             status = "FAIL";
             errorReason = e.getMessage();
@@ -230,7 +267,7 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                         .ip(getClientIp(httpRequest))
                         .userAgent(getUserAgent(httpRequest))
                         .metadata(null)
-                        .request(String.valueOf(request))
+                        .request(convertJson(request))
                         .build();
 
                 auditLogProducer.sendAuditLog(logEvent, doc.getId().toString());

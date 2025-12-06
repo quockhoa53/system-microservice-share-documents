@@ -11,7 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "document_keys")
+@Table(name = "document_keys",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"document_version_id", "recipient_id"})})
 public class DocumentKey {
 
     @Id

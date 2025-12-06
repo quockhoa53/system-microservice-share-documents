@@ -14,9 +14,9 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/user_db?user=${DB_USERNAME}&password=${DB_PASSWORD}&sslmode=${DB_SSL_MODE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${LOCAL_DB_HOST}:${LOCAL_DB_PORT}/user_db?user=${LOCAL_DB_USERNAME}&password=${LOCAL_DB_PASSWORD}&sslmode=${LOCAL_DB_SSL_MODE}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
+//Thêm check chủ tài liệu mới được cấp và cập nhật quyền
 public interface DocumentAccessService {
     List<DocumentAccessResponse> grantAccessDocument(GrantAccessRequest request, HttpServletRequest httpRequest) throws Exception;
     List<DocumentAccessResponse> revokeGrantAccessDocument(RevokeAccessRequest request, HttpServletRequest httpRequest) throws Exception;

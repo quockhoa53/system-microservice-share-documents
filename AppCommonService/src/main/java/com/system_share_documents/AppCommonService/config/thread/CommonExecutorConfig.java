@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 @EnableAsync
-public class ExecutorConfig {
+public class CommonExecutorConfig {
 
     @Bean(name = "commonExecutor")
     public ExecutorService commonExecutor() {

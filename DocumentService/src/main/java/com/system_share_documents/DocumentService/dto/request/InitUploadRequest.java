@@ -13,10 +13,10 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class InitUploadRequest {
+    private String documentId;
     private String originalFilename;
     private String contentType;
     private Long sizeBytes;
     private Map<String, Object> metadata;
-    private List<String> recipients;
     private String storageClass;
 }

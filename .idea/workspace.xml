@@ -5,69 +5,98 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/thread/ExecutorConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/constant/ObjectTypeConstant.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/ApiResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/utils/AuthenticationUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/utils/ProcessJsonUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/validation/EnumValidator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/validation/ValidEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/controller/DocumentAccessController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/ApiResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/CheckAccessRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/GetListRecipientsRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/GrantAccessRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/RevokeAccessRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/response/DocumentAccessResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/enums/DocumentAccessRole.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/AppException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/AuthError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/BusinessError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/ErrorCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/NotExistError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/SystemError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/ValidationError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/repository/DocumentRecipientRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/DocumentAccessService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/RecipientGrantService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/DocumentAccessServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/RecipientGrantServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/AppException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/AuthError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/BusinessError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/ErrorCode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/NotExistError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/SystemError.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/exception/errorcode/ValidationError.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/cache/document/DocumentCacheService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/cache/document/DocumentCacheServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/properties/GrantAccessProperties.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/properties/VaultProperties.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/vault/VaultConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/constant/KeysResponseUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/constant/PrefixCacheConstant.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/request/CheckAccessRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/request/GrantAccessRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/response/DocumentCacheResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/performance/PerformanceAspect.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/grantAccess/GrantAccessRest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/grantAccess/GrantAccessRestImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/service/VaultTransitService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/service/impl/VaultTransitServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/utils/DocumentUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/config/JobConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/sink/DocumentRedisSink.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/transform/CdcDataTransformer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/.gitattributes" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/build.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/gradlew" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/gradlew.bat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/settings.gradle" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/main/java/system_microservice_share_documents/CDCUpdatePublicKeyDataCache/CDCUpdatePublicKeyDataCacheApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/main/java/system_microservice_share_documents/CDCUpdatePublicKeyDataCache/config/JobConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/main/java/system_microservice_share_documents/CDCUpdatePublicKeyDataCache/sink/PublicKeyRedisSink.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/main/java/system_microservice_share_documents/CDCUpdatePublicKeyDataCache/transform/CdcDataTransformer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/main/resources/application.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache/src/test/java/system_microservice_share_documents/UpdateDocumentData/UpdateDocumentDataApplicationTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/DocumentController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/DocumentVersionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/ShareDocumentController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/GetListDocumentRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/GetListDocumentVersionRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/ShareDocumentRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/response/DocumentResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/response/DocumentVersionResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/DocumentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/ShareDocumentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/ShareDocumentServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/utils/MapperUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/postgres-cdc-connector.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AppCommonService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/event/AuditLogEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/event/AuditLogEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/entity/AuditLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/entity/AuditLog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/AuthAccessControlServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/AuthAccessControlServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/entity/Acl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/entity/Acl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/rest/RestTemplateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/rest/RestTemplateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/thread/ExecutorConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/thread/CommonExecutorConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/constant/KeyCloakConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/constant/KeyCloakConstant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/request/CreateDocumentKeyRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/dto/request/CreateDocumentKeyRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/documentKey/DocumentKeyRestImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/documentKey/DocumentKeyRestImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/utils/AuthenticationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/utils/AuthenticationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/GrantAccessRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/dto/request/GrantAccessRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/entity/DocumentRecipient.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/entity/DocumentRecipient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/AuthError.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/exception/errorcode/AuthError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/DocumentAccessService.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/DocumentAccessService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/DocumentAccessServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/DocumentAccessServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/RecipientGrantServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/RecipientGrantServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthAccessControlService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/DocumentServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/DocumentServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/InitUploadRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/InitUploadRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/entity/DocumentKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/entity/DocumentKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/entity/DocumentVersion.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/entity/DocumentVersion.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/BusinessError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/BusinessError.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/NotExistError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/NotExistError.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/ValidationError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/ValidationError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentKeyRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentKeyRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentVersionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentVersionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/DocumentVersionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/DocumentVersionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/OpenPgpService.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/OpenPgpService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/UploadDocumentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/UploadDocumentService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentKeyServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentKeyServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentVersionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentVersionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DownLoadDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DownLoadDocumentServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/OpenPgpServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/OpenPgpServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UpdateDocumentData/src/main/java/system_microservice_share_documents/UpdateDocumentData/UpdateDocumentDataApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/UpdateDocumentData/src/main/java/system_microservice_share_documents/UpdateDocumentData/UpdateDocumentDataApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UpdateDocumentData/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/UpdateDocumentData/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/repository/WatermarkJobRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/repository/WatermarkJobRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/WatermarkProcessorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/WatermarkProcessorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WaterMarkServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WaterMarkServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/worker/WatermarkWorker.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/worker/WatermarkWorker.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,6 +144,9 @@
         <task path="$PROJECT_DIR$/WatermarkWorkerService">
           <activation />
         </task>
+        <task path="$PROJECT_DIR$/CDCUpdateDocumentDataCache">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
@@ -125,25 +157,25 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateDocumentDataCache" type="2d1252cf:ModuleNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateDocumentDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateDocumentDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="build" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="UpdateDocumentData" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateDocumentDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="shadow" type="c8890929:TasksNode$1" />
               </path>
@@ -158,6 +190,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
+        <option value="Kotlin Class" />
         <option value="Interface" />
         <option value="Class" />
       </list>
@@ -204,10 +237,13 @@
     "Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor": "Run",
     "Gradle.system-microservice-share-documents:APIGatewayService [build].executor": "Run",
     "Gradle.system-microservice-share-documents:APIGatewayService [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [build].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [shadowJar].executor": "Run",
     "Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor": "Run",
     "Gradle.system-microservice-share-documents:UpdateDocumentData [clean].executor": "Run",
     "Gradle.system-microservice-share-documents:UpdateDocumentData [knows].executor": "Run",
-    "Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor": "Debug",
+    "Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor": "Run",
     "Gradle.system-microservice-share-documents:WatermarkWorkerService [clean].executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -218,21 +254,25 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.ApiGatewayServiceApplication.executor": "Run",
+    "Spring Boot.AppCommonServiceApplication.executor": "Run",
     "Spring Boot.AuditLogServiceApplication.executor": "Run",
-    "Spring Boot.AuthAccessControlServiceApplication.executor": "Debug",
+    "Spring Boot.AuthAccessControlServiceApplication.executor": "Run",
     "Spring Boot.CloudConfigServerServiceApplication.executor": "Run",
     "Spring Boot.DocumentServiceApplication.executor": "Run",
     "Spring Boot.EurekaServiceApplication.executor": "Run",
     "Spring Boot.UserServiceApplication.executor": "Run",
     "Spring Boot.WatermarkWorkerServiceApplication.executor": "Run",
-    "git-widget-placeholder": "dev__api__access__grant",
+    "git-widget-placeholder": "dev__update__upload__download__document",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/DoAnTotNghiep/system-microservice-share-documents/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService",
+    "last_opened_file_path": "D:/DoAnTotNghiep/system-microservice-share-documents",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "run.configurations.included.in.services": "true",
     "vue.rearranger.settings.migration": "true"
@@ -243,17 +283,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\DoAnTotNghiep\system-microservice-share-documents" />
       <recent name="D:\DoAnTotNghiep\system-microservice-share-documents\AuthAccessControlService\src\main\java\com\system_share_documents\AuthAccessControlService" />
       <recent name="D:\DoAnTotNghiep\system-microservice-share-documents\WatermarkWorkerService\src\main\java\com\system_share_documents\WatermarkWorkerService" />
       <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService" />
       <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.system_share_documents.AppCommonService.dto.request" />
       <recent name="com.system_share_documents.AuthAccessControlService.config" />
       <recent name="com.system_share_documents.AuthAccessControlService.dto" />
       <recent name="com.system_share_documents.AppCommonService.dto.response" />
       <recent name="com.system_share_documents.UserService.entity" />
-      <recent name="com.system_share_documents.UserService.controller.user" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -267,10 +308,10 @@
     </option>
   </component>
   <component name="RunManager" selected="Gradle.system-microservice-share-documents:UpdateDocumentData [clean]">
-    <configuration name="system-microservice-share-documents:UpdateDocumentData [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="system-microservice-share-documents:CDCUpdateDocumentDataCache [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/UpdateDocumentData" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/CDCUpdateDocumentDataCache" />
         <option name="externalSystemIdString" value="GRADLE" />
         <option name="scriptParameters" />
         <option name="taskDescriptions">
@@ -278,7 +319,51 @@
         </option>
         <option name="taskNames">
           <list>
-            <option value="build" />
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="system-microservice-share-documents:CDCUpdateDocumentDataCache [shadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/CDCUpdateDocumentDataCache" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="shadowJar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="system-microservice-share-documents:CDCUpdatePublicKeyDataCache [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -311,28 +396,6 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="system-microservice-share-documents:UpdateDocumentData [knows]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/UpdateDocumentData" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="knows" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
     <configuration name="system-microservice-share-documents:UpdateDocumentData [shadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -345,28 +408,6 @@
         <option name="taskNames">
           <list>
             <option value="shadowJar" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="system-microservice-share-documents:WatermarkWorkerService [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/WatermarkWorkerService" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="clean" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -405,6 +446,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="CDCUpdateDocumentDataCache" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="system-microservice-share-documents.CDCUpdateDocumentDataCache.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="system_microservice_share_documents.CDCUpdateDocumentDataCache.CDCUpdateDocumentDataCache" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="CloudConfigServerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="system-microservice-share-documents.CloudConfigServerService.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.CloudConfigServerService.CloudConfigServerServiceApplication" />
@@ -435,6 +483,7 @@
     </configuration>
     <configuration name="WatermarkWorkerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="system-microservice-share-documents.WatermarkWorkerService.main" />
+      <option name="SHORTEN_COMMAND_LINE" value="MANIFEST" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.WatermarkWorkerService.WatermarkWorkerServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -447,28 +496,29 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [build]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdatePublicKeyDataCache [clean]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [clean]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [shadowJar]" />
       <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [clean]" />
-      <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [knows]" />
       <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar]" />
-      <item itemvalue="Gradle.system-microservice-share-documents:WatermarkWorkerService [clean]" />
+      <item itemvalue="Spring Boot.EurekaServiceApplication" />
+      <item itemvalue="Spring Boot.DocumentServiceApplication" />
       <item itemvalue="Spring Boot.AppCommonServiceApplication" />
+      <item itemvalue="Spring Boot.CDCUpdateDocumentDataCache" />
       <item itemvalue="Spring Boot.UserServiceApplication" />
       <item itemvalue="Spring Boot.ApiGatewayServiceApplication" />
       <item itemvalue="Spring Boot.AuditLogServiceApplication" />
       <item itemvalue="Spring Boot.AuthAccessControlServiceApplication" />
       <item itemvalue="Spring Boot.CloudConfigServerServiceApplication" />
-      <item itemvalue="Spring Boot.DocumentServiceApplication" />
-      <item itemvalue="Spring Boot.EurekaServiceApplication" />
       <item itemvalue="Spring Boot.WatermarkWorkerServiceApplication" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [clean]" />
+        <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdatePublicKeyDataCache [clean]" />
+        <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [clean]" />
+        <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateDocumentDataCache [shadowJar]" />
         <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar]" />
-        <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [build]" />
-        <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [knows]" />
-        <item itemvalue="Gradle.system-microservice-share-documents:WatermarkWorkerService [clean]" />
       </list>
     </recent_temporary>
   </component>
@@ -515,11 +565,79 @@
       <workItem from="1763392082766" duration="4087000" />
       <workItem from="1763465697252" duration="7168000" />
       <workItem from="1763517491803" duration="97000" />
-      <workItem from="1763790324866" duration="28835000" />
+      <workItem from="1763790324866" duration="31486000" />
+      <workItem from="1763827575525" duration="1234000" />
+      <workItem from="1763866137626" duration="17493000" />
+      <workItem from="1763899888749" duration="17497000" />
+      <workItem from="1763950811459" duration="23000" />
+      <workItem from="1763970811229" duration="13000" />
+      <workItem from="1763972545978" duration="144000" />
+      <workItem from="1763973320159" duration="217000" />
+      <workItem from="1763973555291" duration="145000" />
+      <workItem from="1763980309038" duration="233000" />
+      <workItem from="1764043399015" duration="97000" />
+      <workItem from="1764151148114" duration="2578000" />
+      <workItem from="1764168230506" duration="6649000" />
+      <workItem from="1764258854471" duration="3709000" />
+      <workItem from="1764390288384" duration="20513000" />
+      <workItem from="1764435606344" duration="6395000" />
+      <workItem from="1764467720597" duration="16224000" />
+      <workItem from="1764515522318" duration="4524000" />
+      <workItem from="1764555657902" duration="31000" />
+      <workItem from="1764600611588" duration="10629000" />
+      <workItem from="1764641224286" duration="55000" />
+      <workItem from="1764735967914" duration="4898000" />
+      <workItem from="1764824603071" duration="2174000" />
+      <workItem from="1764862172577" duration="11668000" />
+      <workItem from="1764900137373" duration="120000" />
+      <workItem from="1764911625796" duration="2850000" />
+      <workItem from="1764948154121" duration="2048000" />
+      <workItem from="1764952826153" duration="15756000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/RecipientGrantServiceImpl.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/AuthAccessControlService/src/main/java/com/system_share_documents/AuthAccessControlService/service/impl/RecipientGrantServiceImpl.java</url>
+          <line>45</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java</url>
+          <line>210</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/OpenPgpServiceImpl.java</url>
+          <line>119</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java</url>
+          <line>200</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java</url>
+          <line>205</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="SpringBootApplicationConfigurationType">
+        <watch expression="frontend-" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

@@ -1,8 +1,10 @@
 package com.system_share_documents.DocumentService.service.impl;
 
+import com.system_share_documents.AppCommonService.dto.request.CheckAccessRequest;
 import com.system_share_documents.AppCommonService.enums.ActionLog;
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
 import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
+import com.system_share_documents.AppCommonService.rest.grantAccess.GrantAccessRest;
 import com.system_share_documents.AppCommonService.rest.minio.MinioStorageRest;
 import com.system_share_documents.DocumentService.dto.request.DownLoadDocumentRequest;
 import com.system_share_documents.DocumentService.dto.response.DownLoadDocumentResponse;
@@ -22,8 +24,11 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.UUID;
 
+import static com.system_share_documents.AppCommonService.constant.KeysResponseUtils.CAN_DOWNLOAD;
+import static com.system_share_documents.AppCommonService.constant.KeysResponseUtils.DATA;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
 
@@ -40,10 +45,14 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
     private MinioStorageRest minioStorageRest;
 
     @Autowired
+    private GrantAccessRest grantAccessRest;
+
+    @Autowired
     private AuditLogProducer auditLogProducer;
 
     private final int presignExpiryMinutes = 15;
 
+    // Thêm case check thời gian hết hạn quyền download (expirationDays)
     @Override
     public DownLoadDocumentResponse getDownLoadDocument(DownLoadDocumentRequest request, String userId, HttpServletRequest httpRequest) throws Exception {
         String status = "OK";
@@ -66,6 +75,17 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
             if(version.getStatus() != VersionStatus.AVAILABLE) {
                 throw new AppException(BusinessError.DOCUMENT_NOT_YET_AVAILABLE);
             }
+
+            CheckAccessRequest accessRequest = CheckAccessRequest.builder()
+                    .documentId(String.valueOf(request.getDocumentId()))
+                    .userId(userId)
+                    .build();
+            HashMap<String, Object> response = grantAccessRest.checkGrantAccess(accessRequest);
+            HashMap<String, Object> data = (HashMap<String, Object>) response.get(DATA);
+            if (data.get(CAN_DOWNLOAD) == null || Boolean.FALSE.equals(data.get(CAN_DOWNLOAD))) {
+                throw new AppException(BusinessError.USER_NOT_PERMISSION);
+            }
+
             byte[] wrappedCek = documentKeyService.getDocumentKeyForUser(request.getVersionId(), userId);
             if (wrappedCek == null) {
                 throw new AppException(NotExistError.DOCUMENT_KEY_NOT_FOUND);
@@ -85,10 +105,6 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
                     .expiresAt(Timestamp.from(Instant.now().plusSeconds(presignExpiryMinutes * 60)))
                     .build();
 
-        } catch (AppException e) {
-            status = "FAIL";
-            errorReason = e.getMessage();
-            throw e;
         } catch (Exception e) {
             status = "FAIL";
             errorReason = e.getMessage();

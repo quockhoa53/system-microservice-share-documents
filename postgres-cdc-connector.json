@@ -1,0 +1,32 @@
+{
+  "name": "documents-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "database.hostname": "localhost",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "1234",
+    "database.dbname": "document_db",
+    "database.server.name": "postgres-server",
+    "table.include.list": "public.documents",
+    "schema.include.list": "public",
+    "plugin.name": "pgoutput",
+    "slot.name": "flink_cdc_slot",
+    "publication.name": "documents_pub",
+    "topic.prefix": "postgres-server",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "cdc-document-data-cache",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+    "snapshot.mode": "initial",
+    "database.history.skip.unparseable.ddl": "true",
+    "sslmode": "disable",
+
+    "transforms": "rename",
+    "transforms.rename.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.rename.regex": ".*",
+    "transforms.rename.replacement": "cdc-update-document-cache"
+  }
+}

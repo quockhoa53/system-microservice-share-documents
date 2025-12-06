@@ -345,7 +345,7 @@
       </method>
     </configuration>
     <configuration name="AppCommonServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="com.system_share_documents.system-microservice-share-documents.AppCommonService.main" />
+      <module name="system-microservice-share-documents.AppCommonService.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.system_share_documents.AppCommonService.AppCommonServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />

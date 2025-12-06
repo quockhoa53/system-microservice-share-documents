@@ -11,7 +11,9 @@ import com.system_share_documents.AuthAccessControlService.dto.response.Document
 import com.system_share_documents.AuthAccessControlService.entity.DocumentRecipient;
 import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
 import com.system_share_documents.AuthAccessControlService.exception.AppException;
+import com.system_share_documents.AuthAccessControlService.exception.errorcode.AuthError;
 import com.system_share_documents.AuthAccessControlService.exception.errorcode.BusinessError;
+import com.system_share_documents.AuthAccessControlService.exception.errorcode.NotExistError;
 import com.system_share_documents.AuthAccessControlService.repository.DocumentRecipientRepository;
 import com.system_share_documents.AuthAccessControlService.service.DocumentAccessService;
 import com.system_share_documents.AuthAccessControlService.service.RecipientGrantService;
@@ -27,10 +29,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
+import static com.system_share_documents.AppCommonService.constant.KeyCloakConstant.GRANT_PASSWORD;
 import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.GRANT_ACCESS;
+import static com.system_share_documents.AppCommonService.utils.AuthenticationUtils.getGrantType;
 import static com.system_share_documents.AppCommonService.utils.AuthenticationUtils.getUsername;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
+import static com.system_share_documents.AppCommonService.utils.DocumentUtils.checkExistDocument;
+import static com.system_share_documents.AppCommonService.utils.DocumentUtils.isDocumentOwnedByUser;
 import static com.system_share_documents.AppCommonService.utils.ProcessJsonUtils.convertJson;
 
 @Service
@@ -55,6 +61,11 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
 
     @Override
     public List<DocumentAccessResponse> grantAccessDocument(GrantAccessRequest request, HttpServletRequest httpRequest) throws Exception {
+        if(getGrantType(httpRequest) != null && Objects.equals(getGrantType(httpRequest), GRANT_PASSWORD)) {
+            if(!isDocumentOwnedByUser(getUsername(), request.getDocumentId())) {
+                throw new AppException(AuthError.GRANT_FORBIDDEN);
+            }
+        }
         String status = "OK";
         String errorReason = null;
         List<DocumentAccessResponse> responses = new ArrayList<>();
@@ -80,10 +91,6 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
                 }
             }
             return responses;
-        } catch (AppException e) {
-            status = "FAIL";
-            errorReason = e.getMessage();
-            throw e;
         } catch (Exception e) {
             status = "FAIL";
             errorReason = e.getMessage();
@@ -121,6 +128,9 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
     @Override
     @Transactional
     public List<DocumentAccessResponse> revokeGrantAccessDocument(RevokeAccessRequest request, HttpServletRequest httpRequest) throws Exception {
+        if(!isDocumentOwnedByUser(getUsername(), request.getDocumentId())) {
+            throw new AppException(AuthError.GRANT_FORBIDDEN);
+        }
         String status = "OK";
         String errorReason = null;
         List<DocumentAccessResponse> responses = new ArrayList<>();

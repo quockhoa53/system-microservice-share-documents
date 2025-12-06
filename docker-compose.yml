@@ -29,16 +29,17 @@ services:
 
   # Vault (Secret Manager)
   vault:
-    image: hashicorp/vault:1.14
+    image: hashicorp/vault:1.13
     container_name: vault
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "root-token"
-      VAULT_ADDR: "http://0.0.0.0:8200"
     ports:
       - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
+      - ./vault/config.hcl:/vault/config.hcl
+      - ./vault/policies:/vault/policies   # <-- ADD THIS
     cap_add:
       - IPC_LOCK
-    command: "server -dev -dev-root-token-id=root-token"
+    command: vault server -config=/vault/config.hcl
     networks:
       - system-net
 
@@ -84,6 +85,29 @@ services:
     networks:
       - app-net
 
+  # Kafka Connect (Debezium)
+  kafka-connect:
+    image: debezium/connect:2.3
+    container_name: kafka-connect
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      STATUS_STORAGE_TOPIC: connect_statuses
+      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      # replication factor cho topic internal
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+    ports:
+      - "8090:8083"  # host 8090 → container 8083
+    depends_on:
+      - kafka
+    networks:
+      - app-net
+
   flink-jobmanager:
     build:
       context: .
@@ -120,6 +144,13 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
+
+  # Redis
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
 
 networks:
   system-net:

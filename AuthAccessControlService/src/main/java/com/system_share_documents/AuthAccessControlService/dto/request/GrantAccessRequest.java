@@ -21,8 +21,6 @@ public class GrantAccessRequest {
     @Builder
     public static class AccessRecipientRequest {
         private String recipientUserId; // ID user nhận quyền
-        private String recipientKeyId;  // ID key của recipient
-        private byte[] encryptedCek;    // CEK đã mã hóa
         private String accessRole;      // reader, editor, admin
         private String expirationDays;  // Số ngày cho đến khi hết hạn
         private Boolean canDownload;    // Có cho phép download không

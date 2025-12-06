@@ -28,12 +28,6 @@ public class DocumentRecipient {
     @Column(name = "recipient_user_id", nullable = false)
     private String recipientUserId; // ID của user nhận tài liệu (từ User Service)
 
-    @Column(name = "recipient_key_id")
-    private String recipientKeyId; // ID của key được dùng để mã hóa CEK (từ User Service)
-
-    @Column(name = "encrypted_cek", nullable = false)
-    private byte[] encryptedCek; // CEK đã được mã hóa bằng public key của recipient
-
     @Enumerated(EnumType.STRING)
     @Column(name = "access_role", nullable = false, length = 10)
     private DocumentAccessRole accessRole = DocumentAccessRole.VIEWER;

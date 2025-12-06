@@ -42,16 +42,19 @@ public class RecipientGrantServiceImpl implements RecipientGrantService {
                 }
             }
 
-            boolean isNew = false;
+            boolean isCanDownload = false;
+            DocumentAccessRole role = DocumentAccessRole.valueOf(accessRecipient.getAccessRole());
+            if (role == DocumentAccessRole.OWNER || role == DocumentAccessRole.EDITOR || role == DocumentAccessRole.DOWNLOADER) {
+                isCanDownload = true;
+            }
 
+            boolean isNew = false;
             if (recipient == null) {
                 recipient = DocumentRecipient.builder()
                         .documentId(documentId)
                         .recipientUserId(accessRecipient.getRecipientUserId())
-                        .recipientKeyId(accessRecipient.getRecipientKeyId())
-                        .encryptedCek(accessRecipient.getEncryptedCek())
                         .accessRole(DocumentAccessRole.valueOf(accessRecipient.getAccessRole() != null ? accessRecipient.getAccessRole() : DocumentAccessRole.VIEWER.name()))
-                        .canDownload(accessRecipient.getCanDownload() != null ? accessRecipient.getCanDownload() : true)
+                        .canDownload(isCanDownload)
                         .expiresAt(expiresAt)
                         .createdAt(Timestamp.from(Instant.now()))
                         .build();
@@ -60,18 +63,10 @@ public class RecipientGrantServiceImpl implements RecipientGrantService {
                 if (accessRecipient.getAccessRole() != null) {
                     recipient.setAccessRole(DocumentAccessRole.valueOf(accessRecipient.getAccessRole()));
                 }
-                if (accessRecipient.getCanDownload() != null) {
-                    recipient.setCanDownload(accessRecipient.getCanDownload());
-                }
                 if (expiresAt != null) {
                     recipient.setExpiresAt(expiresAt);
                 }
-                if (accessRecipient.getRecipientKeyId() != null) {
-                    recipient.setRecipientKeyId(accessRecipient.getRecipientKeyId());
-                }
-                if (accessRecipient.getEncryptedCek() != null) {
-                    recipient.setEncryptedCek(accessRecipient.getEncryptedCek());
-                }
+                recipient.setCanDownload(isCanDownload);
                 recipient.setUpdatedAt(Timestamp.from(Instant.now()));
             }
 

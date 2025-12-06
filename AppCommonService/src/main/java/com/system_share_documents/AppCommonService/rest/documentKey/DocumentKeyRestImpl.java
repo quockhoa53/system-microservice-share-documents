@@ -33,8 +33,9 @@ public class DocumentKeyRestImpl implements DocumentKeyRest {
             );
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Create Document Key API failed with status: " + response.getStatusCode());
+            } else {
+                System.out.printf("🗝️ Create Document Key API returned: %s\n", response.getBody());
             }
-            System.out.println("😁 OKE CON GÀ ĐEN");
         } catch (Exception ex) {
             throw new Exception("Error calling Document Key API: " + ex.getMessage(), ex);
         }

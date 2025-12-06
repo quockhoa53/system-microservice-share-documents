@@ -57,14 +57,14 @@ public class OpenPgpServiceImpl implements OpenPgpService {
     }
 
     @Override
-    public byte[] wrapCekWithRecipientPublicKey(byte[] cekBytes, String recipientPublicKeyArmored) {
+    public byte[] wrapCekWithRecipientPublicKey(String recipientId, byte[] cekBytes, String recipientPublicKeyArmored) {
         try {
             if (cekBytes == null || cekBytes.length == 0)
                 throw new AppException(ValidationError.CEK_BYTE_EMPTY);
             if (recipientPublicKeyArmored == null || recipientPublicKeyArmored.isBlank())
                 throw new AppException(ValidationError.RECIPIENT_PUBLIC_KEY_EMPTY);
 
-            PGPPublicKey encKey = getEncryptionKey(recipientPublicKeyArmored, recipientPublicKeyArmored);
+            PGPPublicKey encKey = getEncryptionKey(recipientId, recipientPublicKeyArmored);
 
             JcePGPDataEncryptorBuilder dataEncryptor = new JcePGPDataEncryptorBuilder(PGPEncryptedData.AES_256)
                     .setWithIntegrityPacket(true)

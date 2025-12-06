@@ -3,8 +3,16 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/UpdateDocumentData/src/main/resources/resources.iml" filepath="$PROJECT_DIR$/UpdateDocumentData/src/main/resources/resources.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AppCommonService/system-microservice-share-documents.AppCommonService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AppCommonService/system-microservice-share-documents.AppCommonService.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UpdateDocumentData/system-microservice-share-documents.UpdateDocumentData.main.iml" filepath="$PROJECT_DIR$/.idea/modules/UpdateDocumentData/system-microservice-share-documents.UpdateDocumentData.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CDCUpdatePublicKeyDataCache/system-microservice-share-documents.CDCUpdatePublicKeyDataCache.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CDCUpdatePublicKeyDataCache/system-microservice-share-documents.CDCUpdatePublicKeyDataCache.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CloudConfigServerService/system-microservice-share-documents.CloudConfigServerService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CloudConfigServerService/system-microservice-share-documents.CloudConfigServerService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.test.iml" filepath="$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/WatermarkWorkerService/system-microservice-share-documents.WatermarkWorkerService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/WatermarkWorkerService/system-microservice-share-documents.WatermarkWorkerService.main.iml" />
     </modules>
   </component>
 </project>

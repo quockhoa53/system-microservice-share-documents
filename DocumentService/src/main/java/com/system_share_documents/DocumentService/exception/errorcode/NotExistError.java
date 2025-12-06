@@ -12,7 +12,9 @@ public enum NotExistError implements ErrorCode {
     SINGER_PUBLIC_KEY_EMPTY("SINGER_PUBLIC_KEY_EMPTY", "Singer public key not found", HttpStatus.BAD_REQUEST),
     USER_PUBLIC_KEY_EMPTY("USER_PUBLIC_KEY_EMPTY", "User public key not found", HttpStatus.BAD_REQUEST),
     ENCRYPTION_KEY_NOT_FOUND("ENCRYPTION_KEY_NOT_FOUND", "No encryption key found in recipient public key", HttpStatus.BAD_REQUEST),
-    PUBLIC_KEY_SIGNATURE_NOT_FOUND("PUBLIC_KEY_SIGNATURE_NOT_FOUND", "Public key for signature not found in keyring", HttpStatus.BAD_REQUEST),;
+    PUBLIC_KEY_SIGNATURE_NOT_FOUND("PUBLIC_KEY_SIGNATURE_NOT_FOUND", "Public key for signature not found in keyring", HttpStatus.BAD_REQUEST),
+    DOCUMENT_KEY_EXITS("DOCUMENT_KEY_EXITS", "Document key already exits", HttpStatus.BAD_REQUEST),
+    CEK_NOT_FOUND("CEK_NOT_FOUND", "Owner CEK not found", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

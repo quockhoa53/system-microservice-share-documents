@@ -1,5 +1,6 @@
 rootProject.name = 'system-microservice-share-documents'
 
+//Service
 include 'EurekaService'
 include 'APIGatewayService'
 include 'UserService'
@@ -9,4 +10,7 @@ include 'AuditLogService'
 include 'CloudConfigServerService'
 include 'WatermarkWorkerService'
 include 'AppCommonService'
+//Job Flink
 include 'UpdateDocumentData'
+include 'CDCUpdateDocumentDataCache'
+include 'CDCUpdatePublicKeyDataCache'

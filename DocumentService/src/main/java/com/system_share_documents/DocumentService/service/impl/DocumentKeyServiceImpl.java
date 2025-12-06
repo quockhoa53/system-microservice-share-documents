@@ -5,6 +5,7 @@ import com.system_share_documents.AppCommonService.enums.ActionLog;
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
 import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
 import com.system_share_documents.AppCommonService.rest.userkey.UserKeyRest;
+import com.system_share_documents.AppCommonService.service.VaultTransitService;
 import com.system_share_documents.DocumentService.entity.DocumentKey;
 import com.system_share_documents.DocumentService.entity.DocumentVersion;
 import com.system_share_documents.DocumentService.exception.AppException;
@@ -22,8 +23,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 import static com.system_share_documents.AppCommonService.constant.KeysConstant.*;
@@ -41,6 +44,9 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
     private OpenPgpService openPgpService;
 
     @Autowired
+    private VaultTransitService vaultTransitService;
+
+    @Autowired
     private DocumentKeyRepository documentKeyRepository;
 
     @Autowired
@@ -55,20 +61,31 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
         String errorReason = null;
         DocumentVersion version = null;
         try {
+            version = documentVersionRepository.findById(request.getDocumentVersionId())
+                    .orElseThrow(() -> new AppException(NotExistError.VERSION_NOT_FOUND));
+
+            String wrappedMaster = new String(request.getWrappedByVault(), StandardCharsets.UTF_8);
+            String rawCEKBase64 = vaultTransitService.decrypt(wrappedMaster);
+            byte[] rawCEK = Base64.getDecoder().decode(rawCEKBase64);
+            version.setWrappedCEKMaster(wrappedMaster);
+            documentVersionRepository.save(version);
+
             String publicKey = userKeyRepository.getUserPublicPrimaryKeyForUser(request.getRecipientId(), OPENPGP_CV25519);
             if (publicKey == null) {
                 throw new AppException(NotExistError.USER_PUBLIC_KEY_EMPTY);
             }
-            version = documentVersionRepository.findById(request.getDocumentVersionId())
-                    .orElseThrow(() -> new AppException(NotExistError.VERSION_NOT_FOUND));
 
-            byte[] wrapped = openPgpService.wrapCekWithRecipientPublicKey(request.getRawCek(), publicKey);
+            if (documentKeyRepository.existsByDocumentVersionIdAndRecipientId(request.getDocumentVersionId(), request.getRecipientId())) {
+                return;
+            }
+
+            byte[] wrapped = openPgpService.wrapCekWithRecipientPublicKey(request.getRecipientId(), rawCEK, publicKey);
             DocumentKey key = DocumentKey.builder()
-                    .recipientId(request.getRecipientId())
                     .wrappedCek(wrapped)
                     .algorithm(OPENPGP_AES256)
                     .createdAt(Timestamp.from(Instant.now()))
                     .documentVersion(version)
+                    .recipientId(request.getRecipientId())
                     .build();
             documentKeyRepository.save(key);
         } catch (AppException e) {

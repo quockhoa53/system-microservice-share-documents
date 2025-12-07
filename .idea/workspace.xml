@@ -4,106 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/elasticsearch/ElasticsearchConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/redis/RedisConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/config/ElasticsearchConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/deserializa/NullableStringSchema.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/sink/DocumentElasticsearchSink.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/SearchDocumentRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/java/com/system_share_documents/APIGatewayService/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/java/com/system_share_documents/APIGatewayService/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/cache/document/DocumentCacheServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/cache/document/DocumentCacheServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthAccessControlService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/AuthAccessControlService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/CDCUpdateDocumentDataCacheApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/CDCUpdateDocumentDataCacheApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/sink/DocumentRedisSink.java" beforeDir="false" afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/sink/DocumentRedisSink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/transform/CdcDataTransformer.java" beforeDir="false" afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/java/system_microservice_share_documents/CDCUpdateDocumentDataCache/transform/CdcDataTransformer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/CDCUpdateDocumentDataCache/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/DocumentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/DocumentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/DocumentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/DocumentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/settings.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/UserServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/constant/JwtClaims.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/constant/UserStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/admin/AdminAuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/AuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/GroupController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/GroupInternalController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/InternalUserController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/UserKeyController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/controller/user/UserProfileController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/ApiResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/AddMemberRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/ChangeMemberRoleRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/CreateGroupRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/GetPublicKeyRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/UpdateProfileRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/request/UploadKeyRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/GroupDetailResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/GroupMemberResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/GroupResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/InternalMembershipResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/InternalUserInfoResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/PublicKeyResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/UserKeyResponse_test.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/dto/response/UserResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/entity/Group.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/entity/GroupMember.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/entity/GroupMemberId.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/entity/User.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/entity/UserKey.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/AppException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/AuthError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/BusinessError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/ErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/KeyErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/SystemError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/exception/errorcode/ValidationError.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/mapper/GroupMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/mapper/UserKeyMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/mapper/UserMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/repository/GroupMemberRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/repository/GroupRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/repository/UserKeyRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/repository/UserRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/security/jwt/KeycloakGrantedAuthoritiesConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/AuthKeycloakUserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/GroupService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/KeyCryptoService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/UserKeyService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/UserProfileService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/impl/AuthKeycloakUserServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/impl/GroupServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/impl/KeyCryptoServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/impl/UserKeyServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/service/impl/UserProfileServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/util/HexUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/util/SecurityUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/utils/HexUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/java/com/system_share_documents/UserService/utils/SecurityUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/resources/application.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/main/resources/bootstrap.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService - Copy/src/test/java/com/system_share_documents/UserService/UserServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/AuthKeycloakUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/AuthKeycloakUserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -564,7 +465,7 @@
       <workItem from="1764779996979" duration="2035000" />
       <workItem from="1764807783599" duration="60000" />
       <workItem from="1765028124246" duration="18747000" />
-      <workItem from="1765077058214" duration="15303000" />
+      <workItem from="1765077058214" duration="15961000" />
     </task>
     <servers />
   </component>

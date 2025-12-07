@@ -30,18 +30,23 @@ public class AuditLogProducer {
                 event.setTimestamp(Instant.now());
             }
 
-            CompletableFuture
-                    .runAsync(() -> kafkaTemplate.send(AUDIT_LOG_TOPIC, key, event))
+            log.debug("[AuditLogProducer] Sending audit log to topic {} with key: {}, action: {}", 
+                    AUDIT_LOG_TOPIC, key, event.getAction());
+            
+            // Gửi trực tiếp, không cần CompletableFuture vì đã @Async
+            kafkaTemplate.send(AUDIT_LOG_TOPIC, key, event)
                     .whenComplete((result, ex) -> {
                         if (ex != null) {
-                            log.warn("[AuditLogProducer] Failed to send audit log for key {}: {}", key, ex.getMessage());
-                        } else if (log.isDebugEnabled()) {
-                            log.debug("[AuditLogProducer] Audit log sent successfully: {}", key);
+                            log.error("[AuditLogProducer] Failed to send audit log for key {}: {}", key, ex.getMessage(), ex);
+                        } else {
+                            log.info("[AuditLogProducer] Audit log sent successfully - topic: {}, key: {}, action: {}", 
+                                    AUDIT_LOG_TOPIC, key, event.getAction());
                         }
                     });
 
         } catch (Exception e) {
-            log.error("[AuditLogProducer] Unexpected error when sending log async", e);
+            log.error("[AuditLogProducer] Unexpected error when sending log async - key: {}, action: {}", 
+                    key, event != null ? event.getAction() : "unknown", e);
         }
     }
 }

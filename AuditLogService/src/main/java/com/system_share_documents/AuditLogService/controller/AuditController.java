@@ -20,23 +20,18 @@ public class AuditController {
 
     private final AuditLogService auditLogService;
 
-    // 1) User xem log của chính mình
-    // Trong kiến trúc full OIDC, userId có thể lấy từ token tại gateway,
-    // ở đây demo dùng query param userId cho đơn giản.
     @GetMapping("/my")
     public ApiResponse<List<AuditLogResponse>> myLogs(
             @RequestParam String userId,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
-        Timestamp fromTs = from != null ? Timestamp.from(from.toInstant(ZoneOffset.UTC)) : null;
-        Timestamp toTs = to != null ? Timestamp.from(to.toInstant(ZoneOffset.UTC)) : null;
-
+        Timestamp fromTs = Timestamp.from(from.toInstant(ZoneOffset.UTC));
+        Timestamp toTs   = Timestamp.from(to.toInstant(ZoneOffset.UTC));
         var logs = auditLogService.getLogsOfUser(userId, fromTs, toTs);
         return ApiResponse.success("OK", "My audit logs", logs);
     }
+
 
     // 2) Log theo document
     @GetMapping("/documents/{documentId}")

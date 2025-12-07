@@ -1,5 +1,8 @@
 package com.system_share_documents.UserService.service.impl;
 
+import com.system_share_documents.AppCommonService.enums.ActionLog;
+import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.entity.User;
 import com.system_share_documents.UserService.exception.AppException;
@@ -9,19 +12,28 @@ import com.system_share_documents.UserService.mapper.UserMapper;
 import com.system_share_documents.UserService.repository.UserRepository;
 import com.system_share_documents.UserService.service.AuthKeycloakUserService;
 import com.system_share_documents.UserService.service.UserKeyService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
 import static com.system_share_documents.UserService.constant.JwtClaims.*;
 import static com.system_share_documents.UserService.constant.UserStatus.ACTIVE;
+@Slf4j
 @Service
 public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
 
@@ -33,6 +45,9 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
 
     @Autowired
     private UserKeyService userKeyService;
+
+    @Autowired(required = false)
+    private AuditLogProducer auditLogProducer;
 
     @Override
     @Transactional
@@ -65,6 +80,7 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
             Optional<User> existingUser = userRepository.findById(keycloakUserId);
 
             User userEntity;
+            boolean isNewUser = false;
             if (existingUser.isPresent()) {
                 userEntity = existingUser.get();
 
@@ -84,6 +100,7 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
                 }
             } else {
                 // Tạo user mới với id = Keycloak userId
+                isNewUser = true;
                 Timestamp now = Timestamp.from(Instant.now());
                 userEntity = User.builder()
                         .id(keycloakUserId) // QUAN TRỌNG: id = sub
@@ -101,12 +118,88 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
             UserResponse userResponse = userMapper.toResponse(userEntity);
             userResponse.setAccessToken(token);
 
+            // Gửi audit log
+            sendUserAuditLog(
+                    isNewUser ? ActionLog.REGISTER : ActionLog.LOGIN,
+                    keycloakUserId.toString(),
+                    "OK",
+                    null
+            );
+
             return userResponse;
 
         } catch (AppException e) {
+            // Gửi audit log cho login/register failed
+            try {
+                String userId = auth != null && auth.getPrincipal() instanceof Jwt jwt 
+                    ? jwt.getSubject() 
+                    : "unknown";
+                sendUserAuditLog(
+                        ActionLog.LOGIN,
+                        userId,
+                        "FAIL",
+                        e.getMessage()
+                );
+            } catch (Exception logEx) {
+                // Ignore audit log errors
+            }
             throw e;
         } catch (Exception e) {
             throw new AppException(SystemError.INTERNAL_ERROR);
+        }
+    }
+
+    /**
+     * Helper method để gửi audit log cho user operations
+     */
+    private void sendUserAuditLog(ActionLog action, String userId, String status, String errorReason) {
+        if (auditLogProducer == null) {
+            log.warn("[AuditLog] AuditLogProducer is null, cannot send audit log for action: {}, userId: {}", action, userId);
+            return; // Nếu không có producer thì bỏ qua
+        }
+
+        log.info("[AuditLog] Sending audit log - action: {}, userId: {}, status: {}", action, userId, status);
+        try {
+            HttpServletRequest httpRequest = null;
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                httpRequest = attributes.getRequest();
+            }
+
+            String ip = httpRequest != null ? getClientIp(httpRequest) : "unknown";
+            String userAgent = httpRequest != null ? getUserAgent(httpRequest) : "unknown";
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("action", action.toString());
+            metadata.put("timestamp", Instant.now().toString());
+
+            AuditLogEvent logEvent = AuditLogEvent.builder()
+                    .requestId(UUID.randomUUID().toString())
+                    .userId(userId)
+                    .action(String.valueOf(action))
+                    .objectType("user")
+                    .typeLog("USER")
+                    .status("OK".equals(status) ? "OK" : "FAIL")
+                    .errorReason(errorReason)
+                    .ip(ip)
+                    .userAgent(userAgent)
+                    .metadata(convertMetadataToJson(metadata))
+                    .timestamp(Instant.now())
+                    .build();
+
+            auditLogProducer.sendAuditLog(logEvent, userId);
+            log.info("[AuditLog] Audit log sent successfully - action: {}, userId: {}", action, userId);
+        } catch (Exception e) {
+            log.error("[AuditLog] Failed to send audit log - action: {}, userId: {}, error: {}", action, userId, e.getMessage(), e);
+            // Ignore audit log errors để không ảnh hưởng đến flow chính
+        }
+    }
+
+    private String convertMetadataToJson(Map<String, Object> metadata) {
+        try {
+            return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(metadata);
+        } catch (Exception e) {
+            return "{}";
         }
     }
 }

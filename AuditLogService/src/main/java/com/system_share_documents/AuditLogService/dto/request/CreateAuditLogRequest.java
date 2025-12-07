@@ -3,8 +3,6 @@ package com.system_share_documents.AuditLogService.dto.request;
 
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
 public class CreateAuditLogRequest {
 
@@ -21,13 +19,20 @@ public class CreateAuditLogRequest {
     // Loại đối tượng: document, group, key, user, ...
     private String objectType;
 
+    // Loại log
+    private String typeLog;
+
     // Trạng thái: ok, fail
     private String status;
+
+    private String errorReason;
 
     // IP & user agent (có thể được Document/User Service gửi sang)
     private String ip;
     private String userAgent;
-
+    private String request;
     // Metadata bổ sung: lưu JSON để truy vết chi tiết (vd: { "groupId": "...", "keyId": "..." })
-    private Map<String, Object> metadata;
+    // Lưu dưới dạng JSON string để tương thích với AuditLogEvent từ Kafka
+    private String metadata;
+
 }

@@ -21,6 +21,7 @@ public class AuditLogEvent implements Serializable {
     private String action;
     private String documentId;
     private String objectType;
+    private String typeLog;
     private String status;
     private String errorReason;
     private String ip;

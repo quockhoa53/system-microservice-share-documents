@@ -49,6 +49,9 @@ dependencies {
     implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
     // spring-dotenv (nạp .env)
     implementation "me.paulschwarz:spring-dotenv:3.0.0"
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

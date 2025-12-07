@@ -7,7 +7,6 @@ import com.system_share_documents.UserService.dto.response.GroupDetailResponse;
 import com.system_share_documents.UserService.dto.response.GroupMemberResponse;
 import com.system_share_documents.UserService.dto.response.GroupResponse;
 import com.system_share_documents.UserService.service.GroupService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,7 @@ public class GroupController {
 
     @PostMapping
     public ApiResponse<GroupResponse> createGroup(
-            @RequestBody @Valid CreateGroupRequest request,
+            @RequestBody CreateGroupRequest request,
             Authentication auth
     ) {
         GroupResponse group = groupService.createGroup(request, auth);
@@ -57,7 +56,7 @@ public class GroupController {
     @PostMapping("/{groupId}/members")
     public ApiResponse<Void> addMember(
             @PathVariable UUID groupId,
-            @RequestBody @Valid AddMemberRequest request,
+            @RequestBody AddMemberRequest request,
             Authentication auth
     ) {
         groupService.addMember(groupId, request, auth);

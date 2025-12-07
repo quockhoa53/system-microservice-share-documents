@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import static com.system_share_documents.UserService.constant.JwtClaims.*;
 import static com.system_share_documents.UserService.constant.UserStatus.ACTIVE;
-
 @Service
 public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
 
@@ -52,21 +51,50 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
                 throw new AppException(AuthError.INVALID_JWT);
             }
 
-            Optional<User> existingUser = userRepository.findByUsername(username);
+            // Lấy userId từ Keycloak (sub)
+            String sub = jwt.getSubject();
+            UUID keycloakUserId;
+            try {
+                keycloakUserId = UUID.fromString(sub);
+            } catch (IllegalArgumentException e) {
+                // nếu sub không phải UUID hợp lệ
+                throw new AppException(AuthError.INVALID_JWT, "Invalid Keycloak subject (not UUID)");
+            }
+
+            // Ưu tiên tìm theo id = Keycloak userId
+            Optional<User> existingUser = userRepository.findById(keycloakUserId);
 
             User userEntity;
             if (existingUser.isPresent()) {
                 userEntity = existingUser.get();
+
+                // (tuỳ chọn) sync lại thông tin nếu thay đổi trên Keycloak
+                boolean changed = false;
+                if (email != null && !email.equals(userEntity.getEmail())) {
+                    userEntity.setEmail(email);
+                    changed = true;
+                }
+                if (fullName != null && !fullName.equals(userEntity.getFullName())) {
+                    userEntity.setFullName(fullName);
+                    changed = true;
+                }
+                if (changed) {
+                    userEntity.setUpdatedAt(Timestamp.from(Instant.now()));
+                    userEntity = userRepository.save(userEntity);
+                }
             } else {
+                // Tạo user mới với id = Keycloak userId
+                Timestamp now = Timestamp.from(Instant.now());
                 userEntity = User.builder()
-                        .id(UUID.fromString(auth.getName()))
+                        .id(keycloakUserId) // QUAN TRỌNG: id = sub
                         .username(username)
-                        .email(email != null ? email : (jwt.getSubject() + "@unknown.local"))
+                        .email(email != null ? email : (sub + "@unknown.local"))
                         .fullName(fullName)
                         .status(ACTIVE)
-                        .createdAt(Timestamp.from(Instant.now()))
-                        .updatedAt(Timestamp.from(Instant.now()))
+                        .createdAt(now)
+                        .updatedAt(now)
                         .build();
+
                 userEntity = userRepository.save(userEntity);
             }
 
@@ -81,5 +109,4 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
             throw new AppException(SystemError.INTERNAL_ERROR);
         }
     }
-
 }

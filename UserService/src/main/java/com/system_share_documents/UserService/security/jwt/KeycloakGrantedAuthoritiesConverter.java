@@ -50,8 +50,12 @@ public class KeycloakGrantedAuthoritiesConverter implements Converter<Jwt, Colle
 
         // chuẩn hóa thành ROLE_*
         return roles.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .map(r -> r.toUpperCase(Locale.ROOT)) // CHUẨN HOÁ HOA
                 .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
+
     }
 }

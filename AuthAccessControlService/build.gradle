@@ -44,6 +44,9 @@ dependencies {
 	implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
 	// spring-dotenv (nạp .env)
 	implementation "me.paulschwarz:spring-dotenv:3.0.0"
+	// Redis
+	implementation 'com.redislabs:jredisearch:2.2.0'
+	implementation 'redis.clients:jedis:3.7.1'
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

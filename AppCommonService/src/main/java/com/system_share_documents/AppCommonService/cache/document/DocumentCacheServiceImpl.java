@@ -24,14 +24,18 @@ public class DocumentCacheServiceImpl implements DocumentCacheService {
     @Override
     public DocumentCacheResponse getDocumentFromCache(String documentId) {
         String key = PREFIX_DOCUMENT_KEY + documentId;
-        String json = redisTemplate.opsForValue().get(key);
-        if(json == null) {
+        // Lấy tất cả field từ hash
+        var hashMap = redisTemplate.opsForHash().entries(key);
+        if (hashMap == null || hashMap.isEmpty()) {
             return null;
         }
-        try{
+
+        try {
+            // Chuyển Map<String, String> sang JSON -> parse object
+            String json = objectMapper.writeValueAsString(hashMap);
             return objectMapper.readValue(json, DocumentCacheResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException("Cannot parse Redis JSON for key: " + key, e);
+            throw new RuntimeException("Cannot parse Redis HASH for key: " + key, e);
         }
     }
 
@@ -47,26 +51,15 @@ public class DocumentCacheServiceImpl implements DocumentCacheService {
             return List.of();
         }
 
-        List<String> keys = docIds.stream()
-                .map(id -> PREFIX_DOCUMENT_KEY + id)
-                .toList();
-
-        List<String> jsonList = redisTemplate.opsForValue().multiGet(keys);
-        if (jsonList == null) {
-            return List.of();
-        }
-
         List<DocumentCacheResponse> result = new ArrayList<>();
-        for (String json : jsonList) {
-            if (json == null) continue;
-            try {
-                result.add(objectMapper.readValue(json, DocumentCacheResponse.class));
-            } catch (Exception ignored) {
+        for (String id : docIds) {
+            DocumentCacheResponse doc = getDocumentFromCache(id);
+            if (doc != null) {
+                result.add(doc);
             }
         }
         return result;
     }
-
 
     @Override
     public Set<String> getDocumentIdsOfUser(String userId) {
@@ -74,3 +67,4 @@ public class DocumentCacheServiceImpl implements DocumentCacheService {
         return redisTemplate.opsForSet().members(key);
     }
 }
+

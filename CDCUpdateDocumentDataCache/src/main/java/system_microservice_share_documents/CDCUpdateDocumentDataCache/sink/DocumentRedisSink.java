@@ -12,6 +12,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import system_microservice_share_documents.CDCUpdateDocumentDataCache.config.JobConfig;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DocumentRedisSink extends RichSinkFunction<Map<String, Object>> {
 
@@ -78,10 +79,28 @@ public class DocumentRedisSink extends RichSinkFunction<Map<String, Object>> {
                 case "UPDATE":
                 case "SNAPSHOT":
                     documentData.remove("_operation");
-                    String documentJson = objectMapper.writeValueAsString(documentData);
-                    jedis.set(redisKey, documentJson);
+
+                    // Chuyển tất cả value sang String, JSON hóa nếu cần
+                    Map<String, String> hashData = documentData.entrySet().stream()
+                            .filter(e -> e.getValue() != null)
+                            .collect(Collectors.toMap(
+                                    Map.Entry::getKey,
+                                    e -> {
+                                        Object val = e.getValue();
+                                        try {
+                                            if (val instanceof Map || val instanceof Iterable) {
+                                                return objectMapper.writeValueAsString(val);
+                                            }
+                                        } catch (Exception ex) {
+                                            log.warn("Failed to serialize field {}: {}", e.getKey(), ex.getMessage());
+                                        }
+                                        return String.valueOf(val);
+                                    }
+                            ));
+
+                    jedis.hset(redisKey, hashData);
                     jedis.sadd(userSetKey, documentId);
-                    log.info("{} document ID {} -> Redis key={} + Set index={}", op, documentId, redisKey, userSetKey);
+                    log.info("{} document ID {} -> Redis HASH key={} + Set index={}", op, documentId, redisKey, userSetKey);
                     break;
 
                 case "DELETE":

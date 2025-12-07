@@ -334,7 +334,7 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
             }
 
             GrantAccessRequest request = GrantAccessRequest.builder()
-                    .documentId(event.getVersionId())
+                    .documentId(event.getDocumentId())
                     .recipients(event.getRecipients().stream()
                             .map(recipient -> GrantAccessRequest.AccessRecipientRequest.builder()
                                     .recipientUserId(recipient)

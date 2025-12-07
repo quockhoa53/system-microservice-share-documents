@@ -15,51 +15,71 @@ public class CdcDataTransformer extends RichMapFunction<String, Map<String, Obje
 
     @Override
     public void open(Configuration parameters) {
-        recordsTransformed = getRuntimeContext().getMetricGroup().counter("recordsTransformed");
+        recordsTransformed = getRuntimeContext()
+                .getMetricGroup()
+                .counter("recordsTransformed");
+        mapper = new ObjectMapper();
     }
 
     @Override
     public Map<String, Object> map(String jsonString) throws Exception {
         recordsTransformed.inc();
-        if (jsonString == null || jsonString.isEmpty()) {
-            return null;
-        }
+        if (jsonString == null || jsonString.isEmpty()) return null;
 
-        if (mapper == null) {
-            mapper = new ObjectMapper();
-        }
+        if (mapper == null) mapper = new ObjectMapper();
 
         JsonNode rootNode = mapper.readTree(jsonString);
         JsonNode afterNode = rootNode.get("after");
+        JsonNode beforeNode = rootNode.get("before");
         JsonNode opNode = rootNode.get("op");
 
-        if (afterNode == null || afterNode.isNull() || opNode == null || opNode.isNull()) {
-            return null;
-        }
+        if (opNode == null || opNode.isNull()) return null;
 
         String op = opNode.asText();
-        String opType;
-        switch (op) {
-            case "c":
-                opType = "CREATE";
-                break;
-            case "u":
-                opType = "UPDATE";
-                break;
-            case "d":
-                opType = "DELETE";
-                break;
-            case "r":
-                opType = "SNAPSHOT";
-                break;
-            default:
-                return null;
+        String opType =
+                op.equals("c") ? "CREATE" :
+                        op.equals("u") ? "UPDATE" :
+                                op.equals("d") ? "DELETE" :
+                                        op.equals("r") ? "SNAPSHOT" :
+                                                null;
+
+        if (opType == null) return null;
+
+        Map<String, Object> documentData;
+
+        if (opType.equals("DELETE")) {
+            // dùng before để lấy id
+            if (beforeNode == null || beforeNode.isNull()) return null;
+
+            documentData = mapper.readValue(beforeNode.toString(), Map.class);
+        } else {
+            if (afterNode == null || afterNode.isNull()) return null;
+            documentData = mapper.readValue(afterNode.toString(), Map.class);
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> documentData = mapper.readValue(afterNode.toString(), Map.class);
         documentData.put("_operation", opType);
+
+        // normalize metadata nếu CREATE/UPDATE/SNAPSHOT
+        if (!opType.equals("DELETE")) {
+            Object metadataVal = documentData.get("metadata");
+            if (metadataVal instanceof String) {
+                String metaStr = ((String) metadataVal).trim();
+                if (!metaStr.isEmpty() && !metaStr.equalsIgnoreCase("null")) {
+                    try {
+                        Map<String, Object> parsed = mapper.readValue(metaStr, Map.class);
+                        documentData.put("metadata", parsed);
+                    } catch (Exception e) {
+                        documentData.put("metadata", Map.of());
+                    }
+                } else {
+                    documentData.put("metadata", Map.of());
+                }
+            } else if (metadataVal == null) {
+                documentData.put("metadata", Map.of());
+            }
+        }
 
         return documentData;
     }
+
 }

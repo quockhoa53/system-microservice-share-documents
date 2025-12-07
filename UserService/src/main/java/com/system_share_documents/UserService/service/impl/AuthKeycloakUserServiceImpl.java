@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.system_share_documents.UserService.constant.JwtClaims.*;
 import static com.system_share_documents.UserService.constant.UserStatus.ACTIVE;
@@ -58,6 +59,7 @@ public class AuthKeycloakUserServiceImpl implements AuthKeycloakUserService {
                 userEntity = existingUser.get();
             } else {
                 userEntity = User.builder()
+                        .id(UUID.fromString(auth.getName()))
                         .username(username)
                         .email(email != null ? email : (jwt.getSubject() + "@unknown.local"))
                         .fullName(fullName)

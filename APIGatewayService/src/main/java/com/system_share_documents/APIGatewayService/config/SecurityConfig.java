@@ -61,7 +61,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "https://lolsocial-lake.vercel.app",
+                "http://localhost:3000",
+                "http://192.168.1.219:3000",
                 "http://localhost:5173",
                 "http://127.0.0.1:5500",
                 "http://192.168.1.33:5173"

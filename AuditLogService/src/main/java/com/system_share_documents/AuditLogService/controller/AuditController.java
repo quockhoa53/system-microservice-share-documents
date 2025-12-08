@@ -4,8 +4,10 @@ package com.system_share_documents.AuditLogService.controller;
 import com.system_share_documents.AuditLogService.dto.ApiResponse;
 import com.system_share_documents.AuditLogService.dto.response.AuditLogResponse;
 import com.system_share_documents.AuditLogService.service.AuditLogService;
+import com.system_share_documents.AuditLogService.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
@@ -20,25 +22,41 @@ public class AuditController {
 
     private final AuditLogService auditLogService;
 
-    // 1) User xem log của chính mình
-    // Trong kiến trúc full OIDC, userId có thể lấy từ token tại gateway,
-    // ở đây demo dùng query param userId cho đơn giản.
+    /**
+     * Lấy audit logs của user hiện tại (tự động lấy userId từ JWT token)
+     * @param auth Authentication từ Spring Security
+     * @param from Ngày bắt đầu (optional)
+     * @param to Ngày kết thúc (optional)
+     * @param action Filter theo action (optional)
+     * @return Danh sách audit logs
+     */
     @GetMapping("/my")
     public ApiResponse<List<AuditLogResponse>> myLogs(
-            @RequestParam String userId,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
+            Authentication auth,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam(required = false) String action
     ) {
+        String userId = SecurityUtils.requireCurrentUserId(auth);
+        
         Timestamp fromTs = from != null ? Timestamp.from(from.toInstant(ZoneOffset.UTC)) : null;
         Timestamp toTs = to != null ? Timestamp.from(to.toInstant(ZoneOffset.UTC)) : null;
-
-        var logs = auditLogService.getLogsOfUser(userId, fromTs, toTs);
+        
+        List<AuditLogResponse> logs = auditLogService.getLogsOfUser(userId, fromTs, toTs);
+        
+        // Filter theo action nếu có
+        if (action != null && !action.isBlank()) {
+            logs = logs.stream()
+                    .filter(log -> action.equalsIgnoreCase(log.getAction()))
+                    .toList();
+        }
+        
         return ApiResponse.success("OK", "My audit logs", logs);
     }
 
-    // 2) Log theo document
+    /**
+     * Lấy audit logs theo document
+     */
     @GetMapping("/documents/{documentId}")
     public ApiResponse<List<AuditLogResponse>> logsByDocument(
             @PathVariable String documentId
@@ -47,7 +65,9 @@ public class AuditController {
         return ApiResponse.success("OK", "Document audit logs", logs);
     }
 
-    // 3) Xem chi tiết một log
+    /**
+     * Xem chi tiết một log
+     */
     @GetMapping("/{id}")
     public ApiResponse<AuditLogResponse> getLogDetail(@PathVariable Long id) {
         var log = auditLogService.getLogDetail(id);

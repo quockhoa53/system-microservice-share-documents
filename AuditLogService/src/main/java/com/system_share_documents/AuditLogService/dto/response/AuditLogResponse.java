@@ -14,6 +14,7 @@ public class AuditLogResponse {
     private String action;
     private String documentId;
     private String objectType;
+    private String typeLog;
     private String status;
     private String ip;
     private String userAgent;

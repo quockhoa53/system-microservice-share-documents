@@ -1,7 +1,6 @@
 package com.system_share_documents.AuditLogService.service.impl;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system_share_documents.AuditLogService.dto.request.CreateAuditLogRequest;
 import com.system_share_documents.AuditLogService.dto.response.AuditLogResponse;
@@ -28,15 +27,8 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     @Transactional
     public AuditLogResponse createLog(CreateAuditLogRequest req) {
-        String metadataJson = null;
-        if (req.getMetadata() != null) {
-            try {
-                metadataJson = objectMapper.writeValueAsString(req.getMetadata());
-            } catch (JsonProcessingException e) {
-                // tuỳ bạn: có thể ném AppException hoặc log warning
-                metadataJson = "{}";
-            }
-        }
+        // Metadata đã là JSON string từ Kafka hoặc REST API, không cần convert
+        String metadataJson = req.getMetadata();
 
         AuditLog log = AuditLog.builder()
                 .userId(req.getUserId())
@@ -45,11 +37,15 @@ public class AuditLogServiceImpl implements AuditLogService {
                 .documentId(req.getDocumentId())
                 .objectType(req.getObjectType())
                 .status(req.getStatus())
+                .errorReason(req.getErrorReason())
                 .ip(req.getIp())
                 .userAgent(req.getUserAgent())
-                .createdAt(Timestamp.from(Instant.now()))
+                .request(req.getRequest())
                 .metadata(metadataJson)
+                .typeLog(req.getTypeLog() != null ? req.getTypeLog() : "USER")
+                .createdAt(Timestamp.from(Instant.now()))
                 .build();
+
 
         AuditLog saved = auditLogRepository.save(log);
         return toResponse(saved);
@@ -91,6 +87,7 @@ public class AuditLogServiceImpl implements AuditLogService {
                 .action(log.getAction())
                 .documentId(log.getDocumentId())
                 .objectType(log.getObjectType())
+                .typeLog(log.getTypeLog())
                 .status(log.getStatus())
                 .ip(log.getIp())
                 .userAgent(log.getUserAgent())

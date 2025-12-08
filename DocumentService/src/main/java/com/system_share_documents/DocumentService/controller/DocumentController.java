@@ -52,4 +52,15 @@ public class DocumentController {
         List<DocumentResponse> response = documentService.searchDocuments(keyword, page, size);
         return ApiResponse.success("OK", "Search documents successfully", response);
     }
+
+
+    @PostMapping("/shared/get/lists")
+    public ApiResponse<Page<DocumentResponse>> getSharedDocuments(@RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "20") int size,
+                                                                  Authentication auth,
+                                                                  HttpServletRequest httpRequest) throws Exception {
+        String userId = auth.getName();
+        Page<DocumentResponse> response = documentService.getSharedDocuments(userId, page, size);
+        return ApiResponse.success("OK", "Get list shared documents successfully", response);
+    }
 }

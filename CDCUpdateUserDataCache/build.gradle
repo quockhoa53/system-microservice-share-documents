@@ -30,6 +30,10 @@ dependencies {
 	// CDC connector
 	implementation 'com.ververica:flink-connector-postgres-cdc:2.4.2'
 
+	// Elasticsearch - Downgraded to 7.10.2 for OSS 7.10 compatibility (fix flavor error)
+	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.2'
+	// Remove Flink ES connector as custom sink is used
+
 	// Các thư viện khác
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
 	implementation 'org.springframework:spring-web:6.1.12'
@@ -42,15 +46,14 @@ dependencies {
 	}
 }
 
-
 application {
-	mainClass = 'system_microservice_share_documents.CDCUpdatePublicKeyDataCache.CDCUpdatePublicKeyDataCacheApplication'
+	mainClass = 'system_microservice_share_documents.CDCUpdateUserDataCache.CDCUpdateUserDataCacheApplication'
 }
 
 tasks.named('shadowJar') {
 	archiveClassifier.set('all')
 	manifest {
-		attributes 'Main-Class': 'system_microservice_share_documents.CDCUpdatePublicKeyDataCache.CDCUpdatePublicKeyDataCacheApplication'
+		attributes 'Main-Class': 'system_microservice_share_documents.CDCUpdateUserDataCache.CDCUpdateUserDataCacheApplication'
 	}
 	zip64 true
 	mergeServiceFiles()

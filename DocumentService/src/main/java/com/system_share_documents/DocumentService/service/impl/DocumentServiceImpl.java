@@ -1,13 +1,17 @@
 package com.system_share_documents.DocumentService.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system_share_documents.AppCommonService.cache.document.DocumentCacheService;
 import com.system_share_documents.AppCommonService.dto.response.DocumentCacheResponse;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.entity.Document;
+import com.system_share_documents.DocumentService.entity.DocumentKey;
+import com.system_share_documents.DocumentService.repository.DocumentKeyRepository;
 import com.system_share_documents.DocumentService.repository.DocumentRepository;
 import com.system_share_documents.DocumentService.service.DocumentService;
 import com.system_share_documents.DocumentService.utils.MapperUtils;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,6 +39,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Autowired
     private DocumentRepository documentRepository;
+
+    @Autowired
+    private DocumentKeyRepository documentKeyRepository;
 
     @Autowired
     private MapperUtils mapperUtils;
@@ -131,4 +138,31 @@ public class DocumentServiceImpl implements DocumentService {
         return list;
     }
 
+    @SneakyThrows
+    @Override
+    public Page<DocumentResponse> getSharedDocuments(String userId, int page, int size) throws JsonProcessingException {
+        Pageable pageable = PageRequest.of(page, size);
+        List<DocumentKey> documentKeys = documentKeyRepository.findByRecipientId(userId);
+        Set<UUID> documentIds = documentKeys.stream()
+                .map(key -> key.getDocumentVersion().getDocument().getId())
+                .collect(Collectors.toSet());
+
+        if (documentIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        List<Document> documents = documentRepository.findAllByIdIn(new ArrayList<>(documentIds));
+
+        // Apply pagination manually
+        int start = page * size;
+        int end = Math.min(start + size, documents.size());
+        List<DocumentResponse> allResults = documents.stream()
+                .map(mapperUtils::mapDocumentEntityToResponse)
+                .collect(Collectors.toList());
+
+        List<DocumentResponse> paginatedResults = start < allResults.size()
+                ? allResults.subList(start, end)
+                : new ArrayList<>();
+
+        return new PageImpl<>(paginatedResults, pageable, documents.size());
+    }
 }

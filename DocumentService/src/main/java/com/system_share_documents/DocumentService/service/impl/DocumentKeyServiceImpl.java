@@ -11,7 +11,6 @@ import com.system_share_documents.DocumentService.entity.DocumentVersion;
 import com.system_share_documents.DocumentService.exception.AppException;
 import com.system_share_documents.DocumentService.exception.errorcode.BusinessError;
 import com.system_share_documents.DocumentService.exception.errorcode.NotExistError;
-import com.system_share_documents.DocumentService.exception.errorcode.ValidationError;
 import com.system_share_documents.DocumentService.repository.DocumentKeyRepository;
 import com.system_share_documents.DocumentService.repository.DocumentVersionRepository;
 import com.system_share_documents.DocumentService.service.DocumentKeyService;

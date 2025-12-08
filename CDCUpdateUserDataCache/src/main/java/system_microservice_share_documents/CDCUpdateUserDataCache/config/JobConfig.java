@@ -1,4 +1,4 @@
-package system_microservice_share_documents.CDCUpdatePublicKeyDataCache.config;
+package system_microservice_share_documents.CDCUpdateUserDataCache.config;
 
 import java.io.InputStream;
 import java.util.Properties;

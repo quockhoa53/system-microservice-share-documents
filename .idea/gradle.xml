@@ -13,7 +13,7 @@
             <option value="$PROJECT_DIR$/AuditLogService" />
             <option value="$PROJECT_DIR$/AuthAccessControlService" />
             <option value="$PROJECT_DIR$/CDCUpdateDocumentDataCache" />
-            <option value="$PROJECT_DIR$/CDCUpdatePublicKeyDataCache" />
+            <option value="$PROJECT_DIR$/CDCUpdateUserDataCache" />
             <option value="$PROJECT_DIR$/CloudConfigServerService" />
             <option value="$PROJECT_DIR$/DocumentService" />
             <option value="$PROJECT_DIR$/EurekaService" />

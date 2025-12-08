@@ -13,4 +13,4 @@ include 'AppCommonService'
 //Job Flink
 include 'UpdateDocumentData'
 include 'CDCUpdateDocumentDataCache'
-include 'CDCUpdatePublicKeyDataCache'
+include 'CDCUpdateUserDataCache'

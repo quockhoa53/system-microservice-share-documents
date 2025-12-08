@@ -34,3 +34,16 @@ app:
   security:
     keycloak:
       resource-client-id: ${KEYCLOAK_CLIENT_ID}
+
+vault:
+  scheme: http
+  host: ${VAULT_HOST}
+  port: ${VAULT_PORT}
+  token: ${VAULT_TOKEN}
+  transit-key: ${VAULT_TRANSIT_KEY
+
+minio:
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}

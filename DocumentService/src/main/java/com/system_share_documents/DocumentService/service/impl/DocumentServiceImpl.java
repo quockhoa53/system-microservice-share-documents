@@ -138,9 +138,8 @@ public class DocumentServiceImpl implements DocumentService {
         return list;
     }
 
-    @SneakyThrows
     @Override
-    public Page<DocumentResponse> getSharedDocuments(String userId, int page, int size) throws JsonProcessingException {
+    public Page<DocumentResponse> getSharedDocuments(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<DocumentKey> documentKeys = documentKeyRepository.findByRecipientId(userId);
         Set<UUID> documentIds = documentKeys.stream()
@@ -152,17 +151,23 @@ public class DocumentServiceImpl implements DocumentService {
         }
         List<Document> documents = documentRepository.findAllByIdIn(new ArrayList<>(documentIds));
 
-        // Apply pagination manually
         int start = page * size;
         int end = Math.min(start + size, documents.size());
+
         List<DocumentResponse> allResults = documents.stream()
-                .map(mapperUtils::mapDocumentEntityToResponse)
+                .map(doc -> {
+                    try {
+                        return mapperUtils.mapDocumentEntityToResponse(doc);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Mapping error", e);
+                    }
+                })
                 .collect(Collectors.toList());
 
-        List<DocumentResponse> paginatedResults = start < allResults.size()
-                ? allResults.subList(start, end)
-                : new ArrayList<>();
+        List<DocumentResponse> paginatedResults =
+                start < allResults.size() ? allResults.subList(start, end) : new ArrayList<>();
 
         return new PageImpl<>(paginatedResults, pageable, documents.size());
     }
+
 }

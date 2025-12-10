@@ -4,9 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAsync  // Cần enable async để @Async hoạt động
+@EnableScheduling  // Cần enable scheduling để @Scheduled hoạt động
 @ComponentScan(basePackages = {
         "com.system_share_documents.UserService",
         // Chỉ scan các package cần thiết từ AppCommonService

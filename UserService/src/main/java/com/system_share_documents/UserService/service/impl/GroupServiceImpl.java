@@ -20,6 +20,7 @@ import com.system_share_documents.UserService.service.GroupService;
 import com.system_share_documents.UserService.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
@@ -35,6 +37,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
+    private final com.system_share_documents.UserService.service.KeycloakGroupService keycloakGroupService;
 
     @Override
     @Transactional
@@ -60,17 +63,29 @@ public class GroupServiceImpl implements GroupService {
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
-        // Tạo Group
+        // 1. Tạo group trong Keycloak trước
+        org.keycloak.representations.idm.GroupRepresentation kcGroup = null;
+        try {
+            kcGroup = keycloakGroupService.createKeycloakGroup(name, request.getDescription());
+            // 2. Thêm owner vào Keycloak group
+            keycloakGroupService.addUserToKeycloakGroup(kcGroup.getId(), ownerId);
+        } catch (Exception e) {
+            log.warn("Failed to create group in Keycloak, continuing with database only: {}", e.getMessage());
+            // Tiếp tục tạo trong database nếu Keycloak fail
+        }
+
+        // 3. Tạo Group trong database
         Group group = Group.builder()
                 .name(name)
                 .description(request.getDescription())
                 .visibility(visibility)
                 .owner(owner)
+                .keycloakGroupId(kcGroup != null ? kcGroup.getId() : null)
                 .createdAt(now)
                 .build();
         Group savedGroup = groupRepository.save(group);
 
-        // Tạo GroupMember cho owner với role "owner"
+        // 4. Tạo GroupMember cho owner với role "owner"
         GroupMember gm = GroupMember.builder()
                 .group(savedGroup)
                 .user(owner)
@@ -198,6 +213,17 @@ public class GroupServiceImpl implements GroupService {
 
         String role = normalizeRole(request.getRole()); // "admin" hoặc "member"
 
+        // 1. Thêm vào Keycloak nếu có
+        if (group.getKeycloakGroupId() != null) {
+            try {
+                keycloakGroupService.addUserToKeycloakGroup(group.getKeycloakGroupId(), targetUserId);
+            } catch (Exception e) {
+                log.warn("Failed to add user to Keycloak group, continuing with database only: {}", e.getMessage());
+                // Tiếp tục với database nếu Keycloak fail
+            }
+        }
+
+        // 2. Thêm vào database
         GroupMember gm = GroupMember.builder()
                 .group(group)
                 .user(target)
@@ -250,6 +276,17 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
+        // 1. Xóa khỏi Keycloak nếu có
+        if (group.getKeycloakGroupId() != null) {
+            try {
+                keycloakGroupService.removeUserFromKeycloakGroup(group.getKeycloakGroupId(), targetUserId);
+            } catch (Exception e) {
+                log.warn("Failed to remove user from Keycloak group, continuing with database only: {}", e.getMessage());
+                // Tiếp tục với database nếu Keycloak fail
+            }
+        }
+
+        // 2. Xóa khỏi database
         groupMemberRepository.delete(target);
     }
 

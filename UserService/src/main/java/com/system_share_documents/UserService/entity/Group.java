@@ -32,6 +32,9 @@ public class Group {
     @Column
     Short visibility = 0; // mức độ hiển thị: 0=private (chỉ thành viên), 1=internal, 2=public
 
+    @Column(name = "keycloak_group_id", unique = true)
+    String keycloakGroupId; // ID của group trong Keycloak
+
     @Column(name = "created_at", nullable = false, updatable = false)
     Timestamp createdAt; // thời điểm tạo nhóm
 }

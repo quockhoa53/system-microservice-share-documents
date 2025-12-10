@@ -5,20 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/config/kafka/AuditLogKafkaConsumer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/config/kafka/KafkaConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/event/AuditLogEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/event/AuditLogEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/controller/AuditController.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/controller/AuditController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/dto/request/CreateAuditLogRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/dto/request/CreateAuditLogRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/dto/response/AuditLogResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/dto/response/AuditLogResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/entity/AuditLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/entity/AuditLog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/service/impl/AuditLogServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/service/impl/AuditLogServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/AuthKeycloakUserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/AuthKeycloakUserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/UserProfileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/UserProfileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/repository/AuditLogRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService/repository/AuditLogRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/exception/errorcode/SystemError.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/exception/errorcode/SystemError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/GroupRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/GroupRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/UserKeyRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/UserKeyRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository/UserRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +70,24 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
               </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UserService" type="2d1252cf:ModuleNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UserService" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
+                <item name="UserService" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
+              </path>
             </expand>
             <select />
           </tree_state>
@@ -122,57 +134,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "Gradle.Build EurekaService.executor": "Run",
-    "Gradle.Build system-microservice-share-documents.executor": "Run",
-    "Gradle.Download Sources.executor": "Run",
-    "Gradle.system-microservice-share-documents [build].executor": "Run",
-    "Gradle.system-microservice-share-documents [clean].executor": "Run",
-    "Gradle.system-microservice-share-documents.executor": "Run",
-    "Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor": "Run",
-    "Gradle.system-microservice-share-documents:APIGatewayService [build].executor": "Run",
-    "Gradle.system-microservice-share-documents:APIGatewayService [clean].executor": "Run",
-    "Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor": "Run",
-    "Gradle.system-microservice-share-documents:UpdateDocumentData [clean].executor": "Run",
-    "Gradle.system-microservice-share-documents:UpdateDocumentData [knows].executor": "Run",
-    "Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor": "Debug",
-    "Gradle.system-microservice-share-documents:UserService [clean].executor": "Run",
-    "Gradle.system-microservice-share-documents:WatermarkWorkerService [clean].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.ApiGatewayServiceApplication.executor": "Run",
-    "Spring Boot.AppCommonServiceApplication.executor": "Run",
-    "Spring Boot.AuditLogServiceApplication.executor": "Run",
-    "Spring Boot.AuthAccessControlServiceApplication.executor": "Debug",
-    "Spring Boot.CloudConfigServerServiceApplication.executor": "Run",
-    "Spring Boot.DocumentServiceApplication.executor": "Run",
-    "Spring Boot.EurekaServiceApplication.executor": "Run",
-    "Spring Boot.UserServiceApplication.executor": "Run",
-    "Spring Boot.WatermarkWorkerServiceApplication.executor": "Run",
-    "git-widget-placeholder": "user-and-log",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/work/DoAn/system-microservice-share-documents",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "run.configurations.included.in.services": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.docker-compose.yml.kafka: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build EurekaService.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build system-microservice-share-documents.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:APIGatewayService [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:APIGatewayService [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [knows].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor&quot;: &quot;Debug&quot;,
+    &quot;Gradle.system-microservice-share-documents:UserService [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:WatermarkWorkerService [clean].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApiGatewayServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.AppCommonServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.AuditLogServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.AuthAccessControlServiceApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.CloudConfigServerServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.DocumentServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.EurekaServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.UserServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.WatermarkWorkerServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;tuan&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/work/DoAn/system-microservice-share-documents&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -206,7 +219,7 @@
         <entry key="SpringBootApplicationConfigurationType">
           <value>
             <map>
-              <entry key="ApiGatewayServiceApplication" value="STOPPED" />
+              <entry key="ApiGatewayServiceApplication" value="FAILED" />
               <entry key="AppCommonServiceApplication" value="FAILED" />
               <entry key="AuditLogServiceApplication" value="STOPPED" />
               <entry key="EurekaServiceApplication" value="STOPPED" />
@@ -217,29 +230,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.system-microservice-share-documents:UserService [clean]">
-    <configuration name="system-microservice-share-documents:UpdateDocumentData [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/UpdateDocumentData" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="build" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Docker.docker-compose.yml: Compose Deployment">
     <configuration name="system-microservice-share-documents:UpdateDocumentData [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -252,28 +243,6 @@
         <option name="taskNames">
           <list>
             <option value="clean" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="system-microservice-share-documents:UpdateDocumentData [knows]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/UpdateDocumentData" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="knows" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -397,11 +366,32 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.kafka: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="kafka" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Docker.docker-compose.yml.kafka: Compose Deployment" />
+      <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       <item itemvalue="Gradle.system-microservice-share-documents:UserService [clean]" />
-      <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [build]" />
       <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [clean]" />
-      <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [knows]" />
       <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar]" />
       <item itemvalue="Spring Boot.AppCommonServiceApplication" />
       <item itemvalue="Spring Boot.UserServiceApplication" />
@@ -415,11 +405,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml.kafka: Compose Deployment" />
         <item itemvalue="Gradle.system-microservice-share-documents:UserService [clean]" />
         <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [clean]" />
         <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar]" />
-        <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [build]" />
-        <item itemvalue="Gradle.system-microservice-share-documents:UpdateDocumentData [knows]" />
       </list>
     </recent_temporary>
   </component>
@@ -475,6 +465,10 @@
       <workItem from="1765077198927" duration="209000" />
       <workItem from="1765077422887" duration="12653000" />
       <workItem from="1765097614817" duration="1902000" />
+      <workItem from="1765124295419" duration="7533000" />
+      <workItem from="1765244640839" duration="2530000" />
+      <workItem from="1765330688458" duration="5632000" />
+      <workItem from="1765353641474" duration="316000" />
     </task>
     <servers />
   </component>

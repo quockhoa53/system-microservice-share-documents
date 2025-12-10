@@ -19,6 +19,13 @@ spring:
         locator:
           enabled: true
       routes:
+        # Admin audit endpoints - phải đặt trước user-service route để match trước
+        - id: audit-log-service-admin
+          uri: lb://audit-log-service
+          predicates:
+            - Path=/admin/audit/**
+          filters:
+            - PreserveHostHeader
         - id: user-service
           uri: lb://user-service
           predicates:

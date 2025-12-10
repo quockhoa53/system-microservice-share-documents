@@ -2,6 +2,7 @@ package com.system_share_documents.UserService.repository;
 
 import com.system_share_documents.UserService.entity.UserKey;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +18,10 @@ public interface UserKeyRepository extends JpaRepository<UserKey, UUID> {
     Optional<UserKey> findFirstByUser_IdAndKeyTypeIgnoreCaseAndIsPrimaryTrueAndRevokedAtIsNull(UUID userId, String keyType);
     Optional<UserKey> findFirstByUser_IdAndKeyTypeIgnoreCaseAndRevokedAtIsNull(UUID userId, String keyType);
 
+    // Statistics methods
+    long count();
+    long countByRevokedAtIsNull();
+    
+    @Query("SELECT COUNT(DISTINCT uk.user.id) FROM UserKey uk WHERE uk.revokedAt IS NULL")
+    long countDistinctUsersWithKeys();
 }

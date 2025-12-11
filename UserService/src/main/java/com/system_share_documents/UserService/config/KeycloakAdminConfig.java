@@ -47,3 +47,8 @@ public class KeycloakAdminConfig {
                 .build();
     }
 }
+
+
+
+
+

@@ -20,8 +20,8 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"   # API (S3)
-      - "9001:9001"   # Web UI
+      - "9000:9000" # API (S3)
+      - "9001:9001" # Web UI
     volumes:
       - minio_data:/data
     networks:
@@ -41,6 +41,23 @@ services:
     command: "server -dev -dev-root-token-id=root-token"
     networks:
       - system-net
+
+  # Redis (Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - system-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Kafka
   zookeeper:
@@ -100,7 +117,7 @@ services:
     networks:
       - app-net
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -129,3 +146,4 @@ networks:
 
 volumes:
   minio_data:
+  redis_data:

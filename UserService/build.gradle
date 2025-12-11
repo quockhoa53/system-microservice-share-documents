@@ -56,6 +56,9 @@ dependencies {
     implementation 'org.keycloak:keycloak-admin-client:26.0.2'
     implementation 'org.jboss.resteasy:resteasy-client:6.2.8.Final'
     implementation 'org.jboss.resteasy:resteasy-jackson2-provider:6.2.8.Final'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

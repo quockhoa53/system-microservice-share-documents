@@ -3,11 +3,14 @@ package com.system_share_documents.UserService.controller.user;
 
 import com.system_share_documents.UserService.dto.ApiResponse;
 import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
+import com.system_share_documents.UserService.dto.response.UserBrief;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -31,5 +34,12 @@ public class UserProfileController {
     ) {
         UserResponse user = userProfileService.updateCurrentUserProfile(request, auth);
         return ApiResponse.success("OK", "Profile updated", user);
+    }
+
+    // GET /api/users/search – tìm kiếm users
+    @GetMapping("/search")
+    public ApiResponse<List<UserBrief>> searchUsers(@RequestParam String query) {
+        List<UserBrief> users = userProfileService.searchUsers(query);
+        return ApiResponse.success("OK", "Users found", users);
     }
 }

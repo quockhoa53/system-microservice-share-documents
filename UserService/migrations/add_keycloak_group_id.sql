@@ -13,3 +13,8 @@ WHERE keycloak_group_id IS NOT NULL;
 
 -- Comment cho column
 COMMENT ON COLUMN groups.keycloak_group_id IS 'ID của group trong Keycloak, dùng để đồng bộ 2 chiều';
+
+
+
+
+

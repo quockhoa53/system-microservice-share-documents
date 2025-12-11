@@ -16,11 +16,21 @@ import com.system_share_documents.UserService.mapper.GroupMapper;
 import com.system_share_documents.UserService.repository.GroupMemberRepository;
 import com.system_share_documents.UserService.repository.GroupRepository;
 import com.system_share_documents.UserService.repository.UserRepository;
+import com.system_share_documents.UserService.service.CacheService;
 import com.system_share_documents.UserService.service.GroupService;
 import com.system_share_documents.UserService.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +48,13 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMemberRepository groupMemberRepository;
     private final GroupMapper groupMapper;
     private final com.system_share_documents.UserService.service.KeycloakGroupService keycloakGroupService;
+    private final CacheService cacheService;
+    private final CacheManager cacheManager;
+    private final RedisTemplate<String, Object> redisTemplate;
+    
+    @Autowired
+    @Qualifier("redisObjectMapper")
+    private ObjectMapper redisObjectMapper;
 
     @Override
     @Transactional
@@ -94,6 +111,9 @@ public class GroupServiceImpl implements GroupService {
                 .build();
         groupMemberRepository.save(gm);
 
+        // Evict cache
+        cacheService.evictUserGroupsCache(ownerId);
+
         // Map sang response
         GroupResponse response = groupMapper.toResponse(savedGroup);
         long memberCount = groupMemberRepository.countByGroup_Id(savedGroup.getId());
@@ -107,17 +127,78 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public List<GroupResponse> getMyGroups(Authentication auth) {
         UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
-
-        // Lấy tất cả membership của user
+        
+        // Check cache first - use RedisTemplate directly
+        try {
+            if (redisTemplate != null && redisObjectMapper != null) {
+                String cacheKey = "userGroups::" + currentUserId.toString();
+                Object cached = redisTemplate.opsForValue().get(cacheKey);
+                if (cached != null) {
+                    if (cached instanceof String) {
+                        // Deserialize from JSON string
+                        List<GroupResponse> result = redisObjectMapper.readValue(
+                            (String) cached,
+                            new TypeReference<List<GroupResponse>>() {}
+                        );
+                        log.debug("Cache HIT for userGroups: userId={}", currentUserId);
+                        return result;
+                    } else if (cached instanceof List) {
+                        log.debug("Cache HIT for userGroups: userId={}", currentUserId);
+                        return (List<GroupResponse>) cached;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Cache read error, loading from database: {}", e.getMessage());
+        }
+        
+        log.debug("Cache MISS for userGroups: userId={}, loading from database", currentUserId);
+        
+        // Cache miss - load from database
+        // Optimize: fetch all memberships with groups in one query
         var memberships = groupMemberRepository.findByUser_Id(currentUserId);
-
-        return memberships.stream()
+        
+        // Batch load member counts for all groups at once to avoid N+1
+        List<UUID> groupIds = memberships.stream()
+                .map(m -> m.getGroup().getId())
+                .toList();
+        
+        // Use a map to store member counts
+        java.util.Map<UUID, Long> memberCountMap = new java.util.HashMap<>();
+        for (UUID groupId : groupIds) {
+            memberCountMap.put(groupId, groupMemberRepository.countByGroup_Id(groupId));
+        }
+        
+        List<GroupResponse> response = memberships.stream()
                 .map(m -> {
                     Group g = m.getGroup();
-                    long memberCount = groupMemberRepository.countByGroup_Id(g.getId());
+                    long memberCount = memberCountMap.getOrDefault(g.getId(), 0L);
                     return toGroupResponse(g, memberCount);
                 })
                 .toList();
+        
+        // Store in cache - use RedisTemplate directly to serialize manually
+        try {
+            if (redisTemplate != null && redisObjectMapper != null) {
+                String cacheKey = "userGroups::" + currentUserId.toString();
+                // Serialize to JSON string with proper type information
+                String json = redisObjectMapper.writerFor(new TypeReference<List<GroupResponse>>() {})
+                    .writeValueAsString(response);
+                
+                // Store as string in cache with TTL
+                redisTemplate.opsForValue().set(cacheKey, json, java.time.Duration.ofMinutes(30));
+                log.debug("Cache stored successfully for userGroups: userId={}, groups count={}", currentUserId, response.size());
+            } else {
+                log.warn("RedisTemplate or redisObjectMapper is null");
+            }
+        } catch (Exception e) {
+            log.warn("Cache write error, continuing without cache: {}", e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.error("Cache write error details", e);
+            }
+        }
+        
+        return response;
     }
 
     @Override
@@ -185,6 +266,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"groupMembers", "userGroups"}, allEntries = true)
     public void addMember(UUID groupId, AddMemberRequest request, Authentication auth) {
         UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
 
@@ -232,10 +314,16 @@ public class GroupServiceImpl implements GroupService {
                 .build();
 
         groupMemberRepository.save(gm);
+
+        // Evict cache
+        cacheService.evictGroupMemberCache(groupId);
+        cacheService.evictUserGroupsCache(targetUserId);
+        cacheService.evictGroupCache(groupId);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = {"groupMembers", "userGroups"}, allEntries = true)
     public void removeMember(UUID groupId, UUID targetUserId, Authentication auth) {
         UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
 
@@ -288,10 +376,68 @@ public class GroupServiceImpl implements GroupService {
 
         // 2. Xóa khỏi database
         groupMemberRepository.delete(target);
+
+        // Evict cache
+        cacheService.evictGroupMemberCache(groupId);
+        cacheService.evictUserGroupsCache(targetUserId);
+        cacheService.evictGroupCache(groupId);
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = {"groupMembers", "userGroups", "groupCache"}, allEntries = true)
+    public void deleteGroup(UUID groupId, Authentication auth) {
+        UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "Group not found"));
+
+        // Chỉ owner mới được xóa group
+        if (group.getOwner() == null || !group.getOwner().getId().equals(currentUserId)) {
+            throw new AppException(AuthError.FORBIDDEN, "Only group owner can delete the group");
+        }
+
+        // Lấy danh sách members trước khi xóa
+        var members = groupMemberRepository.findByGroup_Id(groupId);
+
+        // 1. Xóa tất cả members khỏi Keycloak nếu có
+        if (group.getKeycloakGroupId() != null) {
+            try {
+                for (GroupMember member : members) {
+                    try {
+                        keycloakGroupService.removeUserFromKeycloakGroup(group.getKeycloakGroupId(), member.getUser().getId());
+                    } catch (Exception e) {
+                        log.warn("Failed to remove user {} from Keycloak group: {}", member.getUser().getId(), e.getMessage());
+                    }
+                }
+                // Xóa group khỏi Keycloak
+                try {
+                    keycloakGroupService.deleteKeycloakGroup(group.getKeycloakGroupId());
+                } catch (Exception e) {
+                    log.warn("Failed to delete Keycloak group: {}", e.getMessage());
+                }
+            } catch (Exception e) {
+                log.warn("Failed to clean up Keycloak group, continuing with database deletion: {}", e.getMessage());
+            }
+        }
+
+        // 2. Xóa tất cả members khỏi database
+        groupMemberRepository.deleteAll(members);
+
+        // 3. Xóa group khỏi database
+        groupRepository.delete(group);
+
+        // 4. Evict cache cho tất cả members
+        for (GroupMember member : members) {
+            cacheService.evictUserGroupsCache(member.getUser().getId());
+        }
+        cacheService.evictGroupCache(groupId);
+        cacheService.evictGroupMemberCache(groupId);
+    }
+
+    @Override
+    @Transactional
+    @Cacheable(value = "groupMembers", key = "#groupId.toString() + ':' + #userId.toString()")
     public InternalMembershipResponse checkMembership(UUID groupId, UUID userId) {
         // internal API, không cần auth (gọi từ Document Service có API key riêng)
         var membershipOpt = groupMemberRepository.findByGroup_IdAndUser_Id(groupId, userId);

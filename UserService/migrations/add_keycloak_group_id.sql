@@ -18,3 +18,4 @@ COMMENT ON COLUMN groups.keycloak_group_id IS 'ID c·ªßa group trong Keycloak, d√
 
 
 
+

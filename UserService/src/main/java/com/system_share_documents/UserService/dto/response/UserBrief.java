@@ -17,3 +17,4 @@ public class UserBrief {
     private String email;
     private String fullName;
 }
+

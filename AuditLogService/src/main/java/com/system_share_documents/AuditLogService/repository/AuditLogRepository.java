@@ -13,29 +13,22 @@ import java.util.List;
 
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
-    List<AuditLog> findByUserIdOrderByCreatedAtDesc(String userId);
+    @Query(value = "SELECT * FROM sp_find_by_user_id(:userId)", nativeQuery = true)
+    List<AuditLog> findByUserIdOrderByCreatedAtDesc(@Param("userId") String userId);
 
+    @Query(value = "SELECT * FROM sp_find_by_user_id_and_date_range(:userId, :from, :to)", nativeQuery = true)
     List<AuditLog> findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
-            String userId,
-            Timestamp from,
-            Timestamp to
+            @Param("userId") String userId,
+            @Param("from") Timestamp from,
+            @Param("to") Timestamp to
     );
 
-    List<AuditLog> findByDocumentIdOrderByCreatedAtDesc(String documentId);
+    @Query(value = "SELECT * FROM sp_find_by_document_id(:documentId)", nativeQuery = true)
+    List<AuditLog> findByDocumentIdOrderByCreatedAtDesc(@Param("documentId") String documentId);
     
     // Admin methods - Advanced filtering
-    // Sử dụng native query với COALESCE để tránh lỗi PostgreSQL parameter type inference
-    // Note: Không dùng Pageable.sort trong native query, sort được xử lý trong service
-    @Query(value = "SELECT * FROM audit_logs al WHERE " +
-           "(COALESCE(:userId, '') = '' OR al.user_id = :userId) AND " +
-           "(COALESCE(:action, '') = '' OR al.action = :action) AND " +
-           "(COALESCE(:status, '') = '' OR al.status = :status) AND " +
-           "(COALESCE(:objectType, '') = '' OR al.object_type = :objectType) AND " +
-           "(COALESCE(:documentId, '') = '' OR al.document_id = :documentId) AND " +
-           "al.created_at >= COALESCE(:from, al.created_at) AND " +
-           "al.created_at <= COALESCE(:to, al.created_at) " +
-           "ORDER BY al.created_at DESC " +
-           "LIMIT :limit OFFSET :offset",
+    @Query(value = "SELECT * FROM sp_find_all_with_filters(" +
+           ":userId, :action, :status, :objectType, :documentId, :from, :to, :limit, :offset)",
            nativeQuery = true)
     List<AuditLog> findAllWithFilters(
             @Param("userId") String userId,
@@ -48,16 +41,9 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
             @Param("limit") int limit,
             @Param("offset") int offset
     );
-    
-    // Count query riêng - sử dụng COALESCE để tránh lỗi PostgreSQL parameter type inference
-    @Query(value = "SELECT COUNT(*) FROM audit_logs al WHERE " +
-            "(COALESCE(:userId, '') = '' OR al.user_id = :userId) AND " +
-            "(COALESCE(:action, '') = '' OR al.action = :action) AND " +
-            "(COALESCE(:status, '') = '' OR al.status = :status) AND " +
-            "(COALESCE(:objectType, '') = '' OR al.object_type = :objectType) AND " +
-            "(COALESCE(:documentId, '') = '' OR al.document_id = :documentId) AND " +
-            "al.created_at >= COALESCE(:from, al.created_at) AND " +
-            "al.created_at <= COALESCE(:to, al.created_at)",
+
+    @Query(value = "SELECT sp_count_all_with_filters(" +
+            ":userId, :action, :status, :objectType, :documentId, :from, :to)",
             nativeQuery = true)
     long countAllWithFilters(
             @Param("userId") String userId,
@@ -70,13 +56,7 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     );
 
 
-    // Statistics queries
-    @Query(value = "SELECT COUNT(*) FROM audit_logs al WHERE " +
-            "(COALESCE(:action, '') = '' OR al.action = :action) AND " +
-            "(COALESCE(:status, '') = '' OR al.status = :status) AND " +
-            "al.created_at >= COALESCE(:from, al.created_at) AND " +
-            "al.created_at <= COALESCE(:to, al.created_at)",
-            nativeQuery = true)
+    @Query(value = "SELECT sp_count_with_filters(:action, :status, :from, :to)", nativeQuery = true)
     long countWithFilters(
             @Param("action") String action,
             @Param("status") String status,
@@ -85,21 +65,13 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     );
 
 
-    @Query(value = "SELECT al.action, COUNT(*) FROM audit_logs al WHERE " +
-            "al.created_at >= COALESCE(:from, al.created_at) AND " +
-            "al.created_at <= COALESCE(:to, al.created_at) " +
-           "GROUP BY al.action",
-           nativeQuery = true)
+    @Query(value = "SELECT action, count FROM sp_count_by_action(:from, :to)", nativeQuery = true)
     List<Object[]> countByAction(
             @Param("from") Timestamp from,
             @Param("to") Timestamp to
     );
-    
-    @Query(value = "SELECT al.status, COUNT(*) FROM audit_logs al WHERE " +
-            "al.created_at >= COALESCE(:from, al.created_at) AND " +
-            "al.created_at <= COALESCE(:to, al.created_at) " +
-           "GROUP BY al.status",
-           nativeQuery = true)
+
+    @Query(value = "SELECT status, count FROM sp_count_by_status(:from, :to)", nativeQuery = true)
     List<Object[]> countByStatus(
             @Param("from") Timestamp from,
             @Param("to") Timestamp to

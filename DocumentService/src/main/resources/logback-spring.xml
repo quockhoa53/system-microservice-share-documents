@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Properties -->
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="user-service"/>
+    <springProperty scope="context" name="graylogHost" source="graylog.host" defaultValue="localhost"/>
+    <springProperty scope="context" name="graylogPort" source="graylog.port" defaultValue="12201"/>
+    <springProperty scope="context" name="graylogEnabled" source="graylog.enabled" defaultValue="true"/>
+
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- GELF Appender for Graylog -->
+    <if condition='property("graylogEnabled").equals("true")'>
+        <then>
+            <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+                <graylogHost>${graylogHost}</graylogHost>
+                <graylogPort>${graylogPort}</graylogPort>
+                <maxChunkSize>508</maxChunkSize>
+                <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+                    <includeRawMessage>false</includeRawMessage>
+                    <includeMarker>true</includeMarker>
+                    <includeCallerData>false</includeCallerData>
+                    <includeRootCauseData>true</includeRootCauseData>
+                    <includeLevelName>true</includeLevelName>
+                    <shortPatternLayout class="ch.qos.logback.classic.PatternLayout">
+                        <pattern>%m%n</pattern>
+                    </shortPatternLayout>
+                    <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
+                        <pattern>%m%n</pattern>
+                    </fullPatternLayout>
+                    <staticField>application:${appName}</staticField>
+                    <staticField>environment:${spring.profiles.active:default}</staticField>
+                    <staticField>stream:document-service-logs-api</staticField>
+                </encoder>
+
+                <!-- Filter: Chỉ gửi log quan trọng -->
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>INFO</level>
+                </filter>
+
+                <!-- Filter: Loại bỏ log dư thừa -->
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            message.contains("HikariPool") ||
+                            message.contains("Tomcat") ||
+                            message.contains("o.s.b.a.e") ||
+                            message.contains("o.s.c.n.eureka") ||
+                            message.contains("org.springframework.cloud") ||
+                            message.contains("org.springframework.web") ||
+                            (level == DEBUG &amp;&amp; !message.contains("[API]") &amp;&amp; !message.contains("[PERF]") &amp;&amp; !message.contains("[ERROR]"))
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+            </appender>
+        </then>
+    </if>
+
+    <!-- Logger cho Application logs -->
+    <logger name="com.system_share_documents" level="INFO"/>
+
+    <!-- Logger cho Spring Framework - chỉ ERROR và WARN -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.web" level="WARN"/>
+    <logger name="org.springframework.cloud" level="WARN"/>
+    <logger name="org.springframework.security" level="WARN"/>
+
+    <!-- Logger cho Hibernate - chỉ ERROR -->
+    <logger name="org.hibernate" level="ERROR"/>
+    <logger name="org.hibernate.SQL" level="WARN"/>
+
+    <!-- Logger cho Eureka - chỉ WARN và ERROR -->
+    <logger name="com.netflix" level="WARN"/>
+
+    <!-- Logger cho GELF Appender debug (tạm thời để debug) -->
+    <logger name="de.siegmar.logbackgelf" level="DEBUG"/>
+
+<!--    &lt;!&ndash; Logger cho Performance &ndash;&gt;-->
+<!--    <logger name="com.system_share_documents.AppCommonService.performance.PerformanceAspect" level="INFO" additivity="false">-->
+<!--        <appender-ref ref="GELF"/>-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </logger>-->
+
+    <!-- Logger cho HTTP Request/Response API Logging -->
+    <logger name="com.system_share_documents.AppCommonService.filter.HttpLoggingFilter" level="INFO" additivity="false">
+        <appender-ref ref="GELF"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="GELF"/>
+    </root>
+
+</configuration>

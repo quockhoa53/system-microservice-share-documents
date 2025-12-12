@@ -1,6 +1,5 @@
 package com.system_share_documents.DocumentService.controller;
 
-import com.system_share_documents.AppCommonService.dto.request.CreateDocumentKeyRequest;
 import com.system_share_documents.DocumentService.dto.ApiResponse;
 import com.system_share_documents.DocumentService.dto.request.GetListDocumentVersionRequest;
 import com.system_share_documents.DocumentService.dto.response.DocumentVersionResponse;
@@ -26,4 +25,6 @@ public class DocumentVersionController {
         List<DocumentVersionResponse> response = documentVersionService.getDocumentVersion(request, page, size);
         return ApiResponse.success("OK", "Get list document version of document successfully", response);
     }
+
+
 }

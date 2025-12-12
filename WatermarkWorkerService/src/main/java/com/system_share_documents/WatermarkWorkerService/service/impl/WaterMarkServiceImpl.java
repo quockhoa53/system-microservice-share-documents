@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,26 +32,42 @@ public class WaterMarkServiceImpl implements WaterMarkService {
             if (isPdf(input)) {
                 try (PDDocument document = PDDocument.load(inputStream);
                      ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
                     for (PDPage page : document.getPages()) {
                         var mediaBox = page.getMediaBox();
-                        float pageWidth = mediaBox.getWidth();
-                        float pageHeight = mediaBox.getHeight();
-                        try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                            contentStream.beginText();
-                            contentStream.setFont(PDType1Font.HELVETICA_OBLIQUE, 36);
-                            contentStream.setNonStrokingColor(150, 150, 150);
+                        float w = mediaBox.getWidth();
+                        float h = mediaBox.getHeight();
+
+                        try (PDPageContentStream cs = new PDPageContentStream(
+                                document, page,
+                                PDPageContentStream.AppendMode.APPEND,
+                                true, true
+                        )) {
+                            cs.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, 40);
+                            cs.setNonStrokingColor(180, 180, 180); // màu xám nhẹ
+
                             float angle = (float) Math.toRadians(45);
-                            float x = pageWidth / 4;
-                            float y = pageHeight / 2;
-                            contentStream.setTextMatrix(
-                                    (float) Math.cos(angle), (float) Math.sin(angle),
-                                    (float) -Math.sin(angle), (float) Math.cos(angle),
-                                    x, y
-                            );
-                            contentStream.showText(text);
-                            contentStream.endText();
+
+                            // khoảng cách giữa các watermark
+                            float stepX = 300;
+                            float stepY = 250;
+
+                            for (float x = -w; x < w * 2; x += stepX) {
+                                for (float y = -h; y < h * 2; y += stepY) {
+
+                                    cs.beginText();
+                                    cs.setTextMatrix(
+                                            (float) Math.cos(angle), (float) Math.sin(angle),
+                                            (float) -Math.sin(angle), (float) Math.cos(angle),
+                                            x, y
+                                    );
+                                    cs.showText(text);
+                                    cs.endText();
+                                }
+                            }
                         }
                     }
+
                     document.save(outputStream);
                     return outputStream.toByteArray();
                 }
@@ -63,20 +78,38 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 BufferedImage image = ImageIO.read(inputStream);
                 int width = image.getWidth();
                 int height = image.getHeight();
+
                 Graphics2D g2d = image.createGraphics();
+
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+
+                // Đậm vừa phải
+                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.20f);
                 g2d.setComposite(alphaChannel);
+
                 g2d.setColor(Color.GRAY);
-                int fontSize = Math.max(24, width / 15);
-                g2d.setFont(new Font("Arial", Font.BOLD, fontSize));
-                FontRenderContext frc = g2d.getFontRenderContext();
-                double textWidth = g2d.getFont().getStringBounds(text, frc).getWidth();
-                int centerX = (width - (int) textWidth) / 2;
-                int centerY = height / 2;
-                g2d.rotate(Math.toRadians(-30), width / 2.0, height / 2.0);
-                g2d.drawString(text, centerX, centerY);
+
+                int fontSize = Math.max(32, width / 18);
+                Font font = new Font("Arial", Font.BOLD, fontSize);
+                g2d.setFont(font);
+
+                FontMetrics fm = g2d.getFontMetrics();
+                int textWidth = fm.stringWidth(text);
+                int textHeight = fm.getHeight();
+
+                double angle = Math.toRadians(-35);
+                g2d.rotate(angle, width / 2.0, height / 2.0);
+
+                int stepX = (int) (textWidth * 1.8);
+                int stepY = (int) (textHeight * 4);
+
+                for (int x = -width; x < width * 2; x += stepX) {
+                    for (int y = -height; y < height * 2; y += stepY) {
+                        g2d.drawString(text, x, y);
+                    }
+                }
+
                 g2d.dispose();
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                     String format = image.getColorModel().hasAlpha() ? "png" : "jpg";
@@ -85,10 +118,11 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 }
             }
 
+            // fallback
             return input;
 
         } catch (Exception e) {
-            log.error("An error occurred during the process watermark. [Input: {}. Text: {}. Error Reason: {}]", input, text, e.getMessage());
+            log.error("Watermark processing failed. Text: {}. Error: {}", text, e.getMessage());
             throw new AppException(BusinessError.FAILED_WATERMARK);
         }
     }

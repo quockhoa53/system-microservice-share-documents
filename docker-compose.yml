@@ -163,6 +163,14 @@ services:
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
       - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200/_cluster/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     ulimits:
       memlock:
         soft: -1
@@ -170,6 +178,68 @@ services:
     mem_limit: 2g
     networks:
       - app-net
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-net
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  graylog:
+    image: graylog/graylog:6.0
+    container_name: graylog
+    depends_on:
+      mongo:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      # Graylog configuration
+      GRAYLOG_PASSWORD_SECRET: abcdefghijklmnop1234567890
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+      # Elasticsearch connection
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      GRAYLOG_ELASTICSEARCH_SHARDS: 1
+      GRAYLOG_ELASTICSEARCH_REPLICAS: 0
+      # MongoDB connection
+      GRAYLOG_MONGODB_URI: mongodb://mongo:27017/graylog
+      # Network settings
+      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+      GRAYLOG_HTTP_EXTERNAL_URI: http://localhost:9002/
+      # GELF input
+      GRAYLOG_HTTP_ENABLE_CORS: true
+      GRAYLOG_HTTP_ENABLE_GZIP: true
+      # Timezone
+      TZ: Asia/Ho_Chi_Minh
+    entrypoint: >
+      /usr/bin/tini --
+      wait-for-it mongo:27017 --timeout=60 --
+      wait-for-it elasticsearch:9200 --timeout=60 --
+      /docker-entrypoint.sh
+    ports:
+      - "9002:9000"   # Web UI
+      - "12201:12201/udp" # GELF UDP
+      - "12201:12201/tcp" # GELF TCP
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+      - graylog_journal:/usr/share/graylog/data/journal
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9002/api/system || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 networks:
   system-net:
@@ -179,3 +249,7 @@ networks:
 
 volumes:
   minio_data:
+  mongo_data:
+  graylog_data:
+  graylog_journal:
+  es_data:

@@ -51,6 +51,10 @@ dependencies {
 	implementation 'com.google.guava:guava:33.0.0-jre'
 	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.2'
 	implementation 'org.elasticsearch:elasticsearch:7.10.2'
+	// GELF Appender for Graylog
+	implementation 'de.siegmar:logback-gelf:5.0.0'
+	// Janino for logback conditional processing
+	implementation 'org.codehaus.janino:janino:3.1.12'
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

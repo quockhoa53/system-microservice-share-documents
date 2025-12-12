@@ -69,6 +69,11 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
             version.setWrappedCEKMaster(wrappedMaster);
             documentVersionRepository.save(version);
 
+            if (rawCEK.length != 32) {
+                throw new AppException(BusinessError.FAILED_CREATE_KEY,
+                        String.format("CEK length is %d bytes, expected 32 bytes for AES-256. This indicates an issue with key generation or Vault encryption/decryption.", rawCEK.length));
+            }
+
             String publicKey = userKeyRepository.getUserPublicPrimaryKeyForUser(request.getRecipientId(), OPENPGP_CV25519);
             if (publicKey == null) {
                 throw new AppException(NotExistError.USER_PUBLIC_KEY_EMPTY);

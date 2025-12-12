@@ -61,6 +61,10 @@ public class OpenPgpServiceImpl implements OpenPgpService {
         try {
             if (cekBytes == null || cekBytes.length == 0)
                 throw new AppException(ValidationError.CEK_BYTE_EMPTY);
+            if (cekBytes.length != 32) {
+                throw new AppException(ValidationError.CEK_BYTE_EMPTY,
+                        String.format("CEK length is %d bytes, expected 32 bytes for AES-256", cekBytes.length));
+            }
             if (recipientPublicKeyArmored == null || recipientPublicKeyArmored.isBlank())
                 throw new AppException(ValidationError.RECIPIENT_PUBLIC_KEY_EMPTY);
 
@@ -77,8 +81,11 @@ public class OpenPgpServiceImpl implements OpenPgpService {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             try (OutputStream cOut = encGen.open(out, new byte[8192])) {
                 PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
-                try (OutputStream pOut = lData.open(cOut, PGPLiteralData.BINARY, "_CEK", cekBytes.length, new Date())) {
-                    pOut.write(cekBytes);
+                // CRITICAL: Use PGPLiteralData.BINARY and specify exact length (32 bytes)
+                // The filename "_CEK" is just metadata, the actual data is 32 bytes
+                try (OutputStream pOut = lData.open(cOut, PGPLiteralData.BINARY, "_CEK", 32, new Date())) {
+                    // Write exactly 32 bytes
+                    pOut.write(cekBytes, 0, 32);
                 }
             }
 

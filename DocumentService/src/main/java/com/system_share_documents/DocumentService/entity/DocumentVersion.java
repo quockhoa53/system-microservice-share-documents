@@ -72,4 +72,7 @@ public class DocumentVersion {
 
     @Column(name = "updated_at", updatable = false)
     private Timestamp updatedAt; // thời điểm tạo phiên bản
+
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt; // thời điểm xóa (soft delete), NULL = chưa xóa
 }

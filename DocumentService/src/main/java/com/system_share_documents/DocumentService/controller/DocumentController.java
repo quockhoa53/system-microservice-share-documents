@@ -6,6 +6,7 @@ import com.system_share_documents.DocumentService.dto.request.InitUploadRequest;
 import com.system_share_documents.DocumentService.dto.request.SearchDocumentRequest;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.InitUploadResponse;
+import com.system_share_documents.DocumentService.dto.response.SharedDocumentResponse;
 import com.system_share_documents.DocumentService.service.DocumentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,23 +45,22 @@ public class DocumentController {
 
 
     @PostMapping("/search")
-    public ApiResponse<List<DocumentResponse>> initUploadController(
-            @RequestParam(required = false, defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+    public ApiResponse<List<DocumentResponse>> searchController(
+            @RequestParam("q") String query,
+            @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit
     ) throws Exception {
-        List<DocumentResponse> response = documentService.searchDocuments(keyword, page, size);
+        List<DocumentResponse> response = documentService.searchDocuments(query, limit);
         return ApiResponse.success("OK", "Search documents successfully", response);
     }
 
 
     @PostMapping("/shared/get/lists")
-    public ApiResponse<Page<DocumentResponse>> getSharedDocuments(@RequestParam(defaultValue = "0") int page,
+    public ApiResponse<Page<SharedDocumentResponse>> getSharedDocuments(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "20") int size,
                                                                   Authentication auth,
                                                                   HttpServletRequest httpRequest) throws Exception {
         String userId = auth.getName();
-        Page<DocumentResponse> response = documentService.getSharedDocuments(userId, page, size);
+        Page<SharedDocumentResponse> response = documentService.getSharedDocuments(userId, page, size);
         return ApiResponse.success("OK", "Get list shared documents successfully", response);
     }
 }

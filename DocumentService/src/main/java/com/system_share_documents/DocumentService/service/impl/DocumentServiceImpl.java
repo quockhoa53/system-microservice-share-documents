@@ -5,34 +5,40 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system_share_documents.AppCommonService.cache.document.DocumentCacheService;
 import com.system_share_documents.AppCommonService.dto.response.DocumentCacheResponse;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
+import com.system_share_documents.DocumentService.dto.response.SharedDocumentResponse;
 import com.system_share_documents.DocumentService.entity.Document;
-import com.system_share_documents.DocumentService.entity.DocumentKey;
 import com.system_share_documents.DocumentService.repository.DocumentKeyRepository;
 import com.system_share_documents.DocumentService.repository.DocumentRepository;
 import com.system_share_documents.DocumentService.service.DocumentService;
 import com.system_share_documents.DocumentService.utils.MapperUtils;
-import lombok.SneakyThrows;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import io.redisearch.client.Client;
-import io.redisearch.Query;
-import io.redisearch.SearchResult;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
+    private static final String DOCUMENTS_INDEX = "documents";
+    private static final int DEFAULT_LIMIT = 20;
+    private static final int MAX_LIMIT = 100;
+
     @Autowired
-    private Client searchClient;
+    private RestHighLevelClient elasticsearchClient;
 
     @Autowired
     private DocumentCacheService documentCacheService;
@@ -96,78 +102,80 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<DocumentResponse> searchDocuments(String keyword, int page, int size) {
-        int offset = page * size;
-
-        String queryStr;
-        if (keyword == null || keyword.isEmpty()) {
-            queryStr = "*";
-        } else {
-            queryStr = String.format("@original_filename:{%s*}", keyword);
+    public List<DocumentResponse> searchDocuments(String query, Integer limit) {
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
         }
 
-        Query query = new Query(queryStr)
-                .limit(offset, size)
-                .setSortBy("created_at", false);
+        int searchLimit = limit != null ? Math.min(limit, MAX_LIMIT) : DEFAULT_LIMIT;
+        String normalizedQuery = query.trim().toLowerCase();
 
-        SearchResult result = searchClient.search(query);
-        List<DocumentResponse> list = new ArrayList<>();
+        try {
+            SearchRequest searchRequest = new SearchRequest(DOCUMENTS_INDEX);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-        for (io.redisearch.Document doc : result.docs) {
-            try {
-                String metadataJson = (String) doc.get("metadata");
-                Object metadata = metadataJson != null ? objectMapper.readValue(metadataJson, Object.class) : null;
+            // Sử dụng multi-match query với prefix fields cho real-time search
+            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                    .should(QueryBuilders.multiMatchQuery(normalizedQuery)
+                            .field("original_filename.prefix", 2.0f)  // Boost filename matches
+                            .field("original_filename", 1.0f)
+                            .type(MultiMatchQueryBuilder.Type.BOOL_PREFIX)
+                            .fuzziness("AUTO"))
+                    .should(QueryBuilders.wildcardQuery("original_filename.keyword", "*" + normalizedQuery + "*"))
+                    .minimumShouldMatch(1);
 
-                list.add(new DocumentResponse(
-                        doc.getId().replace("document:", ""),
-                        doc.get("size_bytes") != null ? Long.parseLong(doc.get("size_bytes").toString()) : 0L,
-                        (String) doc.get("storage_class"),
-                        (String) doc.get("owner_id"),
-                        (String) doc.get("checksum"),
-                        (String) doc.get("content_type"),
-                        (String) doc.get("original_filename"),
-                        metadata,
-                        doc.get("created_at") != null ? Long.parseLong(doc.get("created_at").toString()) : 0L,
-                        doc.get("updated_at") != null ? Long.parseLong(doc.get("updated_at").toString()) : 0L
-                ));
-            } catch (Exception e) {
-                e.printStackTrace();
+            // Chỉ lấy documents chưa bị xóa (deleted_at IS NULL)
+            boolQuery.mustNot(QueryBuilders.existsQuery("deleted_at"));
+
+            searchSourceBuilder.query(boolQuery);
+            searchSourceBuilder.size(searchLimit);
+            searchSourceBuilder.fetchSource(true);
+
+            searchRequest.source(searchSourceBuilder);
+
+            SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
+
+            List<DocumentResponse> documents = new ArrayList<>();
+            for (SearchHit hit : searchResponse.getHits().getHits()) {
+                Map<String, Object> sourceMap = hit.getSourceAsMap();
+                DocumentResponse document = mapperUtils.mapToDocumentResponse(sourceMap);
+                if (document != null) {
+                    documents.add(document);
+                }
             }
-        }
+            return documents;
 
-        return list;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     @Override
-    public Page<DocumentResponse> getSharedDocuments(String userId, int page, int size) {
+    public Page<SharedDocumentResponse> getSharedDocuments(String userId, int page, int size) throws JsonProcessingException {
         Pageable pageable = PageRequest.of(page, size);
-        List<DocumentKey> documentKeys = documentKeyRepository.findByRecipientId(userId);
-        Set<UUID> documentIds = documentKeys.stream()
-                .map(key -> key.getDocumentVersion().getDocument().getId())
-                .collect(Collectors.toSet());
+        int limit = size + 1;
+        Timestamp createdAt = null;
+        UUID docId = null;
+        String jsonResult = documentRepository.getSharedDocuments(userId, limit, createdAt, docId);
 
-        if (documentIds.isEmpty()) {
+        if (jsonResult == null || jsonResult.trim().isEmpty() || jsonResult.equals("null")) {
             return Page.empty(pageable);
         }
-        List<Document> documents = documentRepository.findAllByIdIn(new ArrayList<>(documentIds));
 
-        int start = page * size;
-        int end = Math.min(start + size, documents.size());
+        List<SharedDocumentResponse> sharedDocs = objectMapper.readValue(
+                jsonResult,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, SharedDocumentResponse.class)
+        );
 
-        List<DocumentResponse> allResults = documents.stream()
-                .map(doc -> {
-                    try {
-                        return mapperUtils.mapDocumentEntityToResponse(doc);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException("Mapping error", e);
-                    }
-                })
-                .collect(Collectors.toList());
+        if (sharedDocs == null || sharedDocs.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        boolean hasNext = sharedDocs.size() > size;
+        if (hasNext) {
+            sharedDocs = sharedDocs.subList(0, size);
+        }
+        long total = hasNext ? (page + 1) * size + 1 : (page * size) + sharedDocs.size();
 
-        List<DocumentResponse> paginatedResults =
-                start < allResults.size() ? allResults.subList(start, end) : new ArrayList<>();
-
-        return new PageImpl<>(paginatedResults, pageable, documents.size());
+        return new PageImpl<>(sharedDocs, pageable, total);
     }
-
 }

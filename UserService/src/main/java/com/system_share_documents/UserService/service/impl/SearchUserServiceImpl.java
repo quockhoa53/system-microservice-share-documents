@@ -45,14 +45,24 @@ public class SearchUserServiceImpl implements SearchUserService {
             SearchRequest searchRequest = new SearchRequest(USERS_INDEX);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
+            // Sử dụng multi-match query với prefix fields cho real-time search
             BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
                     .should(QueryBuilders.multiMatchQuery(normalizedQuery)
                             .field("username.prefix", 2.0f)
                             .field("email.prefix", 1.5f)
+                            .field("full_name.prefix", 1.5f)
+                            .field("username", 1.0f)
+                            .field("email", 1.0f)
+                            .field("full_name", 1.0f)
                             .type(MultiMatchQueryBuilder.Type.BOOL_PREFIX)
                             .fuzziness("AUTO"))
-                    .must(QueryBuilders.termQuery("status", 1)) // chỉ user active
+                    .should(QueryBuilders.wildcardQuery("username.keyword", "*" + normalizedQuery + "*"))
+                    .should(QueryBuilders.wildcardQuery("email.keyword", "*" + normalizedQuery + "*"))
+                    .should(QueryBuilders.wildcardQuery("full_name.keyword", "*" + normalizedQuery + "*"))
                     .minimumShouldMatch(1);
+
+            // Chỉ lấy user có status = 1 (active)
+            boolQuery.must(QueryBuilders.termQuery("status", 1));
 
             searchSourceBuilder.query(boolQuery);
             searchSourceBuilder.size(searchLimit);
@@ -71,6 +81,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                 }
             }
 
+            log.debug("Found {} users for query: {}", users.size(), query);
             return users;
 
         } catch (Exception e) {

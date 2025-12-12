@@ -50,6 +50,9 @@ public class Document {
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt; // thời điểm cập nhật metadata cuối cùng
 
+    @Column(name = "deleted_at")
+    private Timestamp deletedAt; // thời điểm xóa (soft delete), NULL = chưa xóa
+
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> metadata;

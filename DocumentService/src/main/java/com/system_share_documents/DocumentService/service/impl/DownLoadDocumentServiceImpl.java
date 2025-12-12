@@ -20,6 +20,7 @@ import com.system_share_documents.DocumentService.service.DownLoadDocumentServic
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -54,6 +55,7 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
 
     // Thêm case check thời gian hết hạn quyền download (expirationDays)
     @Override
+    @Transactional
     public DownLoadDocumentResponse getDownLoadDocument(DownLoadDocumentRequest request, String userId, HttpServletRequest httpRequest) throws Exception {
         String status = "OK";
         String errorReason = null;

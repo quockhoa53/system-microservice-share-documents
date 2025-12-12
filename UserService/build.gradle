@@ -59,6 +59,10 @@ dependencies {
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    // GELF Appender for Graylog
+    implementation 'de.siegmar:logback-gelf:5.0.0'
+    // Janino for logback conditional processing
+    implementation 'org.codehaus.janino:janino:3.1.12'
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

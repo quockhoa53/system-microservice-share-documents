@@ -4,12 +4,14 @@ import com.system_share_documents.UserService.dto.ApiResponse;
 import com.system_share_documents.UserService.dto.request.GetPublicKeyRequest;
 import com.system_share_documents.UserService.dto.request.UploadKeyRequest;
 import com.system_share_documents.UserService.dto.response.PublicKeyResponse;
+import com.system_share_documents.UserService.service.UserKeyBackupService;
 import com.system_share_documents.UserService.service.UserKeyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +21,7 @@ import java.util.UUID;
 public class UserKeyController {
 
     private final UserKeyService userKeyService;
+    private final UserKeyBackupService backupService;
 
     @GetMapping("/me")
     public ApiResponse<List<PublicKeyResponse>> myKeys(Authentication auth) {
@@ -86,6 +89,28 @@ public class UserKeyController {
         return userKeyService.getPublicPrimaryKeyByUsername(username, keyType)
                 .map(k -> ApiResponse.success("OK", "Primary public key", k))
                 .orElseGet(() -> ApiResponse.success("OK", "No primary key", null));
+    }
+
+    // ===== KEY BACKUP ENDPOINTS =====
+    // End-to-end encrypted backup - server không thể đọc được nội dung
+
+    @GetMapping("/backup/me")
+    public ApiResponse<Map<String, String>> getMyBackup(Authentication auth) {
+        String encryptedBackup = backupService.getMyBackup(auth);
+        if (encryptedBackup == null || encryptedBackup.isBlank()) {
+            return ApiResponse.success("OK", "No backup found", Map.of("encryptedBackup", ""));
+        }
+        return ApiResponse.success("OK", "Backup retrieved", Map.of("encryptedBackup", encryptedBackup));
+    }
+
+    @PostMapping("/backup")
+    public ApiResponse<Void> saveBackup(@RequestBody Map<String, String> request, Authentication auth) {
+        String encryptedBackup = request.get("encryptedBackup");
+        if (encryptedBackup == null || encryptedBackup.isBlank()) {
+            return ApiResponse.error("BAD_REQUEST", "encryptedBackup is required", null);
+        }
+        backupService.saveBackup(encryptedBackup, auth);
+        return ApiResponse.success("OK", "Backup saved", null);
     }
 
 }

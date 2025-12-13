@@ -18,3 +18,4 @@ public class UserBrief {
     private String fullName;
 }
 
+

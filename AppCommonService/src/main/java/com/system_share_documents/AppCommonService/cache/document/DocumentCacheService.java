@@ -9,4 +9,5 @@ public interface DocumentCacheService {
     DocumentCacheResponse getDocumentFromCache(String documentId);
     List<DocumentCacheResponse> getDocumentsOfUser(String userId);
     Set<String> getDocumentIdsOfUser(String userId);
+    void removeDocumentFromCache(String documentId, String userId);
 }

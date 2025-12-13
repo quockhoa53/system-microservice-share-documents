@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 public enum AuthError implements ErrorCode {
     UNAUTHORIZED("UNAUTHORIZED", "Authentication required", HttpStatus.UNAUTHORIZED),
     FORBIDDEN("FORBIDDEN", "Access denied", HttpStatus.FORBIDDEN),
-    INVALID_JWT("INVALID_JWT", "Invalid JWT token", HttpStatus.BAD_REQUEST);
+    INVALID_JWT("INVALID_JWT", "Invalid JWT token", HttpStatus.BAD_REQUEST),
+    FORBIDDEN_ACTION_DELETE("FORBIDDEN_ACTION_DELETE", "Action delete document is denied", HttpStatus.BAD_REQUEST),
+    FORBIDDEN_ACTION_UPLOAD("FORBIDDEN_ACTION_UPLOAD", "Action update document is denied", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

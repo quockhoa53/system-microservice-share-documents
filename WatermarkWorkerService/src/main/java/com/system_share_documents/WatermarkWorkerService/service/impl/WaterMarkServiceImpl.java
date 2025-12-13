@@ -43,18 +43,26 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                                 PDPageContentStream.AppendMode.APPEND,
                                 true, true
                         )) {
-                            cs.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, 40);
-                            cs.setNonStrokingColor(180, 180, 180); // màu xám nhẹ
+                            // Font size tự động dựa trên kích thước trang
+                            float baseFontSize = Math.min(w, h) / 25f;
+                            float fontSize = Math.max(24f, Math.min(48f, baseFontSize));
+                            cs.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+
+                            // Màu xám nhẹ với độ trong suốt tốt hơn (lighter gray)
+                            cs.setNonStrokingColor(200, 200, 200);
 
                             float angle = (float) Math.toRadians(45);
 
-                            // khoảng cách giữa các watermark
-                            float stepX = 300;
-                            float stepY = 250;
+                            // Khoảng cách giữa các watermark tự động dựa trên kích thước trang
+                            float stepX = Math.max(250f, w * 0.4f);
+                            float stepY = Math.max(200f, h * 0.35f);
 
-                            for (float x = -w; x < w * 2; x += stepX) {
-                                for (float y = -h; y < h * 2; y += stepY) {
+                            // Điều chỉnh vị trí bắt đầu để watermark được căn giữa tốt hơn
+                            float startX = -w * 0.2f;
+                            float startY = -h * 0.2f;
 
+                            for (float x = startX; x < w * 1.5f; x += stepX) {
+                                for (float y = startY; y < h * 1.5f; y += stepY) {
                                     cs.beginText();
                                     cs.setTextMatrix(
                                             (float) Math.cos(angle), (float) Math.sin(angle),
@@ -81,16 +89,21 @@ public class WaterMarkServiceImpl implements WaterMarkService {
 
                 Graphics2D g2d = image.createGraphics();
 
+                // Cải thiện chất lượng rendering
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-                // Đậm vừa phải
-                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.20f);
+                // Độ trong suốt vừa phải - không quá đậm, không quá nhạt
+                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.15f);
                 g2d.setComposite(alphaChannel);
 
-                g2d.setColor(Color.GRAY);
+                // Màu xám nhẹ hơn
+                g2d.setColor(new Color(180, 180, 180));
 
-                int fontSize = Math.max(32, width / 18);
+                // Font size tự động dựa trên kích thước ảnh
+                int fontSize = Math.max(28, Math.min(72, Math.max(width, height) / 20));
                 Font font = new Font("Arial", Font.BOLD, fontSize);
                 g2d.setFont(font);
 
@@ -98,15 +111,33 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 int textWidth = fm.stringWidth(text);
                 int textHeight = fm.getHeight();
 
+                // Góc xoay watermark
                 double angle = Math.toRadians(-35);
-                g2d.rotate(angle, width / 2.0, height / 2.0);
 
-                int stepX = (int) (textWidth * 1.8);
-                int stepY = (int) (textHeight * 4);
+                // Khoảng cách giữa các watermark
+                int stepX = (int) (textWidth * 2.2);
+                int stepY = (int) (textHeight * 3.5);
 
-                for (int x = -width; x < width * 2; x += stepX) {
-                    for (int y = -height; y < height * 2; y += stepY) {
+                // Điều chỉnh vị trí bắt đầu để watermark được phân bố đều
+                int offsetX = (int) (-width * 0.1);
+                int offsetY = (int) (-height * 0.1);
+
+                // Vẽ watermark với rotation riêng cho mỗi vị trí
+                for (int x = offsetX; x < width * 1.3; x += stepX) {
+                    for (int y = offsetY; y < height * 1.3; y += stepY) {
+                        // Lưu transform hiện tại
+                        java.awt.geom.AffineTransform originalTransform = g2d.getTransform();
+
+                        // Tính toán tâm của watermark text
+                        double centerX = x + textWidth / 2.0;
+                        double centerY = y + textHeight / 2.0;
+
+                        // Xoay quanh tâm của text
+                        g2d.rotate(angle, centerX, centerY);
                         g2d.drawString(text, x, y);
+
+                        // Khôi phục transform
+                        g2d.setTransform(originalTransform);
                     }
                 }
 

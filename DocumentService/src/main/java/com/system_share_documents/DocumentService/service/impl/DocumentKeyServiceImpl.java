@@ -16,6 +16,8 @@ import com.system_share_documents.DocumentService.repository.DocumentVersionRepo
 import com.system_share_documents.DocumentService.service.DocumentKeyService;
 import com.system_share_documents.DocumentService.service.OpenPgpService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -35,6 +37,8 @@ import static com.system_share_documents.AppCommonService.utils.ClientUtils.getU
 
 @Service
 public class DocumentKeyServiceImpl implements DocumentKeyService {
+
+    private static final Logger log = LoggerFactory.getLogger(DocumentKeyServiceImpl.class);
 
     @Autowired
     private UserKeyRest userKeyRepository;
@@ -75,6 +79,8 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
             }
 
             String publicKey = userKeyRepository.getUserPublicPrimaryKeyForUser(request.getRecipientId(), OPENPGP_CV25519);
+            log.info(String.format("Public key used to decrypt document %s is %s", request.getDocumentVersionId(), publicKey));
+
             if (publicKey == null) {
                 throw new AppException(NotExistError.USER_PUBLIC_KEY_EMPTY);
             }

@@ -168,9 +168,17 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
             return existing;
         }
 
+        // Format watermark text: userId | YYYY-MM-DD HH:mm
+        Instant now = Instant.now();
+        String timeStr = now.toString();
+        String formattedTime = timeStr.contains("T")
+                ? timeStr.substring(0, timeStr.indexOf("T") + 6).replace("T", " ")
+                : timeStr.substring(0, Math.min(16, timeStr.length()));
+        String watermarkText = String.format("%s | %s", event.getOwnerId(), formattedTime);
+
         WatermarkJob job = WatermarkJob.builder()
                 .documentId(event.getDocumentId())
-                .watermarkText(event.getOwnerId() + " | " + Instant.now())
+                .watermarkText(watermarkText)
                 .recipientUserId(event.getOwnerId())
                 .status(WorkerProcessStatus.PROCESSING)
                 .processingNode(getHostName())

@@ -1,9 +1,11 @@
 package com.system_share_documents.DocumentService.controller;
 
 import com.system_share_documents.DocumentService.dto.ApiResponse;
+import com.system_share_documents.DocumentService.dto.request.DeleteDocumentRequest;
 import com.system_share_documents.DocumentService.dto.request.GetListDocumentRequest;
 import com.system_share_documents.DocumentService.dto.request.InitUploadRequest;
 import com.system_share_documents.DocumentService.dto.request.SearchDocumentRequest;
+import com.system_share_documents.DocumentService.dto.response.DeleteDocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.InitUploadResponse;
 import com.system_share_documents.DocumentService.dto.response.SharedDocumentResponse;
@@ -23,7 +25,7 @@ public class DocumentController {
     @Autowired
     private DocumentService documentService;
 
-    @PostMapping("/get/lists")
+    @PostMapping("get/lists")
     public ApiResponse<Page<DocumentResponse>> getListDocumentController(@RequestBody(required = false) GetListDocumentRequest request, Authentication auth, HttpServletRequest httpRequest) throws Exception {
         String userId = auth.getName();
         int page = 0;
@@ -44,7 +46,7 @@ public class DocumentController {
     }
 
 
-    @PostMapping("/search")
+    @PostMapping("search")
     public ApiResponse<List<DocumentResponse>> searchController(
             @RequestParam("q") String query,
             @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit
@@ -54,7 +56,7 @@ public class DocumentController {
     }
 
 
-    @PostMapping("/shared/get/lists")
+    @PostMapping("shared/get/lists")
     public ApiResponse<Page<SharedDocumentResponse>> getSharedDocuments(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "20") int size,
                                                                   Authentication auth,
@@ -62,5 +64,13 @@ public class DocumentController {
         String userId = auth.getName();
         Page<SharedDocumentResponse> response = documentService.getSharedDocuments(userId, page, size);
         return ApiResponse.success("OK", "Get list shared documents successfully", response);
+    }
+
+    @DeleteMapping("delete")
+    public ApiResponse<DeleteDocumentResponse> deleteDocument(@RequestBody DeleteDocumentRequest request, Authentication auth, HttpServletRequest httpRequest
+    ) throws Exception {
+        String userId = auth.getName();
+        DeleteDocumentResponse response = documentService.deleteDocument(request, userId, httpRequest);
+        return ApiResponse.success("OK", "Document deleted successfully", response);
     }
 }

@@ -57,6 +57,32 @@ public class CdcDataTransformer extends RichMapFunction<String, Map<String, Obje
             documentData = mapper.readValue(afterNode.toString(), Map.class);
         }
 
+        // Kiểm tra soft delete: nếu deleted_at != null thì chuyển thành DELETE
+        if (!opType.equals("DELETE")) {
+            Object deletedAt = documentData.get("deleted_at");
+            if (deletedAt != null) {
+                // Nếu deleted_at là số (timestamp) và > 0, hoặc là string không rỗng
+                boolean isDeleted = false;
+                if (deletedAt instanceof Number) {
+                    isDeleted = ((Number) deletedAt).longValue() > 0;
+                } else if (deletedAt instanceof String) {
+                    String deletedAtStr = ((String) deletedAt).trim();
+                    isDeleted = !deletedAtStr.isEmpty() && !deletedAtStr.equalsIgnoreCase("null");
+                    // Thử parse số nếu là string số
+                    try {
+                        long timestamp = Long.parseLong(deletedAtStr);
+                        isDeleted = timestamp > 0;
+                    } catch (NumberFormatException ignored) {
+                        // Giữ nguyên giá trị isDeleted từ check string
+                    }
+                }
+
+                if (isDeleted) {
+                    opType = "DELETE";
+                }
+            }
+        }
+
         documentData.put("_operation", opType);
 
         // normalize metadata nếu CREATE/UPDATE/SNAPSHOT

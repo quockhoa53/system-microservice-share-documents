@@ -62,7 +62,7 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
         Document doc = null;
         DocumentVersion version = null;
         try {
-            doc = documentRepository.findById(request.getDocumentId())
+            doc = documentRepository.findByIdAndNotDeleted(request.getDocumentId())
                     .orElseThrow(() -> new AppException(NotExistError.DOCUMENT_NOT_FOUND));
 
             version = doc.getVersions().stream()

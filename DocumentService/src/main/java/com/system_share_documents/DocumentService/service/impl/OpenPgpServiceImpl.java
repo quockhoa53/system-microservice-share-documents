@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.system_share_documents.DocumentService.utils.AlgorithmUtils.getAlgorithmName;
+
 @Service
 public class OpenPgpServiceImpl implements OpenPgpService {
 
@@ -176,4 +178,39 @@ public class OpenPgpServiceImpl implements OpenPgpService {
             return out.toByteArray();
         }
     }
+
+    /**
+     * Lấy tên algorithm từ signature và public key
+     * @param detachedSignature Signature bytes
+     * @param publicKeyArmored Public key armored string
+     * @return Tên algorithm (vd: "Ed25519", "RSA", "ECDSA")
+     */
+    public String getAlgorithmFromSignature(byte[] detachedSignature, String publicKeyArmored) {
+        try {
+            java.security.Security.addProvider(new BouncyCastleProvider());
+            try (
+                    InputStream keyIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(publicKeyArmored.getBytes(StandardCharsets.UTF_8)));
+                    InputStream sigIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(detachedSignature))
+            ) {
+                PGPPublicKeyRingCollection pgpPubRingCollection = new PGPPublicKeyRingCollection(keyIn, new JcaKeyFingerprintCalculator());
+                PGPObjectFactory pgpFact = new PGPObjectFactory(sigIn, new JcaKeyFingerprintCalculator());
+                Object obj = pgpFact.nextObject();
+                PGPSignatureList sigList = (obj instanceof PGPSignatureList)
+                        ? (PGPSignatureList) obj
+                        : new PGPSignatureList((PGPSignature) obj);
+                PGPSignature sig = sigList.get(0);
+
+                PGPPublicKey key = pgpPubRingCollection.getPublicKey(sig.getKeyID());
+                if (key == null) {
+                    return "UNKNOWN";
+                }
+
+                int algId = key.getAlgorithm();
+                return getAlgorithmName(algId);
+            }
+        } catch (Exception e) {
+            return "UNKNOWN";
+        }
+    }
+
 }

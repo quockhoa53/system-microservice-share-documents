@@ -16,7 +16,11 @@ public enum BusinessError implements ErrorCode {
     DOCUMENT_NOT_YET_WATERMARK("DOCUMENT_NOT_YET_WATERMARK" , "Document version has not been watermarked yet", HttpStatus.BAD_REQUEST),
     DOCUMENT_NOT_YET_AVAILABLE("DOCUMENT_NOT_YET_AVAILABLE" , "Document version must be in status available", HttpStatus.BAD_REQUEST),
     FAILED_GET_ENCRYPTION("FAILED_GET_ENCRYPTION" , "Failed to get encryption key", HttpStatus.BAD_REQUEST),
-    USER_NOT_PERMISSION("USER_NOT_PERMISSION" , "The user does not have permission to download document", HttpStatus.BAD_REQUEST),;
+    USER_NOT_PERMISSION("USER_NOT_PERMISSION" , "The user does not have permission to perform this action on the document", HttpStatus.BAD_REQUEST),
+    FAILED_DELETE_VERSION("FAILED_DELETE_VERSION" , "Failed to delete list versions of document", HttpStatus.BAD_REQUEST),
+    FAILED_DELETE_DOCUMENT("FAILED_DELETE_DOCUMENT" , "Failed to delete document", HttpStatus.BAD_REQUEST),
+    FAILED_PREVIEW_DOCUMENT("FAILED_PREVIEW_DOCUMENT" , "Failed to preview document", HttpStatus.BAD_REQUEST),
+    FAILED_REINIT_UPLOAD("FAILED_REINIT_UPLOAD" , "Failed to reinit upload document", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

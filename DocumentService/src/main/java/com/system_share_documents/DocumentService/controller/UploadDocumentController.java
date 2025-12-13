@@ -3,6 +3,7 @@ package com.system_share_documents.DocumentService.controller;
 import com.system_share_documents.DocumentService.dto.ApiResponse;
 import com.system_share_documents.DocumentService.dto.request.CompleteUploadRequest;
 import com.system_share_documents.DocumentService.dto.request.InitUploadRequest;
+import com.system_share_documents.DocumentService.dto.request.ReinitUploadRequest;
 import com.system_share_documents.DocumentService.dto.response.CompleteUploadResponse;
 import com.system_share_documents.DocumentService.dto.response.InitUploadResponse;
 import com.system_share_documents.DocumentService.service.UploadDocumentService;
@@ -22,12 +23,20 @@ public class UploadDocumentController {
     public ApiResponse<InitUploadResponse> initUploadController(@RequestBody InitUploadRequest request, Authentication auth, HttpServletRequest httpRequest) throws Exception {
         String ownerId = auth.getName();
         InitUploadResponse response = uploadDocumentService.initUpload(request, ownerId, httpRequest);
-        return ApiResponse.success("OK", "Init upload document success", response);
+        return ApiResponse.success("OK", "Init upload document successfully", response);
     }
 
     @PostMapping("/complete-upload")
     public ApiResponse<CompleteUploadResponse> completeUploadController(@RequestBody CompleteUploadRequest request, HttpServletRequest httpRequest) throws Exception {
         CompleteUploadResponse response = uploadDocumentService.completeUpload(request, httpRequest);
-        return ApiResponse.success("OK", "Complete upload document success", response);
+        return ApiResponse.success("OK", "Complete upload document successfully", response);
+    }
+
+    @PostMapping("/reinit")
+    public ApiResponse<InitUploadResponse> reinitUpload(@RequestBody ReinitUploadRequest request, Authentication auth, HttpServletRequest httpRequest
+    ) throws Exception {
+        String userId = auth.getName();
+        InitUploadResponse response = uploadDocumentService.reinitUpload(request, userId, httpRequest);
+        return ApiResponse.success("OK", "Upload reinitialized successfully", response);
     }
 }

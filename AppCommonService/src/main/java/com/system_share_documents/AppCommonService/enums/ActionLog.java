@@ -12,6 +12,11 @@ public enum ActionLog {
     COMPLETE_UPLOAD,
     WATERMARK,
     DOWNLOAD,
+    PREVIEW,
+    DELETE_DOCUMENT,
+
+    // Document Version
+    DELETE_VERSIONS,
     
     // Access Control
     GRANT_ACCESS,

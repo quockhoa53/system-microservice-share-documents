@@ -4,13 +4,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system_share_documents.AppCommonService.cache.document.DocumentCacheService;
 import com.system_share_documents.AppCommonService.dto.response.DocumentCacheResponse;
+import com.system_share_documents.AppCommonService.enums.ActionLog;
+import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
+import com.system_share_documents.DocumentService.dto.request.DeleteDocumentRequest;
+import com.system_share_documents.DocumentService.dto.response.DeleteDocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.SharedDocumentResponse;
 import com.system_share_documents.DocumentService.entity.Document;
+import com.system_share_documents.DocumentService.exception.AppException;
+import com.system_share_documents.DocumentService.exception.errorcode.AuthError;
+import com.system_share_documents.DocumentService.exception.errorcode.BusinessError;
+import com.system_share_documents.DocumentService.exception.errorcode.NotExistError;
 import com.system_share_documents.DocumentService.repository.DocumentKeyRepository;
 import com.system_share_documents.DocumentService.repository.DocumentRepository;
+import com.system_share_documents.DocumentService.repository.DocumentVersionRepository;
 import com.system_share_documents.DocumentService.service.DocumentService;
 import com.system_share_documents.DocumentService.utils.MapperUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -27,8 +38,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.DOCUMENT;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
+import static com.system_share_documents.AppCommonService.utils.ProcessJsonUtils.convertJson;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -50,6 +67,12 @@ public class DocumentServiceImpl implements DocumentService {
     private DocumentKeyRepository documentKeyRepository;
 
     @Autowired
+    private DocumentVersionRepository documentVersionRepository;
+
+    @Autowired
+    private AuditLogProducer auditLogProducer;
+
+    @Autowired
     private MapperUtils mapperUtils;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -62,38 +85,60 @@ public class DocumentServiceImpl implements DocumentService {
         Pageable pageable = PageRequest.of(page, size);
         List<DocumentCacheResponse> cachedDocs = documentCacheService.getDocumentsOfUser(userId);
         List<DocumentResponse> results = new ArrayList<>();
+
         if (cachedDocs != null && !cachedDocs.isEmpty()) {
-            int start = Math.min(page * size, cachedDocs.size());
-            int end = Math.min(start + size, cachedDocs.size());
-            List<DocumentCacheResponse> pageCache = cachedDocs.subList(start, end);
-            for (DocumentCacheResponse c : pageCache) {
+            // Tối ưu: Paginate trước để tránh load tất cả documents vào memory
+            int totalCached = cachedDocs.size();
+            int start = page * size;
+            int end = Math.min(start + size, totalCached);
+
+            // Lấy page data từ cache
+            List<DocumentCacheResponse> pageCachedDocs = start < totalCached
+                    ? cachedDocs.subList(start, end)
+                    : new ArrayList<>();
+
+            // Map cached documents to response (không cần query DB vì cache đã được sync bởi removeDocumentFromCache và CDC job)
+            for (DocumentCacheResponse c : pageCachedDocs) {
                 results.add(mapperUtils.mapDocumentCacheToResponse(c));
             }
-            Set<String> docIds = null;
-            if (end < size) {
-                Set<String> cachedIds = cachedDocs.stream()
+
+            // Nếu chưa đủ size và có thể có documents chưa được cache
+            if (results.size() < size && end >= totalCached) {
+                Set<String> docIds = documentCacheService.getDocumentIdsOfUser(userId);
+                Set<String> cachedDocIds = cachedDocs.stream()
                         .map(DocumentCacheResponse::getId)
                         .collect(Collectors.toSet());
-                docIds = documentCacheService.getDocumentIdsOfUser(userId);
+
                 List<String> missingIds = docIds.stream()
-                        .filter(id -> !cachedIds.contains(id))
+                        .filter(id -> !cachedDocIds.contains(id))
+                        .limit(size - results.size()) // Chỉ lấy số lượng cần thiết
                         .toList();
+
                 if (!missingIds.isEmpty()) {
-                    List<UUID> uuidMissing = missingIds.stream().map(UUID::fromString).toList();
-                    List<Document> entities = documentRepository.findAllByIdIn(uuidMissing);
+                    List<UUID> uuidMissing = missingIds.stream()
+                            .map(UUID::fromString)
+                            .toList();
+                    List<Document> entities = documentRepository.findAllByIdIn(uuidMissing).stream()
+                            .filter(d -> d.getDeletedAt() == null)
+                            .limit(size - results.size())
+                            .toList();
+
                     for (Document e : entities) {
                         results.add(mapperUtils.mapDocumentEntityToResponse(e));
-                        if (results.size() >= size) break; // đảm bảo trả đúng size
                     }
                 }
+
+                // Total count dựa trên số lượng IDs trong cache set
+                // (deleted documents đã được xóa khỏi cache bởi removeDocumentFromCache và CDC job)
+                return new PageImpl<>(results, pageable, docIds != null ? docIds.size() : totalCached);
             }
 
-            if (docIds != null && !docIds.isEmpty()) {
-                return new PageImpl<>(results, pageable, docIds.size());
-            }
+            // Return với total từ cache size
+            return new PageImpl<>(results, pageable, totalCached);
         }
 
-        Page<Document> entityPage = documentRepository.findAllByOwnerId(userId, pageable);
+        // Fallback: Query từ database nếu không có cache
+        Page<Document> entityPage = documentRepository.findActiveDocumentsByOwnerId(userId, pageable);
         for (Document e : entityPage.getContent()) {
             results.add(mapperUtils.mapDocumentEntityToResponse(e));
         }
@@ -177,5 +222,74 @@ public class DocumentServiceImpl implements DocumentService {
         long total = hasNext ? (page + 1) * size + 1 : (page * size) + sharedDocs.size();
 
         return new PageImpl<>(sharedDocs, pageable, total);
+    }
+
+    @Override
+    public DeleteDocumentResponse deleteDocument(DeleteDocumentRequest request, String userId, HttpServletRequest httpRequest) throws Exception {
+        String status = "OK";
+        String errorReason = null;
+        Document doc = null;
+        long deletedVersionsCount = 0;
+
+        try {
+            doc = documentRepository.findByIdAndNotDeleted(request.getDocumentId())
+                    .orElseThrow(() -> new AppException(NotExistError.DOCUMENT_NOT_FOUND));
+
+            if (!doc.getOwnerId().equals(userId)) {
+                throw new AppException(AuthError.FORBIDDEN_ACTION_DELETE);
+            }
+
+            deletedVersionsCount = documentVersionRepository.countByDocumentIdAndDeletedAtIsNull(doc.getId());
+
+            // Soft delete tất cả versions bằng batch update (tối ưu cho 1M records)
+            Timestamp now = Timestamp.from(Instant.now());
+            documentVersionRepository.batchSoftDeleteByDocumentId(doc.getId(), now);
+
+            // Soft delete document
+            doc.setDeletedAt(now);
+            doc.setUpdatedAt(now);
+            documentRepository.save(doc);
+
+            try {
+                documentCacheService.removeDocumentFromCache(doc.getId().toString(), doc.getOwnerId());
+            } catch (Exception cacheException) {
+                // Log lỗi nhưng không throw để không ảnh hưởng đến kết quả xóa document
+                // Cache sẽ được đồng bộ lại bởi CDC job sau đó
+                // Có thể thêm logger ở đây nếu cần
+            }
+
+            return DeleteDocumentResponse.builder()
+                    .documentId(doc.getId())
+                    .deleted(true)
+                    .deletedVersionsCount(deletedVersionsCount)
+                    .build();
+
+        } catch (AppException e) {
+            status = "FAIL";
+            errorReason = e.getMessage();
+            throw e;
+        } catch (Exception e) {
+            status = "FAIL";
+            errorReason = e.getMessage();
+            throw new AppException(BusinessError.FAILED_DELETE_DOCUMENT, e.getMessage());
+        } finally {
+            if (doc != null) {
+                AuditLogEvent logEvent = AuditLogEvent.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .userId(userId)
+                        .action(String.valueOf(ActionLog.DELETE_DOCUMENT))
+                        .documentId(doc.getId().toString())
+                        .objectType(DOCUMENT)
+                        .status(status)
+                        .errorReason(errorReason)
+                        .ip(getClientIp(httpRequest))
+                        .userAgent(getUserAgent(httpRequest))
+                        .metadata(null)
+                        .request(convertJson(request))
+                        .build();
+
+                auditLogProducer.sendAuditLog(logEvent, doc.getId().toString());
+            }
+        }
     }
 }

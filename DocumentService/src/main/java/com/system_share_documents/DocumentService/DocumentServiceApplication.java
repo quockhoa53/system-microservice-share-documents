@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(scanBasePackages = "com.system_share_documents")
 @ConfigurationPropertiesScan
 @EnableAsync
-@EnableAspectJAutoProxy
 public class DocumentServiceApplication {
 
 	public static void main(String[] args) {

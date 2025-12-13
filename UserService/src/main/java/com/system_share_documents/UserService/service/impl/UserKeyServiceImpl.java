@@ -63,6 +63,14 @@ public class UserKeyServiceImpl implements UserKeyService {
         if (hasNewPrimary) {
             userKeyRepository.findByUser_Id(user.getId())
                     .forEach(k -> { if (Boolean.TRUE.equals(k.getIsPrimary())) k.setIsPrimary(false); });
+
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            userKeyRepository.findByUser_Id(user.getId())
+                    .forEach(k -> {
+                        if (k.getRevokedAt() == null) {
+                            k.setRevokedAt(now);
+                        }
+                    });
         }
 
         if (req.getKeys() == null || req.getKeys().isEmpty()) return;

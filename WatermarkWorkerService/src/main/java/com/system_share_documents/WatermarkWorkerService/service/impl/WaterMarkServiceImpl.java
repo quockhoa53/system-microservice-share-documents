@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,26 +32,50 @@ public class WaterMarkServiceImpl implements WaterMarkService {
             if (isPdf(input)) {
                 try (PDDocument document = PDDocument.load(inputStream);
                      ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
                     for (PDPage page : document.getPages()) {
                         var mediaBox = page.getMediaBox();
-                        float pageWidth = mediaBox.getWidth();
-                        float pageHeight = mediaBox.getHeight();
-                        try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
-                            contentStream.beginText();
-                            contentStream.setFont(PDType1Font.HELVETICA_OBLIQUE, 36);
-                            contentStream.setNonStrokingColor(150, 150, 150);
+                        float w = mediaBox.getWidth();
+                        float h = mediaBox.getHeight();
+
+                        try (PDPageContentStream cs = new PDPageContentStream(
+                                document, page,
+                                PDPageContentStream.AppendMode.APPEND,
+                                true, true
+                        )) {
+                            // Font size tự động dựa trên kích thước trang
+                            float baseFontSize = Math.min(w, h) / 25f;
+                            float fontSize = Math.max(24f, Math.min(48f, baseFontSize));
+                            cs.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+
+                            // Màu xám nhẹ với độ trong suốt tốt hơn (lighter gray)
+                            cs.setNonStrokingColor(200, 200, 200);
+
                             float angle = (float) Math.toRadians(45);
-                            float x = pageWidth / 4;
-                            float y = pageHeight / 2;
-                            contentStream.setTextMatrix(
-                                    (float) Math.cos(angle), (float) Math.sin(angle),
-                                    (float) -Math.sin(angle), (float) Math.cos(angle),
-                                    x, y
-                            );
-                            contentStream.showText(text);
-                            contentStream.endText();
+
+                            // Khoảng cách giữa các watermark tự động dựa trên kích thước trang
+                            float stepX = Math.max(250f, w * 0.4f);
+                            float stepY = Math.max(200f, h * 0.35f);
+
+                            // Điều chỉnh vị trí bắt đầu để watermark được căn giữa tốt hơn
+                            float startX = -w * 0.2f;
+                            float startY = -h * 0.2f;
+
+                            for (float x = startX; x < w * 1.5f; x += stepX) {
+                                for (float y = startY; y < h * 1.5f; y += stepY) {
+                                    cs.beginText();
+                                    cs.setTextMatrix(
+                                            (float) Math.cos(angle), (float) Math.sin(angle),
+                                            (float) -Math.sin(angle), (float) Math.cos(angle),
+                                            x, y
+                                    );
+                                    cs.showText(text);
+                                    cs.endText();
+                                }
+                            }
                         }
                     }
+
                     document.save(outputStream);
                     return outputStream.toByteArray();
                 }
@@ -63,20 +86,61 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 BufferedImage image = ImageIO.read(inputStream);
                 int width = image.getWidth();
                 int height = image.getHeight();
+
                 Graphics2D g2d = image.createGraphics();
+
+                // Cải thiện chất lượng rendering
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f);
+                g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+                // Độ trong suốt vừa phải - không quá đậm, không quá nhạt
+                AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.15f);
                 g2d.setComposite(alphaChannel);
-                g2d.setColor(Color.GRAY);
-                int fontSize = Math.max(24, width / 15);
-                g2d.setFont(new Font("Arial", Font.BOLD, fontSize));
-                FontRenderContext frc = g2d.getFontRenderContext();
-                double textWidth = g2d.getFont().getStringBounds(text, frc).getWidth();
-                int centerX = (width - (int) textWidth) / 2;
-                int centerY = height / 2;
-                g2d.rotate(Math.toRadians(-30), width / 2.0, height / 2.0);
-                g2d.drawString(text, centerX, centerY);
+
+                // Màu xám nhẹ hơn
+                g2d.setColor(new Color(180, 180, 180));
+
+                // Font size tự động dựa trên kích thước ảnh
+                int fontSize = Math.max(28, Math.min(72, Math.max(width, height) / 20));
+                Font font = new Font("Arial", Font.BOLD, fontSize);
+                g2d.setFont(font);
+
+                FontMetrics fm = g2d.getFontMetrics();
+                int textWidth = fm.stringWidth(text);
+                int textHeight = fm.getHeight();
+
+                // Góc xoay watermark
+                double angle = Math.toRadians(-35);
+
+                // Khoảng cách giữa các watermark
+                int stepX = (int) (textWidth * 2.2);
+                int stepY = (int) (textHeight * 3.5);
+
+                // Điều chỉnh vị trí bắt đầu để watermark được phân bố đều
+                int offsetX = (int) (-width * 0.1);
+                int offsetY = (int) (-height * 0.1);
+
+                // Vẽ watermark với rotation riêng cho mỗi vị trí
+                for (int x = offsetX; x < width * 1.3; x += stepX) {
+                    for (int y = offsetY; y < height * 1.3; y += stepY) {
+                        // Lưu transform hiện tại
+                        java.awt.geom.AffineTransform originalTransform = g2d.getTransform();
+
+                        // Tính toán tâm của watermark text
+                        double centerX = x + textWidth / 2.0;
+                        double centerY = y + textHeight / 2.0;
+
+                        // Xoay quanh tâm của text
+                        g2d.rotate(angle, centerX, centerY);
+                        g2d.drawString(text, x, y);
+
+                        // Khôi phục transform
+                        g2d.setTransform(originalTransform);
+                    }
+                }
+
                 g2d.dispose();
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
                     String format = image.getColorModel().hasAlpha() ? "png" : "jpg";
@@ -85,10 +149,11 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 }
             }
 
+            // fallback
             return input;
 
         } catch (Exception e) {
-            log.error("An error occurred during the process watermark. [Input: {}. Text: {}. Error Reason: {}]", input, text, e.getMessage());
+            log.error("Watermark processing failed. Text: {}. Error: {}", text, e.getMessage());
             throw new AppException(BusinessError.FAILED_WATERMARK);
         }
     }

@@ -45,6 +45,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     //Kafka
     implementation 'org.springframework.kafka:spring-kafka'
+	// GELF Appender for Graylog
+	implementation 'de.siegmar:logback-gelf:5.0.0'
+	// Janino for logback conditional processing
+	implementation 'org.codehaus.janino:janino:3.1.12'
     //App Common
     implementation project(':AppCommonService')
 }

@@ -4,6 +4,8 @@ import com.system_share_documents.AppCommonService.config.properties.MinioProper
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.StatObjectArgs;
+import io.minio.errors.ErrorResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -85,6 +87,29 @@ public class MinioStorageRestImpl implements MinioStorageRest {
                         .object(objectKey)
                         .build()
         );
+    }
+
+    @Override
+    public boolean objectExists(String objectKey) throws Exception {
+        return objectExists(minioProperties.getBucket(), objectKey);
+    }
+
+    @Override
+    public boolean objectExists(String bucket, String objectKey) throws Exception {
+        try {
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectKey)
+                            .build()
+            );
+            return true;
+        } catch (ErrorResponseException e) {
+            if (e.errorResponse().code().equals("NoSuchKey")) {
+                return false;
+            }
+            throw e;
+        }
     }
 }
 

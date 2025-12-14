@@ -20,8 +20,8 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000" # API (S3)
-      - "9001:9001" # Web UI
+      - "9000:9000"   # API (S3)
+      - "9001:9001"   # Web UI
     volumes:
       - minio_data:/data
     networks:
@@ -29,35 +29,19 @@ services:
 
   # Vault (Secret Manager)
   vault:
-    image: hashicorp/vault:1.14
+    image: hashicorp/vault:1.13
     container_name: vault
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "root-token"
-      VAULT_ADDR: "http://0.0.0.0:8200"
     ports:
       - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data
+      - ./vault/config.hcl:/vault/config.hcl
+      - ./vault/policies:/vault/policies   # <-- ADD THIS
     cap_add:
       - IPC_LOCK
-    command: "server -dev -dev-root-token-id=root-token"
+    command: vault server -config=/vault/config.hcl
     networks:
       - system-net
-
-  # Redis (Cache)
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    networks:
-      - system-net
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Kafka
   zookeeper:
@@ -101,6 +85,31 @@ services:
     networks:
       - app-net
 
+  # Kafka Connect (Debezium)
+  kafka-connect:
+    image: debezium/connect:2.3
+    container_name: kafka-connect
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      STATUS_STORAGE_TOPIC: connect_statuses
+      KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      # replication factor cho topic internal
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+    ports:
+      - "8090:8083"  # host 8090 → container 8083
+    depends_on:
+      - kafka
+    networks:
+      - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   flink-jobmanager:
     build:
       context: .
@@ -116,8 +125,10 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -137,6 +148,108 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    networks:
+      - app-net
+      - system-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    container_name: elasticsearch
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200/_cluster/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 2g
+    networks:
+      - app-net
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-net
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  graylog:
+    image: graylog/graylog:6.0
+    container_name: graylog
+    depends_on:
+      mongo:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      # Graylog configuration
+      GRAYLOG_PASSWORD_SECRET: abcdefghijklmnop1234567890
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+      # Elasticsearch connection
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      GRAYLOG_ELASTICSEARCH_SHARDS: 1
+      GRAYLOG_ELASTICSEARCH_REPLICAS: 0
+      # MongoDB connection
+      GRAYLOG_MONGODB_URI: mongodb://mongo:27017/graylog
+      # Network settings
+      GRAYLOG_HTTP_BIND_ADDRESS: 0.0.0.0:9000
+      GRAYLOG_HTTP_EXTERNAL_URI: http://localhost:9002/
+      # GELF input
+      GRAYLOG_HTTP_ENABLE_CORS: true
+      GRAYLOG_HTTP_ENABLE_GZIP: true
+      # Timezone
+      TZ: Asia/Ho_Chi_Minh
+    entrypoint: >
+      /usr/bin/tini --
+      wait-for-it mongo:27017 --timeout=60 --
+      wait-for-it elasticsearch:9200 --timeout=60 --
+      /docker-entrypoint.sh
+    ports:
+      - "9002:9000"   # Web UI
+      - "12201:12201/udp" # GELF UDP
+      - "12201:12201/tcp" # GELF TCP
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+      - graylog_journal:/usr/share/graylog/data/journal
+    networks:
+      - app-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9002/api/system || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
 networks:
   system-net:
@@ -146,4 +259,7 @@ networks:
 
 volumes:
   minio_data:
-  redis_data:
+  mongo_data:
+  graylog_data:
+  graylog_journal:
+  es_data:

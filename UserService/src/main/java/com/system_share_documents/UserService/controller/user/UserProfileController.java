@@ -3,8 +3,8 @@ package com.system_share_documents.UserService.controller.user;
 
 import com.system_share_documents.UserService.dto.ApiResponse;
 import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
-import com.system_share_documents.UserService.dto.response.UserBrief;
 import com.system_share_documents.UserService.dto.response.UserResponse;
+import com.system_share_documents.UserService.service.SearchUserService;
 import com.system_share_documents.UserService.service.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -18,6 +18,8 @@ import java.util.List;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+
+    private final SearchUserService searchUserService;
 
     // GET /api/users/me – lấy thông tin user hiện tại
     @GetMapping("/me")
@@ -36,10 +38,12 @@ public class UserProfileController {
         return ApiResponse.success("OK", "Profile updated", user);
     }
 
-    // GET /api/users/search – tìm kiếm users
     @GetMapping("/search")
-    public ApiResponse<List<UserBrief>> searchUsers(@RequestParam String query) {
-        List<UserBrief> users = userProfileService.searchUsers(query);
-        return ApiResponse.success("OK", "Users found", users);
+    public ApiResponse<List<UserResponse>> searchUsers(
+            @RequestParam("q") String query,
+            @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit
+    ) {
+        List<UserResponse> users = searchUserService.searchUsers(query, limit);
+        return ApiResponse.success("OK", "Search completed", users);
     }
 }

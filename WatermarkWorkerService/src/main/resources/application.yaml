@@ -7,19 +7,27 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+    # Cấu hình để không fail khi de-register không thành công
+    should-on-demand-update-status-change: false
+    # Tắt health check khi shutdown để tránh lỗi
+    healthcheck:
+      enabled: true
   instance:
     prefer-ip-address: false
-
+    # Lease expiration duration (seconds) - thời gian Eureka chờ trước khi xóa service
+    lease-expiration-duration-in-seconds: 30
+    # Lease renewal interval (seconds) - tần suất gửi heartbeat
+    lease-renewal-interval-in-seconds: 10
 spring:
   application:
     name: watermark-worker-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/watermark_db?user=${DB_USERNAME}&password=${DB_PASSWORD}&sslmode=${DB_SSL_MODE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${LOCAL_DB_HOST}:${LOCAL_DB_PORT}/watermark_db?user=${LOCAL_DB_USERNAME}&password=${LOCAL_DB_PASSWORD}&sslmode=${LOCAL_DB_SSL_MODE}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -64,7 +72,20 @@ document-key:
   url: lb://document-service
   create-document-key: /api/documents/key/create
 
+grant-access:
+  service-name: auth-access-control-service
+  url: lb://auth-access-control-service
+  check-grant-access: /api/document-access/check-access
+  create-grant-access: /api/document-access/grant
+
 keycloak:
   token-base-url: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token
   client-id: ${KEYCLOAK_TOKEN_CLIENT_ID}
   client-secret: ${KEYCLOAK_TOKEN_CLIENT_SECRET}
+
+vault:
+  scheme: http
+  host: ${VAULT_HOST}
+  port: ${VAULT_PORT}
+  token: ${VAULT_TOKEN}
+  transit-key: ${VAULT_TRANSIT_KEY}

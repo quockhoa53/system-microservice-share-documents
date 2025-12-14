@@ -46,6 +46,13 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka:3.2.2'
 	// Resilience4j
 	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+	// Redis
+	implementation 'com.redislabs:jredisearch:2.2.0'
+	implementation 'redis.clients:jedis:3.7.1'
+	// GELF Appender for Graylog
+	implementation 'de.siegmar:logback-gelf:5.0.0'
+	// Janino for logback conditional processing
+	implementation 'org.codehaus.janino:janino:3.1.12'
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

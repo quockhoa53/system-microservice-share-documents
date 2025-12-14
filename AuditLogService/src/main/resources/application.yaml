@@ -7,16 +7,25 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+    # Cấu hình để không fail khi de-register không thành công
+    should-on-demand-update-status-change: false
+    # Tắt health check khi shutdown để tránh lỗi
+    healthcheck:
+      enabled: true
   instance:
     prefer-ip-address: false
+    # Lease expiration duration (seconds) - thời gian Eureka chờ trước khi xóa service
+    lease-expiration-duration-in-seconds: 30
+    # Lease renewal interval (seconds) - tần suất gửi heartbeat
+    lease-renewal-interval-in-seconds: 10
 
 spring:
   application:
     name: audit-log-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/log_db?user=${DB_USERNAME}&password=${DB_PASSWORD}&sslmode=${DB_SSL_MODE}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${LOCAL_DB_HOST}:${LOCAL_DB_PORT}/log_db?user=${LOCAL_DB_USERNAME}&password=${LOCAL_DB_PASSWORD}&sslmode=${LOCAL_DB_SSL_MODE}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none

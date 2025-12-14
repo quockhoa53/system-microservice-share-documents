@@ -1,5 +1,6 @@
 package com.system_share_documents.DocumentService.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,11 +13,12 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class InitUploadRequest {
+    private String documentId;
     private String originalFilename;
     private String contentType;
     private Long sizeBytes;
     private Map<String, Object> metadata;
-    private List<String> recipients;
     private String storageClass;
 }

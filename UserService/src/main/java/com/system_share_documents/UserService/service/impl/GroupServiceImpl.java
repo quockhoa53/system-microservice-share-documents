@@ -18,7 +18,7 @@ import com.system_share_documents.UserService.repository.GroupRepository;
 import com.system_share_documents.UserService.repository.UserRepository;
 import com.system_share_documents.UserService.service.CacheService;
 import com.system_share_documents.UserService.service.GroupService;
-import com.system_share_documents.UserService.util.SecurityUtils;
+import com.system_share_documents.UserService.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

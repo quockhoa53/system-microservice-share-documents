@@ -12,7 +12,9 @@ public enum ValidationError implements ErrorCode {
     RECIPIENT_PUBLIC_KEY_EMPTY("RECIPIENT_PUBLIC_KEY_EMPTY", "Recipient public key must not be null or empty", HttpStatus.BAD_REQUEST),
     FILE_BYTES_EMPTY("FILE_BYTES_EMPTY", "Data file bytes must not be empty", HttpStatus.BAD_REQUEST),
     SIGNATURE_EMPTY("SIGNATURE_EMPTY", "Signature must not be empty", HttpStatus.BAD_REQUEST),
-    PUBLIC_KEY_EMPTY("PUBLIC_KEY_EMPTY", "Public key must not be empty", HttpStatus.BAD_REQUEST),;
+    PUBLIC_KEY_EMPTY("PUBLIC_KEY_EMPTY", "Public key must not be empty", HttpStatus.BAD_REQUEST),
+    VERSION_IDS_EMPTY("VERSION_IDS_EMPTY", "Version IDs list cannot be empty", HttpStatus.BAD_REQUEST),
+    CAN_NOT_UPLOAD_BY_STATUS("CAN_NOT_UPLOAD_BY_STATUS" , "Can only reinitialize upload for versions with UPLOADING status", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

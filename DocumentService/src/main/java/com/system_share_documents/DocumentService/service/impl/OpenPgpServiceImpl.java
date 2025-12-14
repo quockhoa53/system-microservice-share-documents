@@ -25,6 +25,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.system_share_documents.DocumentService.utils.AlgorithmUtils.getAlgorithmName;
+
 @Service
 public class OpenPgpServiceImpl implements OpenPgpService {
 
@@ -57,14 +59,18 @@ public class OpenPgpServiceImpl implements OpenPgpService {
     }
 
     @Override
-    public byte[] wrapCekWithRecipientPublicKey(byte[] cekBytes, String recipientPublicKeyArmored) {
+    public byte[] wrapCekWithRecipientPublicKey(String recipientId, byte[] cekBytes, String recipientPublicKeyArmored) {
         try {
             if (cekBytes == null || cekBytes.length == 0)
                 throw new AppException(ValidationError.CEK_BYTE_EMPTY);
+            if (cekBytes.length != 32) {
+                throw new AppException(ValidationError.CEK_BYTE_EMPTY,
+                        String.format("CEK length is %d bytes, expected 32 bytes for AES-256", cekBytes.length));
+            }
             if (recipientPublicKeyArmored == null || recipientPublicKeyArmored.isBlank())
                 throw new AppException(ValidationError.RECIPIENT_PUBLIC_KEY_EMPTY);
 
-            PGPPublicKey encKey = getEncryptionKey(recipientPublicKeyArmored, recipientPublicKeyArmored);
+            PGPPublicKey encKey = getEncryptionKey(recipientId, recipientPublicKeyArmored);
 
             JcePGPDataEncryptorBuilder dataEncryptor = new JcePGPDataEncryptorBuilder(PGPEncryptedData.AES_256)
                     .setWithIntegrityPacket(true)
@@ -77,8 +83,11 @@ public class OpenPgpServiceImpl implements OpenPgpService {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             try (OutputStream cOut = encGen.open(out, new byte[8192])) {
                 PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
-                try (OutputStream pOut = lData.open(cOut, PGPLiteralData.BINARY, "_CEK", cekBytes.length, new Date())) {
-                    pOut.write(cekBytes);
+                // CRITICAL: Use PGPLiteralData.BINARY and specify exact length (32 bytes)
+                // The filename "_CEK" is just metadata, the actual data is 32 bytes
+                try (OutputStream pOut = lData.open(cOut, PGPLiteralData.BINARY, "_CEK", 32, new Date())) {
+                    // Write exactly 32 bytes
+                    pOut.write(cekBytes, 0, 32);
                 }
             }
 
@@ -169,4 +178,39 @@ public class OpenPgpServiceImpl implements OpenPgpService {
             return out.toByteArray();
         }
     }
+
+    /**
+     * Lấy tên algorithm từ signature và public key
+     * @param detachedSignature Signature bytes
+     * @param publicKeyArmored Public key armored string
+     * @return Tên algorithm (vd: "Ed25519", "RSA", "ECDSA")
+     */
+    public String getAlgorithmFromSignature(byte[] detachedSignature, String publicKeyArmored) {
+        try {
+            java.security.Security.addProvider(new BouncyCastleProvider());
+            try (
+                    InputStream keyIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(publicKeyArmored.getBytes(StandardCharsets.UTF_8)));
+                    InputStream sigIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(detachedSignature))
+            ) {
+                PGPPublicKeyRingCollection pgpPubRingCollection = new PGPPublicKeyRingCollection(keyIn, new JcaKeyFingerprintCalculator());
+                PGPObjectFactory pgpFact = new PGPObjectFactory(sigIn, new JcaKeyFingerprintCalculator());
+                Object obj = pgpFact.nextObject();
+                PGPSignatureList sigList = (obj instanceof PGPSignatureList)
+                        ? (PGPSignatureList) obj
+                        : new PGPSignatureList((PGPSignature) obj);
+                PGPSignature sig = sigList.get(0);
+
+                PGPPublicKey key = pgpPubRingCollection.getPublicKey(sig.getKeyID());
+                if (key == null) {
+                    return "UNKNOWN";
+                }
+
+                int algId = key.getAlgorithm();
+                return getAlgorithmName(algId);
+            }
+        } catch (Exception e) {
+            return "UNKNOWN";
+        }
+    }
+
 }

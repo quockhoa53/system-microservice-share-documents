@@ -10,7 +10,9 @@
         <module name="system-microservice-share-documents.APIGatewayService.main" />
         <module name="system-microservice-share-documents.AuthAccessControlService.main" />
         <module name="com.example.system-microservice-share-documents.UpdateDocumentData.main" />
+        <module name="com.example.system-microservice-share-documents.CDCUpdateDocumentDataCache.main" />
         <module name="system-microservice-share-documents.DocumentService.main" />
+        <module name="com.example.system-microservice-share-documents.CDCUpdateUserDataCache.main" />
         <module name="com.system_share_documents.system-microservice-share-documents.AppCommonService.main" />
         <module name="system-microservice-share-documents.WatermarkWorkerService.main" />
         <module name="system-microservice-share-documents.AuditLogService.main" />

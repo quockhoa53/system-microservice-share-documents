@@ -36,10 +36,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers(
-                                "/api/auth/login"
-                        ).permitAll()
-                        // tất cả request khác đều phải có token
+                        .pathMatchers("/api/auth/login").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -61,7 +58,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "https://lolsocial-lake.vercel.app",
+                "http://localhost:3000",
+                "http://192.168.1.219:3000",
                 "http://localhost:5173",
                 "http://127.0.0.1:5500",
                 "http://192.168.1.33:5173",

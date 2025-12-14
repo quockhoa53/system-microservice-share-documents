@@ -8,4 +8,6 @@ public interface MinioStorageRest {
     byte[] getObjectBytes(String objectKey) throws Exception;
     void putObjectBytes(String objectKey, byte[] data, String contentType) throws Exception;
     InputStream getObjectStream(String objectKey) throws Exception;
+    boolean objectExists(String objectKey) throws Exception;
+    boolean objectExists(String bucket, String objectKey) throws Exception;
 }

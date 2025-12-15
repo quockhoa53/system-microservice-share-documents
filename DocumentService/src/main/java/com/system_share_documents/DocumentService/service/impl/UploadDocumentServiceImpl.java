@@ -60,6 +60,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
     private DocumentVersionService documentVersionService;
 
     @Autowired
+    private FileValidationService fileValidationService;
+
+    @Autowired
     private DocumentRepository documentRepository;
 
     @Autowired
@@ -115,8 +118,11 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                     changed = true;
                 }
 
-                if (request.getSizeBytes() != null && !request.getSizeBytes().equals(doc.getSizeBytes())) {
-                    doc.setSizeBytes(request.getSizeBytes());
+                if (request.getContentType() != null && !request.getContentType().equals(doc.getContentType())) {
+                    if (!fileValidationService.isSupportedFileType(request.getContentType())) {
+                        throw new AppException(ValidationError.FILE_TYPE_NOT_SUPPORTED);
+                    }
+                    doc.setContentType(request.getContentType());
                     changed = true;
                 }
 
@@ -222,6 +228,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
             if(fileBytes == null){
                 throw new AppException(NotExistError.FILE_BYTE_EMPTY);
             }
+
+            fileValidationService.validateFile(fileBytes, doc.getContentType(), doc.getOriginalFilename(), doc.getSizeBytes());
+
             boolean validSignature = openPgpService.verifyDetachedSignature(fileBytes, detachedSignature, singerPublicKey);
             if (!validSignature) {
                 throw new AppException(ValidationError.SIGNATURE_INVALID);

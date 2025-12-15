@@ -34,30 +34,28 @@ public class WatermarkWorker {
 
     @KafkaListener(topics = DOCUMENT_WATERMARK_REQUEST_TOPIC, groupId = WATERMARK_WORKERS_GROUP)
     public void consume(WatermarkJobEvent event, Acknowledgment ack) {
-        executor.execute(event.getRequestId(), () ->
+        String requestId = event.getRequestId();
+        log.info("[requestId={}] Consumed watermark job event, documentId={}, versionId={}",
+                requestId, event.getDocumentId(), event.getVersionId());
+
+        executor.execute(requestId, () ->
                 handleAsync(event)
                         .whenComplete((r, ex) -> {
                             if (ex == null) {
+                                log.info("[requestId={}] Watermark job completed successfully", requestId);
                                 ack.acknowledge();
                                 metrics.counter("watermark_jobs_success").increment();
                             } else {
-                                log.error("Watermark permanently failed → moving on. requestId={}, error={}",
-                                        event.getRequestId(), ex.getMessage(), ex);
+                                log.error("[requestId={}] Watermark job permanently failed, error={}",
+                                        requestId, ex.getMessage(), ex);
                                 metrics.counter("watermark_jobs_failed").increment();
-
-                                // Bạn có thể push DLQ ở đây nếu muốn
                                 ack.acknowledge();
                             }
                         })
         );
     }
 
-    /**
-     * Handler chính — luôn trả CompletableFuture
-     */
     private CompletableFuture<Void> handleAsync(WatermarkJobEvent event) {
-        log.info("Start watermark [requestId={}, documentId={}]", event.getRequestId(), event.getDocumentId());
         return processor.processWatermark(event, DOCUMENT_WATERMARK_PROCESSED_TOPIC);
     }
 }
-

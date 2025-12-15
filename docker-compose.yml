@@ -107,6 +107,8 @@ services:
       - kafka
     networks:
       - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   flink-jobmanager:
     build:
@@ -123,6 +125,8 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
       interval: 10s
@@ -144,13 +148,19 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # Redis
   redis:
     image: redis:latest
+    container_name: redis
     ports:
       - "6379:6379"
     command: [ "redis-server", "--appendonly", "yes" ]
+    networks:
+      - app-net
+      - system-net
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2

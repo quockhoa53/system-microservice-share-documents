@@ -39,20 +39,41 @@ public class UserRedisSink extends RichSinkFunction<Map<String, Object>> {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(maxTotal);
         poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setTestOnBorrow(true);
+        poolConfig.setTestOnReturn(true);
+        poolConfig.setTestWhileIdle(true);
 
+        // Note: JedisPool constructor only accepts password, not username
+        // Username will be handled in invoke() via jedis.auth(username, password)
         if (redisPassword != null && !redisPassword.isEmpty()) {
             this.jedisPool = new JedisPool(poolConfig, host, port, 2000, redisPassword);
+            log.info("Initialized Redis pool to {}:{} with password authentication", host, port);
         } else {
             this.jedisPool = new JedisPool(poolConfig, host, port);
+            log.info("Initialized Redis pool to {}:{} without password", host, port);
         }
-
-        log.info("Initialized Redis pool to {}:{}", host, port);
+        
+        // Test connection
+        try (Jedis testJedis = jedisPool.getResource()) {
+            if (redisPassword != null && !redisPassword.isEmpty()) {
+                if (redisUsername != null && !redisUsername.isEmpty()) {
+                    testJedis.auth(redisUsername, redisPassword);
+                } else {
+                    testJedis.auth(redisPassword);
+                }
+            }
+            testJedis.ping();
+            log.info("Redis connection test successful");
+        } catch (Exception e) {
+            log.error("Failed to connect to Redis at {}:{} - {}", host, port, e.getMessage(), e);
+            throw new RuntimeException("Cannot connect to Redis", e);
+        }
     }
 
     @Override
     public void invoke(Map<String, Object> userData, Context context) throws Exception {
         if (userData == null) return;
-        recordsSinked.inc();
+        
         Object idObj = userData.get("id");
         if (idObj == null) {
             log.warn("Skipping record without 'id' field: {}", userData);
@@ -63,11 +84,21 @@ public class UserRedisSink extends RichSinkFunction<Map<String, Object>> {
         String redisKey = "user:" + userId;
 
         String op = (String) userData.get("_operation");
-        if (op == null) return;
+        if (op == null) {
+            log.warn("Skipping record without '_operation' field for id={}", userId);
+            return;
+        }
 
         try (Jedis jedis = jedisPool.getResource()) {
-            if (redisUsername != null && !redisUsername.isEmpty() && redisPassword != null && !redisPassword.isEmpty()) {
-                jedis.auth(redisUsername, redisPassword);
+            // Redis authentication - handle both username+password and password-only cases
+            if (redisPassword != null && !redisPassword.isEmpty()) {
+                if (redisUsername != null && !redisUsername.isEmpty()) {
+                    // Use username + password authentication
+                    jedis.auth(redisUsername, redisPassword);
+                } else {
+                    // Use password-only authentication (legacy mode)
+                    jedis.auth(redisPassword);
+                }
             }
 
             switch (op) {
@@ -95,17 +126,24 @@ public class UserRedisSink extends RichSinkFunction<Map<String, Object>> {
                             ));
 
                     jedis.hset(redisKey, hashData);
+                    recordsSinked.inc();
                     log.info("{} user ID {} -> Redis HASH key={}", op, userId, redisKey);
                     break;
 
                 case "DELETE":
                     jedis.del(redisKey);
+                    recordsSinked.inc();
                     log.info("DELETE user ID {} -> removed Redis key={}", userId, redisKey);
                     break;
 
                 default:
                     log.warn("Unknown operation: {} for id={}", op, userId);
             }
+        } catch (Exception e) {
+            log.error("Failed to write to Redis for user ID {} (operation: {}): {}", 
+                    userId, op, e.getMessage(), e);
+            // Re-throw to let Flink handle retry/backpressure
+            throw new RuntimeException("Redis sink error for user " + userId, e);
         }
     }
 

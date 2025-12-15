@@ -24,5 +24,7 @@ public interface GroupService {
 
     void removeMember(UUID groupId, UUID targetUserId, Authentication auth);
 
+    void deleteGroup(UUID groupId, Authentication auth);
+
     InternalMembershipResponse checkMembership(UUID groupId, UUID userId);
 }

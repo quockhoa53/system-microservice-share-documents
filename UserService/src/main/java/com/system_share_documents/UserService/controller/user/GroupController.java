@@ -72,4 +72,13 @@ public class GroupController {
         groupService.removeMember(groupId, userId, auth);
         return ApiResponse.success("OK", "Member removed", null);
     }
+
+    @DeleteMapping("/{groupId}")
+    public ApiResponse<Void> deleteGroup(
+            @PathVariable UUID groupId,
+            Authentication auth
+    ) {
+        groupService.deleteGroup(groupId, auth);
+        return ApiResponse.success("OK", "Group deleted", null);
+    }
 }

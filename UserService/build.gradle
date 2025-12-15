@@ -50,8 +50,8 @@ dependencies {
     // spring-dotenv (nạp .env)
     implementation "me.paulschwarz:spring-dotenv:3.0.0"
     // Redis
-    implementation 'com.redislabs:jredisearch:2.2.0'
-    implementation 'redis.clients:jedis:3.7.1'
+//    implementation 'com.redislabs:jredisearch:2.2.0'
+//    implementation 'redis.clients:jedis:3.7.1'
     // Elasticsearch
     implementation 'com.google.guava:guava:33.0.0-jre'
     implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.10.2'
@@ -59,6 +59,13 @@ dependencies {
     // Kafka
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    // Keycloak Admin Client
+    implementation 'org.keycloak:keycloak-admin-client:26.0.2'
+    implementation 'org.jboss.resteasy:resteasy-client:6.2.8.Final'
+    implementation 'org.jboss.resteasy:resteasy-jackson2-provider:6.2.8.Final'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     // GELF Appender for Graylog
     implementation 'de.siegmar:logback-gelf:5.0.0'
     // Janino for logback conditional processing

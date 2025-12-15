@@ -6,7 +6,6 @@ import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.service.SearchUserService;
 import com.system_share_documents.UserService.service.UserProfileService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

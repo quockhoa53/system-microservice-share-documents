@@ -6,8 +6,9 @@ import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProduc
 import com.system_share_documents.UserService.dto.ApiResponse;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.service.AuthKeycloakUserService;
-import com.system_share_documents.UserService.util.SecurityUtils;
+
 import com.system_share_documents.UserService.repository.UserRepository;
+import com.system_share_documents.UserService.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

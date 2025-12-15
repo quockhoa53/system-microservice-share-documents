@@ -38,11 +38,24 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 app:
   security:
     keycloak:
       resource-client-id: ${KEYCLOAK_CLIENT_ID}
+      server-url: ${KEYCLOAK_URL:http://localhost:9090}
+      # Realm để quản lý groups (nên dùng system-share-docs để nhất quán với authentication)
+      realm: ${KEYCLOAK_REALM:system-share-docs}
+      # Realm để login admin (thường là master - realm quản lý của Keycloak)
+      admin-realm: ${KEYCLOAK_ADMIN_REALM:master}
+      admin-username: ${KEYCLOAK_ADMIN:admin}
+      admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
 
 vault:
   scheme: http

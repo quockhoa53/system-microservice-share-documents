@@ -47,7 +47,10 @@ public class AuthController {
     }
 
     @PostMapping("logout")
-    public ApiResponse<Void> logout(Authentication auth, HttpServletRequest httpRequest) {
+    public ApiResponse<Void> logout(
+            @RequestBody(required = false) Map<String, String> requestBody,
+            Authentication auth, 
+            HttpServletRequest httpRequest) {
         log.info("[Logout] Logout endpoint called - auth: {}, httpRequest: {}", 
                 auth != null ? "not null" : "null", 
                 httpRequest != null ? "not null" : "null");
@@ -61,11 +64,18 @@ public class AuthController {
                 log.debug("[Logout] AuditLogProducer is available");
             }
             
-            // Ưu tiên lấy userId từ JWT
-            if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
+            // Ưu tiên lấy userId từ request body (đảm bảo có userId ngay cả khi token hết hạn)
+            if (requestBody != null && requestBody.containsKey("userId") && requestBody.get("userId") != null) {
+                userId = requestBody.get("userId");
+                log.info("[Logout] Got userId from request body: {}", userId);
+            }
+            // Nếu không có trong request body, thử lấy từ JWT
+            else if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
                 userId = jwt.getSubject();
                 log.info("[Logout] Got userId from JWT: {}", userId);
-            } else if (auth != null) {
+            } 
+            // Fallback: thử lấy từ SecurityUtils
+            else if (auth != null) {
                 try {
                     userId = SecurityUtils.requireCurrentUserId(auth, userRepository).toString();
                     log.info("[Logout] Got userId from SecurityUtils: {}", userId);
@@ -74,7 +84,7 @@ public class AuthController {
                     log.warn("[Logout] Cannot get userId from auth: {}", e.getMessage());
                 }
             } else {
-                log.warn("[Logout] Authentication is null - cannot get userId");
+                log.warn("[Logout] Authentication is null and no userId in request body - cannot get userId");
             }
 
             // Gửi audit log nếu có userId và producer

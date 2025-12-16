@@ -9,7 +9,6 @@
       <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/resources/db/stored_procedures.sql" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/resources/db/stored_procedures.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/config/KeycloakAdminConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/config/KeycloakAdminConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/admin/AdminCacheController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/admin/AdminCacheController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/CacheRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/CacheRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/CacheResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/CacheResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserBrief.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserBrief.java" afterDir="false" />
@@ -494,6 +493,7 @@
       <workItem from="1765681980095" duration="10314000" />
       <workItem from="1765696157569" duration="1538000" />
       <workItem from="1765780216859" duration="6561000" />
+      <workItem from="1765858165763" duration="1190000" />
     </task>
     <servers />
   </component>

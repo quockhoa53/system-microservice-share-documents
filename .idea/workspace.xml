@@ -5,21 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/CDCUpdateGroupDataCache/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CDCUpdateGroupDataCache/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/java/com/system_share_documents/APIGatewayService/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/java/com/system_share_documents/APIGatewayService/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/enums/ActionLog.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuditLogService/src/main/resources/db/stored_procedures.sql" beforeDir="false" afterPath="$PROJECT_DIR$/AuditLogService/src/main/resources/db/stored_procedures.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/config/KeycloakAdminConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/config/KeycloakAdminConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/admin/AdminCacheController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/admin/AdminCacheController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/UserProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/UserProfileController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/CacheRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/CacheRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/UpdateProfileRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request/UpdateProfileRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/CacheResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/CacheResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserBrief.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserBrief.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/UserResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/exception/errorcode/AuthError.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/exception/errorcode/AuthError.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/scheduler/KeycloakGroupSyncScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/scheduler/KeycloakGroupSyncScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/KeycloakGroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/KeycloakGroupService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/UserProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/UserProfileService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/CacheHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/CacheHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/CacheManagerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/CacheManagerService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/DocumentCacheHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/DocumentCacheHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/GroupCacheHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/GroupCacheHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/UserCacheHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/cache/impl/UserCacheHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/KeycloakGroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/KeycloakGroupServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/GroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/GroupServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/UserProfileServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/UserProfileServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,6 +87,9 @@
         <task path="$PROJECT_DIR$/CDCUpdateUserDataCache">
           <activation />
         </task>
+        <task path="$PROJECT_DIR$/CDCUpdateGroupDataCache">
+          <activation />
+        </task>
         <projects_view>
           <tree_state>
             <expand>
@@ -83,25 +100,25 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="CDCUpdateUserDataCache" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateGroupDataCache" type="2d1252cf:ModuleNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="CDCUpdateUserDataCache" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateGroupDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="CDCUpdateUserDataCache" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateGroupDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="build" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="system-microservice-share-documents" type="f1a62948:ProjectNode" />
-                <item name="CDCUpdateUserDataCache" type="2d1252cf:ModuleNode" />
+                <item name="CDCUpdateGroupDataCache" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="shadow" type="c8890929:TasksNode$1" />
               </path>
@@ -136,6 +153,7 @@
     &quot;accountId&quot;: &quot;786d991c-9b3f-4981-8e3f-4cf99d39e81e&quot;
   }
 }</component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-8.10-bin/deqhafrv1ntovfmgh0nh3npr9/gradle-8.10" javaHome="$USER_HOME$/.jdks/ms-17.0.16" gradleVersion="8.10" />
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -166,6 +184,7 @@
     &quot;Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.system-microservice-share-documents:APIGatewayService [build].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.system-microservice-share-documents:APIGatewayService [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [clean].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [shadowJar].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor&quot;: &quot;Run&quot;,
@@ -193,12 +212,13 @@
     &quot;Spring Boot.WatermarkWorkerServiceApplication.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;cache__with__job&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/work/DoAn/system-microservice-share-documents&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache2/src/main/java/org/example/Main.java&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
@@ -212,11 +232,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/CDCUpdateGroupDataCache" />
       <recent name="$PROJECT_DIR$/AuditLogService/src/main/java/com/system_share_documents/AuditLogService" />
       <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/repository" />
       <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response" />
       <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/request" />
-      <recent name="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.system_share_documents.UserService.mapper" />
@@ -253,7 +273,51 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean]">
+  <component name="RunManager" selected="Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [shadowJar]">
+    <configuration name="system-microservice-share-documents:CDCUpdateGroupDataCache [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/CDCUpdateGroupDataCache" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="system-microservice-share-documents:CDCUpdateGroupDataCache [shadowJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/CDCUpdateGroupDataCache" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="shadowJar" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration name="system-microservice-share-documents:CDCUpdateUserDataCache [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -367,27 +431,6 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker-compose.yml.kafka-connect: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="kafka-connect" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <configuration name="docker-compose.yml.redis: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -403,8 +446,8 @@
     </configuration>
     <list>
       <item itemvalue="Docker.docker-compose.yml.redis: Compose Deployment" />
-      <item itemvalue="Docker.docker-compose.yml.kafka-connect: Compose Deployment" />
-      <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+      <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [clean]" />
+      <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [shadowJar]" />
       <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean]" />
       <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [shadowJar]" />
       <item itemvalue="Spring Boot.AppCommonServiceApplication" />
@@ -419,11 +462,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [shadowJar]" />
+        <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [clean]" />
         <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean]" />
         <item itemvalue="Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [shadowJar]" />
         <item itemvalue="Docker.docker-compose.yml.redis: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yml.kafka-connect: Compose Deployment" />
-        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
       </list>
     </recent_temporary>
   </component>
@@ -494,10 +537,30 @@
       <workItem from="1765696157569" duration="1538000" />
       <workItem from="1765780216859" duration="6561000" />
       <workItem from="1765858165763" duration="1190000" />
+      <workItem from="1765866459261" duration="3274000" />
+      <workItem from="1765878362398" duration="1231000" />
+      <workItem from="1765936657171" duration="14665000" />
+      <workItem from="1765962653553" duration="945000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/CDCUpdateGroupDataCache2/src/Main.java</url>
+          <line>11</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/CDCUpdateGroupDataCache2/src/main/java/org/example/Main.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

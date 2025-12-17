@@ -2,14 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CDCUpdateUserDataCache/com.example.system-microservice-share-documents.CDCUpdateUserDataCache.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CDCUpdateUserDataCache/com.example.system-microservice-share-documents.CDCUpdateUserDataCache.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AppCommonService/com.system_share_documents.system-microservice-share-documents.AppCommonService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AppCommonService/com.system_share_documents.system-microservice-share-documents.AppCommonService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/UpdateDocumentData/src/main/resources/resources.iml" filepath="$PROJECT_DIR$/UpdateDocumentData/src/main/resources/resources.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/APIGatewayService/system-microservice-share-documents.APIGatewayService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AppCommonService/system-microservice-share-documents.AppCommonService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AppCommonService/system-microservice-share-documents.AppCommonService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuditLogService/system-microservice-share-documents.AuditLogService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuthAccessControlService/system-microservice-share-documents.AuthAccessControlService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CDCUpdateDocumentDataCache/system-microservice-share-documents.CDCUpdateDocumentDataCache.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CDCUpdateDocumentDataCache/system-microservice-share-documents.CDCUpdateDocumentDataCache.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CDCUpdateUserDataCache/system-microservice-share-documents.CDCUpdateUserDataCache.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CDCUpdateUserDataCache/system-microservice-share-documents.CDCUpdateUserDataCache.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/DocumentService/system-microservice-share-documents.DocumentService.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/UserService/system-microservice-share-documents.UserService.main.iml" />
     </modules>
   </component>

@@ -6,6 +6,7 @@ public enum ActionLog {
     LOGOUT,
     REGISTER,
     UPDATE_PROFILE,
+    CHANGE_PASSWORD,
     
     // Document Operations
     INIT_UPLOAD,

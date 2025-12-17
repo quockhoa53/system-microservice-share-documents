@@ -2,6 +2,7 @@ package com.system_share_documents.UserService.controller.user;
 
 
 import com.system_share_documents.UserService.dto.ApiResponse;
+import com.system_share_documents.UserService.dto.request.ChangePasswordRequest;
 import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.service.SearchUserService;
@@ -36,6 +37,16 @@ public class UserProfileController {
     ) {
         UserResponse user = userProfileService.updateCurrentUserProfile(request, auth);
         return ApiResponse.success("OK", "Profile updated", user);
+    }
+
+    // PUT /api/users/me/password – đổi password
+    @PutMapping("/me/password")
+    public ApiResponse<Void> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            Authentication auth
+    ) {
+        userProfileService.changePassword(request, auth);
+        return ApiResponse.success("OK", "Password changed successfully", null);
     }
 
     @GetMapping("/search")

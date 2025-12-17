@@ -30,6 +30,9 @@ public class User {
     @Column(name = "full_name", length = 256)
     String fullName; // tên đầy đủ để hiển thị
 
+    @Column(name = "avatar", length = 512)
+    String avatar; // URL của ảnh đại diện (lưu trên Cloudinary)
+
     @Column(nullable = false)
     Short status = 1; // trạng thái tài khoản: 1=active, 0=disabled
 

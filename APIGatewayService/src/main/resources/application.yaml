@@ -29,7 +29,7 @@ spring:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/auth/**, /api/users/**, /api/keys/**,/api/groups/**, /internal/users/**, /debug/**, /admin/**
+            - Path=/api/auth/**, /api/users/**, /api/keys/**,/api/groups/**, /internal/users/**, /internal/groups/**, /debug/**, /admin/**
           filters:
             - PreserveHostHeader
         - id: document-service

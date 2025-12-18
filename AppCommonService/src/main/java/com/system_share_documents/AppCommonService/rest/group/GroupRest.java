@@ -1,7 +1,10 @@
 package com.system_share_documents.AppCommonService.rest.group;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface GroupRest {
-    HashMap<String, Object> checkMembership(String groupId, String userId);
+    Map<String, Object> checkMembership(UUID groupId, UUID userId);
+    List<Map<String, Object>> getGroupMembers(UUID groupId);
 }

@@ -60,9 +60,15 @@ public class UserKeyController {
     }
 
     @PostMapping("/public-key/get")
-    public ApiResponse<Optional<PublicKeyResponse>> getPublicKeysByUserId(@RequestBody GetPublicKeyRequest request) {
-        var keys = userKeyService.getPublicEncryptionKey(request);
-        return ApiResponse.success("OK", "Get public key for user successfully", keys);
+    public ApiResponse<PublicKeyResponse> getPublicKeysByUserId(@RequestBody GetPublicKeyRequest request) {
+
+        Optional<PublicKeyResponse> optionalKey = userKeyService.getPublicEncryptionKey(request);
+
+        return ApiResponse.success(
+                "OK",
+                "Get public key for user successfully",
+                optionalKey.orElse(null)
+        );
     }
 
     @GetMapping("/public/{userId}/primary")

@@ -17,7 +17,7 @@ public class GroupDocumentResponse {
     private UUID documentId;
     private String documentName;
     private String groupId;
-    private String groupName;
+//    private String groupName;
     private String addedBy;
     private String accessRole;
     private Timestamp createdAt;

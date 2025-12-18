@@ -1,6 +1,5 @@
 package com.system_share_documents.DocumentService.repository;
 
-import com.system_share_documents.DocumentService.entity.Document;
 import com.system_share_documents.DocumentService.entity.DocumentVersion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

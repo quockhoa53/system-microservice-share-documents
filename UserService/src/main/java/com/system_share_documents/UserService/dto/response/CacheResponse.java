@@ -21,3 +21,12 @@ public class CacheResponse {
     private List<String> availableCacheTypes;
 }
 
+
+
+
+
+
+
+
+
+

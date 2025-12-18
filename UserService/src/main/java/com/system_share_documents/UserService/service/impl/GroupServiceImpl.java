@@ -1,6 +1,7 @@
 package com.system_share_documents.UserService.service.impl;
 
 import com.system_share_documents.UserService.dto.request.AddMemberRequest;
+import com.system_share_documents.UserService.dto.request.ChangeMemberRoleRequest;
 import com.system_share_documents.UserService.dto.request.CreateGroupRequest;
 import com.system_share_documents.UserService.dto.response.GroupDetailResponse;
 import com.system_share_documents.UserService.dto.response.GroupMemberResponse;
@@ -31,11 +32,13 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -55,6 +58,9 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     @Qualifier("redisObjectMapper")
     private ObjectMapper redisObjectMapper;
+    
+    @Autowired(required = false)
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     @Transactional
@@ -169,11 +175,38 @@ public class GroupServiceImpl implements GroupService {
             memberCountMap.put(groupId, groupMemberRepository.countByGroup_Id(groupId));
         }
         
+        // Try to read group details from Redis HASH (synced by CDC) to avoid N+1 queries
         List<GroupResponse> response = memberships.stream()
                 .map(m -> {
-                    Group g = m.getGroup();
-                    long memberCount = memberCountMap.getOrDefault(g.getId(), 0L);
-                    return toGroupResponse(g, memberCount);
+                    UUID groupId = m.getGroup().getId();
+                    GroupResponse groupResponse = null;
+                    
+                    // Try to read from Redis HASH first (synced by CDC)
+                    if (stringRedisTemplate != null) {
+                        try {
+                            String redisKey = "group:" + groupId.toString();
+                            Map<Object, Object> hashData = stringRedisTemplate.opsForHash().entries(redisKey);
+                            
+                            if (hashData != null && !hashData.isEmpty()) {
+                                groupResponse = convertHashToGroupResponse(hashData, groupId);
+                                if (groupResponse != null) {
+                                    groupResponse.setMemberCount(memberCountMap.getOrDefault(groupId, 0L));
+                                    log.debug("Read group {} from Redis HASH cache", groupId);
+                                }
+                            }
+                        } catch (Exception e) {
+                            log.debug("Failed to read group {} from Redis HASH: {}", groupId, e.getMessage());
+                        }
+                    }
+                    
+                    // Fallback to database if cache miss
+                    if (groupResponse == null) {
+                        Group g = m.getGroup();
+                        long memberCount = memberCountMap.getOrDefault(g.getId(), 0L);
+                        groupResponse = toGroupResponse(g, memberCount);
+                    }
+                    
+                    return groupResponse;
                 })
                 .toList();
         
@@ -385,6 +418,59 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"groupMembers", "userGroups"}, allEntries = true)
+    public void changeMemberRole(UUID groupId, UUID userId, ChangeMemberRoleRequest request, Authentication auth) {
+        UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "Group not found"));
+
+        GroupMember target = groupMemberRepository.findByGroup_IdAndUser_Id(groupId, userId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "Member not found"));
+
+        GroupMember me = groupMemberRepository.findByGroup_IdAndUser_Id(groupId, currentUserId)
+                .orElseThrow(() -> new AppException(AuthError.FORBIDDEN, "You are not a member of this group"));
+
+        // Chỉ owner/admin mới được đổi role
+        if (!isOwnerOrAdmin(me)) {
+            throw new AppException(AuthError.FORBIDDEN, "Only owner/admin can change member role");
+        }
+
+        // Không được đổi role của owner
+        if ("owner".equalsIgnoreCase(target.getRole())) {
+            throw new AppException(SystemError.INVALID_PARAM, "Cannot change owner role");
+        }
+
+        // Admin không được đổi role của admin khác (chỉ owner mới được)
+        if ("admin".equalsIgnoreCase(target.getRole()) && "admin".equalsIgnoreCase(me.getRole())) {
+            throw new AppException(AuthError.FORBIDDEN, "Admin cannot change another admin's role");
+        }
+
+        // Validate và normalize role mới
+        String newRole = normalizeRole(request.getRole());
+
+        // Không được đổi thành owner role qua API này
+        if ("owner".equalsIgnoreCase(newRole)) {
+            throw new AppException(SystemError.INVALID_PARAM, "Cannot change role to owner");
+        }
+
+        // Nếu role không thay đổi thì không cần làm gì
+        if (newRole.equalsIgnoreCase(target.getRole())) {
+            return;
+        }
+
+        // Update role
+        target.setRole(newRole);
+        groupMemberRepository.save(target);
+
+        // Evict cache
+        cacheService.evictGroupMemberCache(groupId);
+        cacheService.evictUserGroupsCache(userId);
+        cacheService.evictGroupCache(groupId);
+    }
+
+    @Override
+    @Transactional
     @CacheEvict(value = {"groupMembers", "userGroups", "groupCache"}, allEntries = true)
     public void deleteGroup(UUID groupId, Authentication auth) {
         UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
@@ -483,5 +569,69 @@ public class GroupServiceImpl implements GroupService {
             throw new AppException(SystemError.INVALID_PARAM, "Invalid role: " + role);
         }
         return r;
+    }
+    
+    /**
+     * Convert Redis HASH data (from Flink CDC job) to GroupResponse
+     * Flink job stores all fields as String values in the HASH
+     */
+    private GroupResponse convertHashToGroupResponse(Map<Object, Object> hashData, UUID groupId) {
+        try {
+            GroupResponse.GroupResponseBuilder builder = GroupResponse.builder()
+                    .id(groupId);
+            
+            // Extract and convert fields from HASH
+            if (hashData.containsKey("name")) {
+                builder.name(String.valueOf(hashData.get("name")));
+            }
+            if (hashData.containsKey("description")) {
+                Object descObj = hashData.get("description");
+                String descValue = descObj != null ? String.valueOf(descObj) : null;
+                builder.description(!"null".equals(descValue) && !descValue.isEmpty() ? descValue : null);
+            }
+            if (hashData.containsKey("visibility")) {
+                try {
+                    String visibilityStr = String.valueOf(hashData.get("visibility"));
+                    builder.visibility(Short.parseShort(visibilityStr));
+                } catch (NumberFormatException e) {
+                    log.warn("Failed to parse visibility from Redis HASH: {}", hashData.get("visibility"));
+                }
+            }
+            
+            // Handle owner_id (can be UUID string or object)
+            if (hashData.containsKey("owner_id")) {
+                try {
+                    Object ownerIdObj = hashData.get("owner_id");
+                    String ownerIdStr = String.valueOf(ownerIdObj);
+                    if (ownerIdStr != null && !ownerIdStr.equals("null") && !ownerIdStr.isEmpty()) {
+                        builder.ownerId(UUID.fromString(ownerIdStr));
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to parse owner_id from Redis HASH: {}", hashData.get("owner_id"));
+                }
+            }
+            
+            // Parse Timestamp
+            if (hashData.containsKey("created_at")) {
+                try {
+                    String createdAtStr = String.valueOf(hashData.get("created_at"));
+                    if (createdAtStr != null && !createdAtStr.equals("null") && !createdAtStr.isEmpty()) {
+                        long timestamp = Long.parseLong(createdAtStr);
+                        // PostgreSQL Debezium stores timestamp in microseconds, convert to milliseconds
+                        if (timestamp > 1_000_000_000_000_000L) {
+                            timestamp = timestamp / 1000;
+                        }
+                        builder.createdAt(new Timestamp(timestamp));
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to parse created_at from Redis HASH: {}", hashData.get("created_at"));
+                }
+            }
+            
+            return builder.build();
+        } catch (Exception e) {
+            log.error("Failed to convert Redis HASH to GroupResponse for groupId={}: {}", groupId, e.getMessage(), e);
+            return null;
+        }
     }
 }

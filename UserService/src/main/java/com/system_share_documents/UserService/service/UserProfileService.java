@@ -1,5 +1,6 @@
 package com.system_share_documents.UserService.service;
 
+import com.system_share_documents.UserService.dto.request.ChangePasswordRequest;
 import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
 import com.system_share_documents.UserService.dto.response.InternalUserInfoResponse;
 import com.system_share_documents.UserService.dto.response.UserBrief;
@@ -14,6 +15,8 @@ public interface UserProfileService {
     UserResponse getCurrentUser(Authentication auth);
 
     UserResponse updateCurrentUserProfile(UpdateProfileRequest request, Authentication auth);
+
+    void changePassword(ChangePasswordRequest request, Authentication auth);
 
     List<UserBrief> searchUsers(String query);
 

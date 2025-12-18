@@ -56,3 +56,12 @@ public class KeycloakAdminConfig {
 
 
 
+
+
+
+
+
+
+
+
+

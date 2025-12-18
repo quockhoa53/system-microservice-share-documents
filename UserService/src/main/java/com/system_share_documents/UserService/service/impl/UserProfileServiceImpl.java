@@ -4,12 +4,14 @@ package com.system_share_documents.UserService.service.impl;
 import com.system_share_documents.AppCommonService.enums.ActionLog;
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
 import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
+import com.system_share_documents.UserService.dto.request.ChangePasswordRequest;
 import com.system_share_documents.UserService.dto.request.UpdateProfileRequest;
 import com.system_share_documents.UserService.dto.response.InternalUserInfoResponse;
 import com.system_share_documents.UserService.dto.response.UserBrief;
 import com.system_share_documents.UserService.dto.response.UserResponse;
 import com.system_share_documents.UserService.entity.User;
 import com.system_share_documents.UserService.exception.AppException;
+import com.system_share_documents.UserService.exception.errorcode.AuthError;
 import com.system_share_documents.UserService.exception.errorcode.SystemError;
 import com.system_share_documents.UserService.mapper.UserMapper;
 import com.system_share_documents.UserService.repository.UserRepository;
@@ -17,6 +19,16 @@ import com.system_share_documents.UserService.service.CacheService;
 import com.system_share_documents.UserService.service.UserProfileService;
 
 import com.system_share_documents.UserService.utils.SecurityUtils;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import jakarta.ws.rs.WebApplicationException;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -69,6 +82,12 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Autowired(required = false)
     private AuditLogProducer auditLogProducer;
+
+    @Autowired(required = false)
+    private Keycloak keycloakAdmin;
+
+    @Value("${app.security.keycloak.realm:system-share-docs}")
+    private String keycloakRealm;
 
     // ===== /api/users/me (GET) =====
     @Override
@@ -143,6 +162,12 @@ public class UserProfileServiceImpl implements UserProfileService {
                 Object fullNameObj = hashData.getOrDefault("full_name", hashData.get("fullName"));
                 String fullNameValue = fullNameObj != null ? String.valueOf(fullNameObj) : null;
                 builder.fullName(!"null".equals(fullNameValue) && !fullNameValue.isEmpty() ? fullNameValue : null);
+            }
+            // Handle avatar
+            if (hashData.containsKey("avatar")) {
+                Object avatarObj = hashData.get("avatar");
+                String avatarValue = avatarObj != null ? String.valueOf(avatarObj) : null;
+                builder.avatar(!"null".equals(avatarValue) && !avatarValue.isEmpty() ? avatarValue : null);
             }
             if (hashData.containsKey("status")) {
                 try {
@@ -263,6 +288,11 @@ public class UserProfileServiceImpl implements UserProfileService {
             user.setFullName(request.getFullName());
         }
 
+        // cập nhật avatar nếu có
+        if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
+
         // merge profile nếu có
         if (request.getProfile() != null) {
             Map<String, Object> existingProfile = user.getProfile();
@@ -278,6 +308,9 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         User saved = userRepository.save(user);
 
+        // Đồng bộ ngược lại lên Keycloak
+        syncUserToKeycloak(saved, request);
+
         // Evict cache manually to ensure consistency
         cacheService.evictUserCache(currentUserId);
         cacheService.evictUserCacheByUsername(saved.getUsername());
@@ -286,6 +319,186 @@ public class UserProfileServiceImpl implements UserProfileService {
         sendUpdateProfileAuditLog(currentUserId.toString(), request);
 
         return userMapper.toResponse(saved);
+    }
+
+    // ===== PUT /api/users/me/password =====
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request, Authentication auth) {
+        UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "User not found"));
+
+        // Validate old password bằng cách thử login với Keycloak
+        validateCurrentPassword(user.getUsername(), request.getCurrentPassword());
+
+        // Update password mới trong Keycloak
+        updatePasswordInKeycloak(currentUserId, request.getNewPassword());
+
+        // Gửi audit log
+        sendChangePasswordAuditLog(currentUserId.toString());
+    }
+
+    /**
+     * Validate current password bằng cách thử login với Keycloak
+     */
+    private void validateCurrentPassword(String username, String password) {
+        try {
+            // Lấy thông tin từ config
+            String keycloakUrl = getKeycloakServerUrl();
+            String realm = keycloakRealm;
+            String clientId = getKeycloakClientId();
+            String clientSecret = getKeycloakClientSecret();
+
+            // Gọi Keycloak token endpoint để validate password
+            String tokenUrl = String.format("%s/realms/%s/protocol/openid-connect/token", 
+                keycloakUrl, realm);
+
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("grant_type", "password");
+            body.add("username", username);
+            body.add("password", password);
+            body.add("client_id", clientId);
+            if (clientSecret != null && !clientSecret.isEmpty()) {
+                body.add("client_secret", clientSecret);
+            }
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+            try {
+                ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+                if (response.getStatusCode() != HttpStatus.OK) {
+                    throw new AppException(AuthError.INVALID_PASSWORD);
+                }
+                // Nếu thành công thì password đúng
+                log.debug("Current password validated successfully for user: {}", username);
+            } catch (org.springframework.web.client.HttpClientErrorException e) {
+                if (e.getStatusCode() == HttpStatus.UNAUTHORIZED || 
+                    e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                    log.warn("Invalid current password for user: {}", username);
+                    throw new AppException(AuthError.INVALID_PASSWORD);
+                }
+                throw new AppException(SystemError.INTERNAL_ERROR, 
+                    "Failed to validate password: " + e.getMessage());
+            }
+        } catch (AppException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error validating current password: {}", e.getMessage(), e);
+            throw new AppException(SystemError.INTERNAL_ERROR, 
+                "Failed to validate password: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update password mới trong Keycloak
+     */
+    private void updatePasswordInKeycloak(UUID userId, String newPassword) {
+        if (keycloakAdmin == null) {
+            log.error("Keycloak admin client is not available, cannot change password");
+            throw new AppException(SystemError.INTERNAL_ERROR, 
+                "Keycloak admin client is not configured");
+        }
+
+        try {
+            RealmResource realm = keycloakAdmin.realm(keycloakRealm);
+            UserResource userResource = realm.users().get(userId.toString());
+
+            // Tạo CredentialRepresentation cho password mới
+            CredentialRepresentation credential = new CredentialRepresentation();
+            credential.setType(CredentialRepresentation.PASSWORD);
+            credential.setValue(newPassword);
+            credential.setTemporary(false); // Password không phải temporary
+
+            // Reset password trong Keycloak
+            userResource.resetPassword(credential);
+
+            log.info("✅ Successfully changed password in Keycloak for user: {}", userId);
+        } catch (jakarta.ws.rs.WebApplicationException e) {
+            if (e.getResponse() != null && e.getResponse().getStatus() == 404) {
+                log.error("User {} not found in Keycloak, cannot change password", userId);
+                throw new AppException(SystemError.NOT_FOUND, 
+                    "User not found in Keycloak");
+            } else {
+                log.error("Keycloak API error while changing password for user {}: {} (status: {})", 
+                    userId, e.getMessage(), 
+                    e.getResponse() != null ? e.getResponse().getStatus() : "unknown");
+                throw new AppException(SystemError.INTERNAL_ERROR, 
+                    "Failed to change password in Keycloak: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Failed to change password in Keycloak for user {}: {}", userId, e.getMessage(), e);
+            throw new AppException(SystemError.INTERNAL_ERROR, 
+                "Failed to change password: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Helper method để gửi audit log cho CHANGE_PASSWORD
+     */
+    private void sendChangePasswordAuditLog(String userId) {
+        if (auditLogProducer == null) {
+            return;
+        }
+
+        try {
+            HttpServletRequest httpRequest = null;
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                httpRequest = attributes.getRequest();
+            }
+
+            String ip = httpRequest != null ? getClientIp(httpRequest) : "unknown";
+            String userAgent = httpRequest != null ? getUserAgent(httpRequest) : "unknown";
+
+            AuditLogEvent logEvent = AuditLogEvent.builder()
+                    .requestId(UUID.randomUUID().toString())
+                    .userId(userId)
+                    .action(String.valueOf(ActionLog.CHANGE_PASSWORD))
+                    .objectType("user")
+                    .typeLog("USER")
+                    .status("OK")
+                    .errorReason(null)
+                    .ip(ip)
+                    .userAgent(userAgent)
+                    .metadata("{}")
+                    .timestamp(Instant.now())
+                    .build();
+
+            auditLogProducer.sendAuditLog(logEvent, userId);
+        } catch (Exception e) {
+            // Ignore audit log errors
+            log.warn("Failed to send change password audit log: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Helper methods để lấy Keycloak config
+     */
+    @Value("${app.security.keycloak.server-url:http://localhost:9090}")
+    private String keycloakServerUrl;
+
+    @Value("${app.security.keycloak.resource-client-id:frontend-app}")
+    private String keycloakClientId;
+
+    @Value("${KEYCLOAK_CLIENT_SECRET:}")
+    private String keycloakClientSecret;
+
+    private String getKeycloakServerUrl() {
+        return keycloakServerUrl;
+    }
+
+    private String getKeycloakClientId() {
+        return keycloakClientId;
+    }
+
+    private String getKeycloakClientSecret() {
+        return keycloakClientSecret;
     }
 
     // ===== GET /api/users/search =====
@@ -364,6 +577,75 @@ public class UserProfileServiceImpl implements UserProfileService {
             return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(metadata);
         } catch (Exception e) {
             return "{}";
+        }
+    }
+
+    /**
+     * Đồng bộ thông tin user từ database lên Keycloak
+     * Cập nhật fullName và profile (custom attributes) trong Keycloak
+     */
+    private void syncUserToKeycloak(User user, UpdateProfileRequest request) {
+        if (keycloakAdmin == null) {
+            log.warn("Keycloak admin client is not available, skipping Keycloak sync");
+            return;
+        }
+
+        try {
+            RealmResource realm = keycloakAdmin.realm(keycloakRealm);
+            UserResource userResource = realm.users().get(user.getId().toString());
+            
+            // Lấy thông tin user hiện tại từ Keycloak
+            UserRepresentation userRep = userResource.toRepresentation();
+            boolean needsUpdate = false;
+
+            // Cập nhật fullName (firstName trong Keycloak)
+            if (request.getFullName() != null && !request.getFullName().equals(userRep.getFirstName())) {
+                userRep.setFirstName(request.getFullName());
+                needsUpdate = true;
+                log.debug("Updating firstName in Keycloak for user {}: {}", user.getId(), request.getFullName());
+            }
+
+            // Cập nhật profile vào custom attributes trong Keycloak
+            if (request.getProfile() != null && !request.getProfile().isEmpty()) {
+                Map<String, List<String>> attributes = userRep.getAttributes();
+                if (attributes == null) {
+                    attributes = new HashMap<>();
+                }
+
+                // Merge profile vào attributes
+                // Lưu profile dưới dạng JSON string trong attribute "profile"
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    String profileJson = mapper.writeValueAsString(user.getProfile());
+                    attributes.put("profile", List.of(profileJson));
+                    userRep.setAttributes(attributes);
+                    needsUpdate = true;
+                    log.debug("Updating profile attribute in Keycloak for user {}", user.getId());
+                } catch (Exception e) {
+                    log.warn("Failed to serialize profile to JSON for Keycloak sync: {}", e.getMessage());
+                }
+            }
+
+            // Chỉ update nếu có thay đổi
+            if (needsUpdate) {
+                userResource.update(userRep);
+                log.info("✅ Successfully synced user profile to Keycloak for user: {}", user.getId());
+            } else {
+                log.debug("No changes to sync to Keycloak for user: {}", user.getId());
+            }
+
+        } catch (jakarta.ws.rs.WebApplicationException e) {
+            if (e.getResponse() != null && e.getResponse().getStatus() == 404) {
+                log.warn("User {} not found in Keycloak, cannot sync profile", user.getId());
+            } else {
+                log.error("Keycloak API error while syncing user profile for user {}: {} (status: {})", 
+                    user.getId(), e.getMessage(), 
+                    e.getResponse() != null ? e.getResponse().getStatus() : "unknown");
+            }
+        } catch (Exception e) {
+            // Log error nhưng không throw exception để không ảnh hưởng đến flow chính
+            // Database đã được lưu thành công, Keycloak sync chỉ là bonus
+            log.error("Failed to sync user profile to Keycloak for user {}: {}", user.getId(), e.getMessage(), e);
         }
     }
 

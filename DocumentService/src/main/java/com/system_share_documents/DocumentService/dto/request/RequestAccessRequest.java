@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SearchDocumentRequest {
-    private String keyword;
-    private Boolean isUser;
-    private Integer page;
-    private Integer size;
+public class RequestAccessRequest {
+    private String documentId;
+    private String message;
 }

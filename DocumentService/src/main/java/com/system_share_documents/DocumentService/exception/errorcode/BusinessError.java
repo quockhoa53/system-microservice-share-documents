@@ -20,7 +20,10 @@ public enum BusinessError implements ErrorCode {
     FAILED_DELETE_VERSION("FAILED_DELETE_VERSION" , "Failed to delete list versions of document", HttpStatus.BAD_REQUEST),
     FAILED_DELETE_DOCUMENT("FAILED_DELETE_DOCUMENT" , "Failed to delete document", HttpStatus.BAD_REQUEST),
     FAILED_PREVIEW_DOCUMENT("FAILED_PREVIEW_DOCUMENT" , "Failed to preview document", HttpStatus.BAD_REQUEST),
-    FAILED_REINIT_UPLOAD("FAILED_REINIT_UPLOAD" , "Failed to reinit upload document", HttpStatus.BAD_REQUEST),;
+    FAILED_REINIT_UPLOAD("FAILED_REINIT_UPLOAD" , "Failed to reinit upload document", HttpStatus.BAD_REQUEST),
+    USER_IS_OWNER("USER_IS_OWNER" , "User is already the owner of this document", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_HAS_ACCESS("USER_ALREADY_HAS_ACCESS" , "User already has access to this document", HttpStatus.BAD_REQUEST),
+    FAILED_REQUEST_ACCESS("FAILED_REQUEST_ACCESS" , "Failed to request access to document", HttpStatus.BAD_REQUEST);;
 
     private final String code;
     private final String message;

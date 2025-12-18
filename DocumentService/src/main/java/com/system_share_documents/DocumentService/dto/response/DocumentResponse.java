@@ -18,4 +18,8 @@ public class DocumentResponse {
     private Object metadata;
     private long createdAt;
     private long updatedAt;
+    // Permission fields - chỉ được set khi có userId trong search
+    private Boolean isOwner;
+    private Boolean canDownload;
+    private Boolean hasAccess;
 }

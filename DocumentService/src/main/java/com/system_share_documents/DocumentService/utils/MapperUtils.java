@@ -21,34 +21,42 @@ public class MapperUtils {
         if (c.getMetadata() != null) {
             metadataObj = objectMapper.readValue(c.getMetadata(), Object.class);
         }
-        return new DocumentResponse(
-                c.getId(),
-                c.getSize_bytes(),
-                c.getStorage_class(),
-                c.getOwner_id(),
-                c.getChecksum(),
-                c.getContent_type(),
-                c.getOriginal_filename(),
-                metadataObj,
-                c.getCreated_at(),
-                c.getUpdated_at()
-        );
+        DocumentResponse response = new DocumentResponse();
+        response.setDocumentId(c.getId());
+        response.setSizeBytes(c.getSize_bytes());
+        response.setStorageClass(c.getStorage_class());
+        response.setOwnerId(c.getOwner_id());
+        response.setChecksum(c.getChecksum());
+        response.setContentType(c.getContent_type());
+        response.setOriginalFilename(c.getOriginal_filename());
+        response.setMetadata(metadataObj);
+        response.setCreatedAt(c.getCreated_at());
+        response.setUpdatedAt(c.getUpdated_at());
+        // Permission fields sẽ được set bởi enrichDocumentWithPermissions nếu cần
+        response.setIsOwner(null);
+        response.setCanDownload(null);
+        response.setHasAccess(null);
+        return response;
     }
 
     public DocumentResponse mapDocumentEntityToResponse(Document e) throws JsonProcessingException {
         Object metadataObj = e.getMetadata();
-        return new DocumentResponse(
-                e.getId().toString(),
-                e.getSizeBytes(),
-                e.getStorageClass(),
-                e.getOwnerId(),
-                e.getChecksum(),
-                e.getContentType(),
-                e.getOriginalFilename(),
-                metadataObj,
-                e.getCreatedAt().getTime(),
-                e.getUpdatedAt().getTime()
-        );
+        DocumentResponse response = new DocumentResponse();
+        response.setDocumentId(e.getId().toString());
+        response.setSizeBytes(e.getSizeBytes());
+        response.setStorageClass(e.getStorageClass());
+        response.setOwnerId(e.getOwnerId());
+        response.setChecksum(e.getChecksum());
+        response.setContentType(e.getContentType());
+        response.setOriginalFilename(e.getOriginalFilename());
+        response.setMetadata(metadataObj);
+        response.setCreatedAt(e.getCreatedAt().getTime());
+        response.setUpdatedAt(e.getUpdatedAt().getTime());
+        // Permission fields sẽ được set bởi enrichDocumentWithPermissions nếu cần
+        response.setIsOwner(null);
+        response.setCanDownload(null);
+        response.setHasAccess(null);
+        return response;
     }
 
     public DocumentResponse mapToDocumentResponse(Map<String, Object> sourceMap) {
@@ -131,6 +139,11 @@ public class MapperUtils {
                     }
                 }
             }
+
+            // Permission fields sẽ được set bởi enrichDocumentWithPermissions nếu cần
+            response.setIsOwner(null);
+            response.setCanDownload(null);
+            response.setHasAccess(null);
 
             return response;
         } catch (Exception e) {

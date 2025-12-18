@@ -3,11 +3,11 @@ package com.system_share_documents.DocumentService.controller;
 import com.system_share_documents.DocumentService.dto.ApiResponse;
 import com.system_share_documents.DocumentService.dto.request.DeleteDocumentRequest;
 import com.system_share_documents.DocumentService.dto.request.GetListDocumentRequest;
-import com.system_share_documents.DocumentService.dto.request.InitUploadRequest;
+import com.system_share_documents.DocumentService.dto.request.RequestAccessRequest;
 import com.system_share_documents.DocumentService.dto.request.SearchDocumentRequest;
 import com.system_share_documents.DocumentService.dto.response.DeleteDocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
-import com.system_share_documents.DocumentService.dto.response.InitUploadResponse;
+import com.system_share_documents.DocumentService.dto.response.RequestAccessResponse;
 import com.system_share_documents.DocumentService.dto.response.SharedDocumentResponse;
 import com.system_share_documents.DocumentService.service.DocumentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,13 +48,19 @@ public class DocumentController {
 
     @PostMapping("search")
     public ApiResponse<List<DocumentResponse>> searchController(
-            @RequestParam("q") String query,
-            @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit
+            @RequestBody SearchDocumentRequest request,
+            @RequestParam(value = "limit", required = false, defaultValue = "20") Integer limit,
+            Authentication auth
     ) throws Exception {
-        List<DocumentResponse> response = documentService.searchDocuments(query, limit);
+        String userId = auth != null ? auth.getName() : null;
+        String keyword = request.getKeyword() != null ? request.getKeyword() : "";
+        String userIdForFilter = null;
+        if (request.getIsUser() != null && request.getIsUser() && userId != null) {
+            userIdForFilter = userId;
+        }
+        List<DocumentResponse> response = documentService.searchDocuments(keyword, limit, userIdForFilter, userId);
         return ApiResponse.success("OK", "Search documents successfully", response);
     }
-
 
     @PostMapping("shared/get/lists")
     public ApiResponse<Page<SharedDocumentResponse>> getSharedDocuments(@RequestParam(defaultValue = "0") int page,
@@ -72,5 +78,15 @@ public class DocumentController {
         String userId = auth.getName();
         DeleteDocumentResponse response = documentService.deleteDocument(request, userId, httpRequest);
         return ApiResponse.success("OK", "Document deleted successfully", response);
+    }
+
+    @PostMapping("request-access")
+    public ApiResponse<RequestAccessResponse> requestAccess(
+            @RequestBody RequestAccessRequest request,
+            Authentication auth,
+            HttpServletRequest httpRequest) throws Exception {
+        String userId = auth.getName();
+        RequestAccessResponse response = documentService.requestAccess(request, userId, httpRequest);
+        return ApiResponse.success("OK", "Access request sent successfully", response);
     }
 }

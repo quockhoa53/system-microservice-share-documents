@@ -21,6 +21,7 @@ public enum ActionLog {
     // Access Control
     GRANT_ACCESS,
     REVOKE_GRANT_ACCESS,
+    REQUEST_ACCESS,
     VIEW,
     CHECK
 }

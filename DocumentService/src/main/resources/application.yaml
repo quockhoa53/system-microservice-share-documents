@@ -92,3 +92,15 @@ group:
   url: lb://user-service
   check-membership: /internal/groups/{groupId}/membership?userId={userId}
   get-group-members: /api/groups/{groupId}/members
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: nguyenquockhoa5549@gmail.com
+  password: rums kdhs bvku eqqg
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true

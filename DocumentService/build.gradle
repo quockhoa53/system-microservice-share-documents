@@ -55,6 +55,8 @@ dependencies {
 	implementation 'de.siegmar:logback-gelf:5.0.0'
 	// Janino for logback conditional processing
 	implementation 'org.codehaus.janino:janino:3.1.12'
+	// Mail support
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	// Testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

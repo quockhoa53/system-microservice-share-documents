@@ -62,7 +62,7 @@ vault:
   host: ${VAULT_HOST}
   port: ${VAULT_PORT}
   token: ${VAULT_TOKEN}
-  transit-key: ${VAULT_TRANSIT_KEY
+  transit-key: ${VAULT_TRANSIT_KEY}
 
 minio:
   url: ${MINIO_URL}

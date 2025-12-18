@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum NotExistError implements ErrorCode {
+    ALREADY_EXITS("DOCUMENT_NOT_FOUND", "Document not found", HttpStatus.BAD_REQUEST),
     DOCUMENT_NOT_FOUND("DOCUMENT_NOT_FOUND", "Document not found", HttpStatus.BAD_REQUEST),
     VERSION_NOT_FOUND("VERSION_NOT_FOUND", "Document version not found", HttpStatus.BAD_REQUEST),
     DOCUMENT_KEY_NOT_FOUND("DOCUMENT_KEY_NOT_FOUND", "Document key not found", HttpStatus.BAD_REQUEST),
@@ -15,7 +16,9 @@ public enum NotExistError implements ErrorCode {
     PUBLIC_KEY_SIGNATURE_NOT_FOUND("PUBLIC_KEY_SIGNATURE_NOT_FOUND", "Public key for signature not found in keyring", HttpStatus.BAD_REQUEST),
     DOCUMENT_KEY_EXITS("DOCUMENT_KEY_EXITS", "Document key already exits", HttpStatus.BAD_REQUEST),
     CEK_NOT_FOUND("CEK_NOT_FOUND", "Owner CEK not found", HttpStatus.BAD_REQUEST),
-    FILE_NOT_FOUND("FILE_NOT_FOUND", "File not found in storage", HttpStatus.BAD_REQUEST),;
+    FILE_NOT_FOUND("FILE_NOT_FOUND", "File not found in storage", HttpStatus.BAD_REQUEST),
+    GROUP_DOCUMENT_NOT_FOUND("GROUP_DOCUMENT_NOT_FOUND", "Document not found in this group", HttpStatus.BAD_REQUEST),
+    VERSION_NOT_WRAPPED_CEK_MASTER("VERSION_NOT_WRAPPED_CEK_MASTER", "Document version does not have wrappedCEKMaster", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 public class ShareDocumentRequest {
     private String versionId;
+    private String documentId;
     private List<ListRecipients> recipients;
 
     @Data

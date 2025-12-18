@@ -86,3 +86,9 @@ grant-access:
   url: lb://auth-access-control-service
   check-grant-access: /api/document-access/check-access
   create-grant-access: /api/document-access/grant
+
+group:
+  service-name: user-service
+  url: lb://user-service
+  check-membership: /internal/groups/{groupId}/membership?userId={userId}
+  get-group-members: /api/groups/{groupId}/members

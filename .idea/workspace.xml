@@ -5,9 +5,57 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0f7b1fb5-ae38-4261-9b07-f1bd14274906" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/properties/GroupProperties.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/group/GroupRest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/rest/group/GroupRestImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/GroupDocumentController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/AddDocumentToGroupRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/GetGroupDocumentsRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/RemoveDocumentFromGroupRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/response/GroupDocumentDetailResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/response/GroupDocumentResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/entity/GroupDocument.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/enums/AccessRoleGroupDocument.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/GroupDocumentRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/FileValidationService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/GroupDocumentService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/FileValidationServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/GroupDocumentServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/public_keys/_0be39c11-55d6-d173-36f3-21a9089c6bce" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/public_keys/_daa8bc95-462b-5ace-f9c4-4a608e4956c5" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/APIGatewayService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/rest/RestTemplateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AppCommonService/src/main/java/com/system_share_documents/AppCommonService/config/rest/RestTemplateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/ShareDocumentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/controller/ShareDocumentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/ShareDocumentRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/dto/request/ShareDocumentRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/AuthError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/AuthError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/NotExistError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/NotExistError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/ValidationError.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/exception/errorcode/ValidationError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentVersionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/repository/DocumentVersionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentKeyServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/DocumentKeyServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/ShareDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/ShareDocumentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/java/com/system_share_documents/DocumentService/service/impl/UploadDocumentServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/DocumentService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/GroupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/GroupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/GroupInternalController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/GroupInternalController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/UserKeyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/controller/user/UserKeyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/InternalMembershipResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/dto/response/InternalMembershipResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/GroupService.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/GroupService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/GroupServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/java/com/system_share_documents/UserService/service/impl/GroupServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserService/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/UserService/src/main/resources/logback-spring.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WaterMarkServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WaterMarkServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/service/impl/WatermarkProcessorServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/utils/TypeFileUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/utils/TypeFileUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/worker/WatermarkWorker.java" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/java/com/system_share_documents/WatermarkWorkerService/worker/WatermarkWorker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/WatermarkWorkerService/src/main/resources/logback-spring.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/core/_keyring" beforeDir="false" afterPath="$PROJECT_DIR$/vault/data/core/_keyring" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/core/_master" beforeDir="false" afterPath="$PROJECT_DIR$/vault/data/core/_master" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/core/cluster/_feature-flags" beforeDir="false" afterPath="$PROJECT_DIR$/vault/data/core/cluster/_feature-flags" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/named_keys/_default" beforeDir="false" afterPath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/named_keys/_default" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/public_keys/_7a603ff6-61f5-9f9e-6cf4-17b3a911abe4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vault/data/logical/9a74a779-dc7b-d8c9-62d8-f0214105ecd5/oidc_tokens/public_keys/_e2200ed2-6fc9-3913-cbc1-8e89276ac79e" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,64 +166,64 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Docker.docker-compose.yml.kafka-connect: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml.kafka: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml.redis: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build EurekaService.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build system-microservice-share-documents.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:APIGatewayService [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:APIGatewayService [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [shadowJar].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [knows].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor&quot;: &quot;Debug&quot;,
-    &quot;Gradle.system-microservice-share-documents:UserService [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.system-microservice-share-documents:WatermarkWorkerService [clean].executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ApiGatewayServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.AppCommonServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.AuditLogServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.AuthAccessControlServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.CloudConfigServerServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.DocumentServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.EurekaServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.UserServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.WatermarkWorkerServiceApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;cache__with__job&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache2/src/main/java/org/example/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.docker-compose.yml.kafka-connect: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yml.kafka: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yml.redis: Compose Deployment.executor": "Run",
+    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
+    "Gradle.Build EurekaService.executor": "Run",
+    "Gradle.Build system-microservice-share-documents.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.system-microservice-share-documents [build].executor": "Run",
+    "Gradle.system-microservice-share-documents [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents.executor": "Run",
+    "Gradle.system-microservice-share-documents:APIGatewayService [bootJar].executor": "Run",
+    "Gradle.system-microservice-share-documents:APIGatewayService [build].executor": "Run",
+    "Gradle.system-microservice-share-documents:APIGatewayService [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateGroupDataCache [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:CDCUpdateUserDataCache [shadowJar].executor": "Run",
+    "Gradle.system-microservice-share-documents:UpdateDocumentData [build].executor": "Run",
+    "Gradle.system-microservice-share-documents:UpdateDocumentData [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:UpdateDocumentData [knows].executor": "Run",
+    "Gradle.system-microservice-share-documents:UpdateDocumentData [shadowJar].executor": "Debug",
+    "Gradle.system-microservice-share-documents:UserService [clean].executor": "Run",
+    "Gradle.system-microservice-share-documents:WatermarkWorkerService [clean].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.ApiGatewayServiceApplication.executor": "Run",
+    "Spring Boot.AppCommonServiceApplication.executor": "Run",
+    "Spring Boot.AuditLogServiceApplication.executor": "Run",
+    "Spring Boot.AuthAccessControlServiceApplication.executor": "Run",
+    "Spring Boot.CloudConfigServerServiceApplication.executor": "Run",
+    "Spring Boot.DocumentServiceApplication.executor": "Run",
+    "Spring Boot.EurekaServiceApplication.executor": "Run",
+    "Spring Boot.UserServiceApplication.executor": "Run",
+    "Spring Boot.WatermarkWorkerServiceApplication.executor": "Run",
+    "git-widget-placeholder": "Merging cache__with__job",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/work/DoAn/system-microservice-share-documents/CDCUpdateGroupDataCache2/src/main/java/org/example/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "run.configurations.included.in.services": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>

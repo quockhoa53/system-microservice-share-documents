@@ -2,6 +2,7 @@ package com.system_share_documents.UserService.controller.user;
 
 import com.system_share_documents.UserService.dto.ApiResponse;
 import com.system_share_documents.UserService.dto.request.AddMemberRequest;
+import com.system_share_documents.UserService.dto.request.ChangeMemberRoleRequest;
 import com.system_share_documents.UserService.dto.request.CreateGroupRequest;
 import com.system_share_documents.UserService.dto.response.GroupDetailResponse;
 import com.system_share_documents.UserService.dto.response.GroupMemberResponse;
@@ -71,6 +72,17 @@ public class GroupController {
     ) {
         groupService.removeMember(groupId, userId, auth);
         return ApiResponse.success("OK", "Member removed", null);
+    }
+
+    @PutMapping("/{groupId}/members/{userId}")
+    public ApiResponse<Void> changeMemberRole(
+            @PathVariable UUID groupId,
+            @PathVariable UUID userId,
+            @RequestBody ChangeMemberRoleRequest request,
+            Authentication auth
+    ) {
+        groupService.changeMemberRole(groupId, userId, request, auth);
+        return ApiResponse.success("OK", "Member role changed", null);
     }
 
     @DeleteMapping("/{groupId}")

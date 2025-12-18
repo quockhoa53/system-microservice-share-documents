@@ -83,12 +83,6 @@
     <!-- Logger cho GELF Appender debug (tạm thời để debug) -->
     <logger name="de.siegmar.logbackgelf" level="DEBUG"/>
 
-<!--    &lt;!&ndash; Logger cho Performance &ndash;&gt;-->
-<!--    <logger name="com.system_share_documents.AppCommonService.performance.PerformanceAspect" level="INFO" additivity="false">-->
-<!--        <appender-ref ref="GELF"/>-->
-<!--        <appender-ref ref="CONSOLE"/>-->
-<!--    </logger>-->
-
     <!-- Logger cho HTTP Request/Response API Logging -->
     <logger name="com.system_share_documents.AppCommonService.filter.HttpLoggingFilter" level="INFO" additivity="false">
         <appender-ref ref="GELF"/>

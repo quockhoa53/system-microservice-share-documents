@@ -1,6 +1,7 @@
 package com.system_share_documents.UserService.service;
 
 import com.system_share_documents.UserService.dto.request.AddMemberRequest;
+import com.system_share_documents.UserService.dto.request.ChangeMemberRoleRequest;
 import com.system_share_documents.UserService.dto.request.CreateGroupRequest;
 import com.system_share_documents.UserService.dto.response.GroupDetailResponse;
 import com.system_share_documents.UserService.dto.response.GroupMemberResponse;
@@ -23,6 +24,8 @@ public interface GroupService {
     void addMember(UUID groupId, AddMemberRequest request, Authentication auth);
 
     void removeMember(UUID groupId, UUID targetUserId, Authentication auth);
+
+    void changeMemberRole(UUID groupId, UUID userId, ChangeMemberRoleRequest request, Authentication auth);
 
     void deleteGroup(UUID groupId, Authentication auth);
 

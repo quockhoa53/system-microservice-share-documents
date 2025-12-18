@@ -79,25 +79,34 @@ public class DocumentKeyServiceImpl implements DocumentKeyService {
             }
 
             String publicKey = userKeyRepository.getUserPublicPrimaryKeyForUser(request.getRecipientId(), OPENPGP_CV25519);
-            log.info(String.format("Public key used to decrypt document %s is %s", request.getDocumentVersionId(), publicKey));
-
             if (publicKey == null) {
                 throw new AppException(NotExistError.USER_PUBLIC_KEY_EMPTY);
             }
 
-            if (documentKeyRepository.existsByDocumentVersionIdAndRecipientId(request.getDocumentVersionId(), request.getRecipientId())) {
-                return;
-            }
-
             byte[] wrapped = openPgpService.wrapCekWithRecipientPublicKey(request.getRecipientId(), rawCEK, publicKey);
-            DocumentKey key = DocumentKey.builder()
-                    .wrappedCek(wrapped)
-                    .algorithm(OPENPGP_AES256)
-                    .createdAt(Timestamp.from(Instant.now()))
-                    .documentVersion(version)
-                    .recipientId(request.getRecipientId())
-                    .build();
-            documentKeyRepository.save(key);
+
+            // Kiểm tra xem đã tồn tại DocumentKey chưa
+            // Nếu user tạo lại cặp khóa mới, cần cập nhật wrappedCek với public key mới
+            DocumentKey existingKey = documentKeyRepository
+                    .findByDocumentVersionIdAndRecipientId(request.getDocumentVersionId(), request.getRecipientId())
+                    .orElse(null);
+
+            if (existingKey != null) {
+                // Cập nhật wrappedCek với giá trị mới (được mã hóa bằng public key mới)
+                existingKey.setWrappedCek(wrapped);
+                existingKey.setAlgorithm(OPENPGP_AES256);
+                documentKeyRepository.save(existingKey);
+            } else {
+                // Tạo mới DocumentKey
+                DocumentKey key = DocumentKey.builder()
+                        .wrappedCek(wrapped)
+                        .algorithm(OPENPGP_AES256)
+                        .createdAt(Timestamp.from(Instant.now()))
+                        .documentVersion(version)
+                        .recipientId(request.getRecipientId())
+                        .build();
+                documentKeyRepository.save(key);
+            }
         } catch (AppException e) {
             status = "FAIL";
             errorReason = e.getMessage();

@@ -62,4 +62,19 @@ public class RestTemplateConfig {
                 .additionalInterceptors(List.of(authInterceptor))
                 .build();
     }
+
+    @Bean(name = "groupRestTemplate")
+    @LoadBalanced
+    public RestTemplate grouprestTemplate(RestTemplateBuilder builder) {
+        ClientHttpRequestInterceptor authInterceptor = (request, body, execution) -> {
+            String token = keycloakTokenRest.getAccessToken();
+            request.getHeaders().setBearerAuth(token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            return execution.execute(request, body);
+        };
+
+        return builder
+                .additionalInterceptors(List.of(authInterceptor))
+                .build();
+    }
 }

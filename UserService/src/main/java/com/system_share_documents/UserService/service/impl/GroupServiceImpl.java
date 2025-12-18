@@ -1,6 +1,7 @@
 package com.system_share_documents.UserService.service.impl;
 
 import com.system_share_documents.UserService.dto.request.AddMemberRequest;
+import com.system_share_documents.UserService.dto.request.ChangeMemberRoleRequest;
 import com.system_share_documents.UserService.dto.request.CreateGroupRequest;
 import com.system_share_documents.UserService.dto.response.GroupDetailResponse;
 import com.system_share_documents.UserService.dto.response.GroupMemberResponse;
@@ -412,6 +413,59 @@ public class GroupServiceImpl implements GroupService {
         // Evict cache
         cacheService.evictGroupMemberCache(groupId);
         cacheService.evictUserGroupsCache(targetUserId);
+        cacheService.evictGroupCache(groupId);
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = {"groupMembers", "userGroups"}, allEntries = true)
+    public void changeMemberRole(UUID groupId, UUID userId, ChangeMemberRoleRequest request, Authentication auth) {
+        UUID currentUserId = SecurityUtils.requireCurrentUserId(auth, userRepository);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "Group not found"));
+
+        GroupMember target = groupMemberRepository.findByGroup_IdAndUser_Id(groupId, userId)
+                .orElseThrow(() -> new AppException(SystemError.NOT_FOUND, "Member not found"));
+
+        GroupMember me = groupMemberRepository.findByGroup_IdAndUser_Id(groupId, currentUserId)
+                .orElseThrow(() -> new AppException(AuthError.FORBIDDEN, "You are not a member of this group"));
+
+        // Chỉ owner/admin mới được đổi role
+        if (!isOwnerOrAdmin(me)) {
+            throw new AppException(AuthError.FORBIDDEN, "Only owner/admin can change member role");
+        }
+
+        // Không được đổi role của owner
+        if ("owner".equalsIgnoreCase(target.getRole())) {
+            throw new AppException(SystemError.INVALID_PARAM, "Cannot change owner role");
+        }
+
+        // Admin không được đổi role của admin khác (chỉ owner mới được)
+        if ("admin".equalsIgnoreCase(target.getRole()) && "admin".equalsIgnoreCase(me.getRole())) {
+            throw new AppException(AuthError.FORBIDDEN, "Admin cannot change another admin's role");
+        }
+
+        // Validate và normalize role mới
+        String newRole = normalizeRole(request.getRole());
+
+        // Không được đổi thành owner role qua API này
+        if ("owner".equalsIgnoreCase(newRole)) {
+            throw new AppException(SystemError.INVALID_PARAM, "Cannot change role to owner");
+        }
+
+        // Nếu role không thay đổi thì không cần làm gì
+        if (newRole.equalsIgnoreCase(target.getRole())) {
+            return;
+        }
+
+        // Update role
+        target.setRole(newRole);
+        groupMemberRepository.save(target);
+
+        // Evict cache
+        cacheService.evictGroupMemberCache(groupId);
+        cacheService.evictUserGroupsCache(userId);
         cacheService.evictGroupCache(groupId);
     }
 

@@ -1,6 +1,5 @@
 package com.system_share_documents.DocumentService.repository;
 
-import com.system_share_documents.DocumentService.entity.Document;
 import com.system_share_documents.DocumentService.entity.DocumentVersion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,4 +44,7 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
 
     @Query("SELECT v FROM DocumentVersion v WHERE v.document.id = :documentId AND v.deletedAt IS NULL ORDER BY v.versionNumber DESC")
     Optional<DocumentVersion> findLatestVersionByDocumentId(@Param("documentId") UUID documentId);
+
+    @Query("SELECT v.id, v.wrappedCEKMaster FROM DocumentVersion v WHERE v.id IN :versionIds AND v.deletedAt IS NULL")
+    List<Object[]> findWrappedCEKMasterByIds(@Param("versionIds") List<UUID> versionIds);
 }

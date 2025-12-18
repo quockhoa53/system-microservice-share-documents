@@ -40,15 +40,6 @@ import static com.system_share_documents.AppCommonService.constant.ObjectTypeCon
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.*;
 import static com.system_share_documents.WatermarkWorkerService.utils.TypeFileUtils.guessExtension;
 
-/**
- * Clean, safe and refactored implementation.
- *
- * Key ideas:
- *  - Retry ONLY watermark + encrypt + upload stage (idempotent upload path).
- *  - Save CEK per recipient exactly once after upload success (no retry).
- *  - Record attempts and append detailed errors into job record.
- *  - Executor pool for key saves sized to recipient count (capped).
- */
 @Service
 public class WatermarkProcessorServiceImpl implements WatermarkProcessorService {
 
@@ -92,23 +83,25 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
 
     @Override
     public CompletableFuture<Void> processWatermark(WatermarkJobEvent event, String topic) {
-        // Initialize job (idempotency guard)
+        String requestId = event.getRequestId();
+        log.info("[requestId={}] Consumed watermark for documentId={}, versionId={} -> Event: {}",
+                requestId, event.getDocumentId(), event.getVersionId(), event);
+
         WatermarkJob job = initJob(event);
 
         Supplier<CompletableFuture<ProcessResult>> watermarkStageSupplier = () -> doWatermarkEncryptUpload(job, event);
 
-        // Retry ONLY watermark/encrypt/upload stage
         return retryAsync(watermarkStageSupplier, MAX_ATTEMPTS, BASE_BACKOFF, job)
                 .thenCompose(result -> CompletableFuture.runAsync(() -> {
-                    // Post-processing that must run exactly once (no retry at orchestration level)
                     try {
-                        // 1) Save CEK for recipients (parallel but one-time)
+                        log.info("[requestId={}] Watermark/encrypt/upload completed, saving keys for {} recipients",
+                                requestId, event.getRecipients() != null ? event.getRecipients().size() : 0);
+
                         saveKeysOnce(event, result.wrappedCEKMaster, job);
 
-                        // 2) Create grant access
+                        log.info("[requestId={}] Creating grant access", requestId);
                         createGrantAccessForUser(job, event);
 
-                        // 3) Finalize job state & emit event
                         job.setStatus(WorkerProcessStatus.DONE);
                         job.setGeneratedObjectKey(result.objectKey);
                         job.setCompletedAt(Timestamp.from(Instant.now()));
@@ -124,12 +117,14 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                                 .build();
 
                         processProducer.sendWatermarkProcess(topic, processEvent, event.getDocumentId());
+                        log.info("[requestId={}] Watermark process completed successfully, objectKey={}",
+                                requestId, result.objectKey);
 
                         sendAudit(event, "OK", null, job);
 
                     } catch (Exception ex) {
-                        // Post-process failure -> record and mark FAILED (do not retry the upload stage here)
                         String message = ex.getMessage() == null ? ex.toString() : ex.getMessage();
+                        log.error("[requestId={}] Post-process failed: {}", requestId, message, ex);
                         appendError(job, "Post-process failed: " + message);
                         job.setStatus(WorkerProcessStatus.FAILED);
                         job.setCompletedAt(Timestamp.from(Instant.now()));
@@ -139,12 +134,9 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                     }
                 }))
                 .exceptionally(ex -> {
-                    // Any exception from retry or post-process will be handled/logged here.
                     Throwable cause = ex instanceof CompletionException ? ex.getCause() : ex;
                     String err = cause == null ? ex.getMessage() : cause.getMessage();
-                    log.error("Watermark process permanently failed for documentId={} requestId={} error={}",
-                            event.getDocumentId(), event.getRequestId(), err);
-                    // ensure job marked failed (if not already)
+                    log.error("[requestId={}] Watermark process permanently failed, error={}", requestId, err, cause);
                     try {
                         job.setStatus(WorkerProcessStatus.FAILED);
                         job.setCompletedAt(Timestamp.from(Instant.now()));
@@ -152,23 +144,20 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                         jobRepo.save(job);
                         sendAudit(event, "FAIL", err, job);
                     } catch (Exception inner) {
-                        log.error("Error while marking job failed: {}", inner.getMessage(), inner);
+                        log.error("[requestId={}] Error while marking job failed: {}", requestId, inner.getMessage(), inner);
                     }
                     return null;
                 });
     }
 
-    /**
-     * Initialize job or return existing DONE job (idempotent).
-     */
     private WatermarkJob initJob(WatermarkJobEvent event) {
+        String requestId = event.getRequestId();
         WatermarkJob existing = jobRepo.findTopByDocumentIdOrderByCreatedAtDesc(event.getDocumentId()).orElse(null);
         if (existing != null && existing.getStatus() == WorkerProcessStatus.DONE) {
-            log.info("Job already DONE → skip. documentId={}", event.getDocumentId());
+            log.info("[requestId={}] Job already DONE, skipping", requestId);
             return existing;
         }
 
-        // Format watermark text: userId | YYYY-MM-DD HH:mm
         Instant now = Instant.now();
         String timeStr = now.toString();
         String formattedTime = timeStr.contains("T")
@@ -187,12 +176,10 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                 .errorMessage("")
                 .build();
 
+        log.info("[requestId={}] Initialized watermark job, watermarkText={}", requestId, watermarkText);
         return jobRepo.save(job);
     }
 
-    /**
-     * Retry helper that records attempts and appends error details into job record.
-     */
     private <T> CompletableFuture<T> retryAsync(Supplier<CompletableFuture<T>> supplier,
                                                 int maxAttempts, long baseBackoff, WatermarkJob job) {
         return retryAsyncInternal(supplier, 1, maxAttempts, baseBackoff, job);
@@ -203,13 +190,11 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
 
         return supplier.get().handle((result, ex) -> {
             if (ex == null) {
-                // success: persist attempts (useful metrics)
                 job.setAttempts(attempt);
                 jobRepo.save(job);
                 return CompletableFuture.completedFuture(result);
             }
 
-            // record attempt failure with detail
             String errMsg = String.format("Attempt %d failed: %s", attempt, ex.getMessage());
             appendError(job, errMsg);
             job.setAttempts(attempt);
@@ -222,8 +207,8 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
             }
 
             long backoff = baseBackoff * (long) Math.pow(2, attempt - 1);
-            log.warn("Attempt {} failed — retry after {} ms (docId={}, attemptErr={})",
-                    attempt, backoff, job.getDocumentId(), ex.getMessage());
+            log.warn("[requestId={}] Attempt {} failed, retry after {}ms, error={}",
+                    job.getDocumentId(), attempt, backoff, ex.getMessage());
 
             CompletableFuture<T> delayed = new CompletableFuture<>();
             CompletableFuture.delayedExecutor(backoff, TimeUnit.MILLISECONDS)
@@ -239,55 +224,48 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
         }).thenCompose(f -> f);
     }
 
-    /**
-     * The stage that we treat as retryable: watermark -> encrypt -> upload -> wrap CEK.
-     * Returns ProcessResult used by post-processing.
-     */
     private CompletableFuture<ProcessResult> doWatermarkEncryptUpload(WatermarkJob job, WatermarkJobEvent event) {
+        String requestId = event.getRequestId();
         return CompletableFuture.supplyAsync(() -> {
             try {
-                log.info("Start watermark/encrypt/upload stage for documentId={}", job.getDocumentId());
+                log.info("[requestId={}] Starting watermark/encrypt/upload stage", requestId);
 
-                // 1. Get original bytes
                 byte[] original = minio.getObjectBytes(event.getUploadObjectKey());
+                log.debug("[requestId={}] Downloaded original file, size: {} bytes", requestId, original.length);
 
-                // 2. Apply watermark
                 byte[] watermarked = wmService.addWatermark(original, job.getWatermarkText());
+                log.debug("[requestId={}] Applied watermark, watermarked size: {} bytes", requestId, watermarked.length);
 
-                // 3. Generate CEK and encrypt file bytes
                 SecretKey cek = crypto.generateAesKey();
                 byte[] encryptedFile = crypto.encryptFile(watermarked, cek.getEncoded());
+                log.debug("[requestId={}] Encrypted file, encrypted size: {} bytes", requestId, encryptedFile.length);
 
-                // 4. Compute checksum
                 String checksum = crypto.calculateSha256(new ByteArrayInputStream(encryptedFile));
+                log.debug("[requestId={}] Calculated checksum: {}", requestId, checksum);
 
-                // 5. Upload encrypted file (idempotent path)
                 String ext = guessExtension(event.getContentType());
                 String objKey = "final/%s/v1/%s_wm.%s".formatted(event.getDocumentId(), event.getDocumentId(), ext);
                 minio.putObjectBytes(objKey, encryptedFile, event.getContentType());
+                log.info("[requestId={}] Uploaded watermarked file to MinIO, objectKey={}", requestId, objKey);
 
-                // 6. Wrap CEK using Vault Transit
                 String base64Plaintext = Base64.getEncoder().encodeToString(cek.getEncoded());
                 String wrappedCEKMaster = vaultTransitService.encrypt(base64Plaintext);
+                log.debug("[requestId={}] Wrapped CEK using Vault Transit", requestId);
 
-                log.info("Watermark/encrypt/upload done for documentId={}, objectKey={}", job.getDocumentId(), objKey);
                 return new ProcessResult(objKey, checksum, wrappedCEKMaster);
 
             } catch (Exception ex) {
-                log.error("doWatermarkEncryptUpload failed for documentId={} : {}", job.getDocumentId(), ex.getMessage());
+                log.error("[requestId={}] Watermark/encrypt/upload failed: {}", requestId, ex.getMessage(), ex);
                 throw new CompletionException(new AppException(BusinessError.FAILED_PROCESS_WATERMARK, ex.getMessage()));
             }
         });
     }
 
-    /**
-     * Save CEK per recipient exactly once. Executor pool sized to recipients (capped).
-     * Duplicate key exceptions are handled gracefully (logged + appended to job error) without failing whole post-process.
-     */
     private void saveKeysOnce(WatermarkJobEvent event, String wrappedCEKMaster, WatermarkJob job) {
+        String requestId = event.getRequestId();
         List<String> recipients = event.getRecipients();
         if (recipients == null || recipients.isEmpty()) {
-            log.warn("No recipients found for documentId={}. skip saving keys.", event.getDocumentId());
+            log.warn("[requestId={}] No recipients found, skipping key save", requestId);
             return;
         }
 
@@ -307,17 +285,17 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                                     .build();
 
                             keyRest.createAndSaveKey(req);
+                            log.debug("[requestId={}] Saved key for recipient: {}", requestId, recipient);
                         } catch (Exception e) {
-                            // record error but continue other recipients
                             String msg = "Failed save key for " + recipient + ": " + e.getMessage();
+                            log.error("[requestId={}] {}", requestId, msg, e);
                             appendError(job, msg);
-                            log.error(msg, e);
                         }
                     }, pool))
                     .toList();
 
-            // Wait for all recipient key tasks to finish
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            log.info("[requestId={}] Saved keys for {} recipients", requestId, recipients.size());
 
         } finally {
             pool.shutdown();
@@ -332,13 +310,11 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
         }
     }
 
-    /**
-     * Create grant access for recipients (single call). If it fails, throw to let post-process mark job failed.
-     */
     private void createGrantAccessForUser(WatermarkJob job, WatermarkJobEvent event) throws Exception {
+        String requestId = event.getRequestId();
         try {
             if (event.getRecipients() == null || event.getRecipients().isEmpty()) {
-                log.warn("Recipients empty when creating grant access for version {} of document {}", event.getVersionId(), event.getDocumentId());
+                log.warn("[requestId={}] Recipients empty when creating grant access", requestId);
             }
 
             GrantAccessRequest request = GrantAccessRequest.builder()
@@ -353,11 +329,13 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                     .build();
 
             grantAccessRest.createGrantAccess(request);
+            log.info("[requestId={}] Created grant access for {} recipients",
+                    requestId, event.getRecipients() != null ? event.getRecipients().size() : 0);
 
         } catch (Exception ex) {
-            String msg = "Failed create grant access for document " + event.getDocumentId() + ": " + ex.getMessage();
+            String msg = "Failed create grant access: " + ex.getMessage();
+            log.error("[requestId={}] {}", requestId, msg, ex);
             appendError(job, msg);
-            log.error(msg, ex);
             throw ex;
         }
     }
@@ -387,9 +365,6 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
         auditLogProducer.sendAuditLog(audit, event.getDocumentId());
     }
 
-    /**
-     * Container for result from watermark/encrypt/upload stage.
-     */
     private static class ProcessResult {
         final String objectKey;
         final String checksum;

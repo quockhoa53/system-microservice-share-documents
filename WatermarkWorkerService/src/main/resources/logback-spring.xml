@@ -2,20 +2,17 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <!-- Properties -->
     <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="user-service"/>
     <springProperty scope="context" name="graylogHost" source="graylog.host" defaultValue="localhost"/>
     <springProperty scope="context" name="graylogPort" source="graylog.port" defaultValue="12201"/>
     <springProperty scope="context" name="graylogEnabled" source="graylog.enabled" defaultValue="true"/>
 
-    <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- GELF Appender for Graylog -->
     <if condition='property("graylogEnabled").equals("true")'>
         <then>
             <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
@@ -39,12 +36,10 @@
                     <staticField>stream:watermark-worker-logs-api</staticField>
                 </encoder>
 
-                <!-- Filter: Chỉ gửi log quan trọng -->
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
                 </filter>
 
-                <!-- Filter: Loại bỏ log dư thừa -->
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
@@ -54,7 +49,11 @@
                             message.contains("o.s.c.n.eureka") ||
                             message.contains("org.springframework.cloud") ||
                             message.contains("org.springframework.web") ||
-                            (level == DEBUG &amp;&amp; !message.contains("[API]") &amp;&amp; !message.contains("[PERF]") &amp;&amp; !message.contains("[ERROR]"))
+                            message.contains("[Consumer clientId") ||
+                            message.contains("[Producer clientId") ||
+                            message.contains("Node -1 disconnected") ||
+                            message.contains("Node -1 connected") ||
+                            (level == DEBUG &amp;&amp; !message.contains("[requestId="))
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
@@ -64,38 +63,28 @@
         </then>
     </if>
 
-    <!-- Logger cho Application logs -->
     <logger name="com.system_share_documents" level="INFO"/>
 
-    <!-- Logger cho Spring Framework - chỉ ERROR và WARN -->
     <logger name="org.springframework" level="WARN"/>
     <logger name="org.springframework.web" level="WARN"/>
     <logger name="org.springframework.cloud" level="WARN"/>
     <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.springframework.kafka" level="WARN"/>
 
-    <!-- Logger cho Hibernate - chỉ ERROR -->
     <logger name="org.hibernate" level="ERROR"/>
     <logger name="org.hibernate.SQL" level="WARN"/>
 
-    <!-- Logger cho Eureka - chỉ WARN và ERROR -->
     <logger name="com.netflix" level="WARN"/>
 
-    <!-- Logger cho GELF Appender debug (tạm thời để debug) -->
-    <logger name="de.siegmar.logbackgelf" level="DEBUG"/>
+    <logger name="org.apache.kafka" level="WARN"/>
 
-<!--    &lt;!&ndash; Logger cho Performance &ndash;&gt;-->
-<!--    <logger name="com.system_share_documents.AppCommonService.performance.PerformanceAspect" level="INFO" additivity="false">-->
-<!--        <appender-ref ref="GELF"/>-->
-<!--        <appender-ref ref="CONSOLE"/>-->
-<!--    </logger>-->
+    <logger name="de.siegmar.logbackgelf" level="WARN"/>
 
-    <!-- Logger cho HTTP Request/Response API Logging -->
     <logger name="com.system_share_documents.AppCommonService.filter.HttpLoggingFilter" level="INFO" additivity="false">
         <appender-ref ref="GELF"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <!-- Root Logger -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="GELF"/>

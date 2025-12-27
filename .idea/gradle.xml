@@ -16,7 +16,9 @@
             <option value="$PROJECT_DIR$/CDCUpdateUserDataCache" />
             <option value="$PROJECT_DIR$/CloudConfigServerService" />
             <option value="$PROJECT_DIR$/DocumentService" />
+            <option value="$PROJECT_DIR$/EncryptDocumentKeysForNewMember" />
             <option value="$PROJECT_DIR$/EurekaService" />
+            <option value="$PROJECT_DIR$/MalwareScanWorkerService" />
             <option value="$PROJECT_DIR$/UpdateDocumentData" />
             <option value="$PROJECT_DIR$/UserService" />
             <option value="$PROJECT_DIR$/WatermarkWorkerService" />

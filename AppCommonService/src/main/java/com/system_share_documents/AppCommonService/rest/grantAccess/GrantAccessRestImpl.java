@@ -51,4 +51,20 @@ public class GrantAccessRestImpl implements GrantAccessRest {
         }
     }
 
+
+    @Override
+    public void upsertGroupDocumentRecipient(String documentId, String groupId, String accessRole) throws Exception {
+        try {
+            String url = grantAccessProperties.getUrl() + grantAccessProperties.getUpsertGroupDocumentRecipient();
+            HashMap<String, String> request = new HashMap<>();
+            request.put("documentId", documentId);
+            request.put("groupId", groupId);
+            request.put("accessRole", accessRole);
+            HttpEntity<HashMap<String, String>> entity = new HttpEntity<>(request, null);
+            restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        } catch (Exception e) {
+            throw new Exception("Error when calling upsertGroupDocumentRecipient API: " + e.getMessage(), e);
+        }
+    }
+
 }

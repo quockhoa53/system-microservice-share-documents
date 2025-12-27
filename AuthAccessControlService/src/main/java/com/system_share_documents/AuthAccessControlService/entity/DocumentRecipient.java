@@ -1,6 +1,7 @@
 package com.system_share_documents.AuthAccessControlService.entity;
 
 import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
+import com.system_share_documents.AuthAccessControlService.enums.RecipientType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
@@ -14,7 +15,10 @@ import java.util.UUID;
 @Entity
 @Table(
         name = "document_recipients",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"document_id", "recipient_user_id"})}
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"document_id", "recipient_user_id", "recipient_type"}),
+                @UniqueConstraint(columnNames = {"document_id", "recipient_group_id", "recipient_type"})
+        }
 )
 public class DocumentRecipient {
 
@@ -25,8 +29,15 @@ public class DocumentRecipient {
     @Column(name = "document_id", nullable = false)
     private String documentId; // tài liệu được chia sẻ
 
-    @Column(name = "recipient_user_id", nullable = false)
-    private String recipientUserId; // ID của user nhận tài liệu (từ User Service)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recipient_type", nullable = false, length = 10)
+    private RecipientType recipientType = RecipientType.USER; // Loại recipient: USER hoặc GROUP
+
+    @Column(name = "recipient_user_id")
+    private String recipientUserId; // ID của user nhận tài liệu (từ User Service) - nullable khi recipientType=GROUP
+
+    @Column(name = "recipient_group_id")
+    private String recipientGroupId; // ID của group nhận tài liệu - nullable khi recipientType=USER
 
     @Enumerated(EnumType.STRING)
     @Column(name = "access_role", nullable = false, length = 10)

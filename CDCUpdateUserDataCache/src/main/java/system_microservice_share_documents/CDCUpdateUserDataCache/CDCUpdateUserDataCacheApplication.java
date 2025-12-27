@@ -6,6 +6,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import system_microservice_share_documents.CDCUpdateUserDataCache.config.JobConfig;
 import system_microservice_share_documents.CDCUpdateUserDataCache.deserializa.NullableStringSchema;
 import system_microservice_share_documents.CDCUpdateUserDataCache.sink.UserElasticsearchSink;
+import system_microservice_share_documents.CDCUpdateUserDataCache.sink.UserKeycloakSink;
 import system_microservice_share_documents.CDCUpdateUserDataCache.sink.UserRedisSink;
 import system_microservice_share_documents.CDCUpdateUserDataCache.transform.CdcDataTransformer;
 
@@ -36,6 +37,12 @@ public class CDCUpdateUserDataCacheApplication {
 				kafkaProps
 		);
 
+		FlinkKafkaConsumer<String> kafkaSource3 = new FlinkKafkaConsumer<>(
+				JobConfig.get("kafka.topic"),
+				new NullableStringSchema(),
+				kafkaProps
+		);
+
 		env.addSource(kafkaSource1)
 				.name("Kafka-CDC-Source")
 				.assignTimestampsAndWatermarks(WatermarkStrategy.noWatermarks())
@@ -50,6 +57,14 @@ public class CDCUpdateUserDataCacheApplication {
 				.map(new CdcDataTransformer())
 				.filter(value -> value != null)
 				.addSink(new UserElasticsearchSink())
+				.setParallelism(2);
+
+		env.addSource(kafkaSource3)
+				.name("Kafka-CDC-Source-Keycloak")
+				.assignTimestampsAndWatermarks(WatermarkStrategy.noWatermarks())
+				.map(new CdcDataTransformer())
+				.filter(value -> value != null)
+				.addSink(new UserKeycloakSink())
 				.setParallelism(2);
 
 		System.out.println("Starting Flink Job: " + JobConfig.get("job.name"));

@@ -2,14 +2,24 @@ services:
   # Keycloak (OIDC)
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.2
-    command: start-dev --http-port=9090 --spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true
+    command: start-dev --http-port=9090
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     ports:
       - "9090:9090"
     networks:
       - system-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   # MinIO (S3 storage)
   minio:
@@ -26,6 +36,14 @@ services:
       - minio_data:/data
     networks:
       - system-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   # Vault (Secret Manager)
   vault:
@@ -42,6 +60,14 @@ services:
     command: vault server -config=/vault/config.hcl
     networks:
       - system-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   # Kafka
   zookeeper:
@@ -49,10 +75,19 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms256m"
     ports:
       - "2181:2181"
     networks:
       - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   kafka:
     image: confluentinc/cp-kafka:7.2.1
@@ -67,8 +102,17 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms512m"
     networks:
       - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -84,6 +128,14 @@ services:
       - zookeeper
     networks:
       - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   # Kafka Connect (Debezium)
   kafka-connect:
@@ -101,14 +153,21 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx512m -Xms512m"
     ports:
       - "8090:8083"  # host 8090 → container 8083
     depends_on:
       - kafka
     networks:
       - app-net
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
 
   flink-jobmanager:
     build:
@@ -125,13 +184,19 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1.5G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
 
   flink-taskmanager:
     build:
@@ -148,19 +213,49 @@ services:
       - ./flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
     networks:
       - app-net
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2.5G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
 
   # Redis
   redis:
     image: redis:latest
-    container_name: redis
     ports:
       - "6379:6379"
-    command: [ "redis-server", "--appendonly", "yes" ]
+    command: [ "redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru" ]
     networks:
       - app-net
-      - system-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # ClamAV - Antivirus Scanner
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    ports:
+      - "3311:3310"
+    volumes:
+      - clamav_data:/var/lib/clamav
+      - ./clamav:/usr/local/etc/clamav
+    networks:
+      - app-net
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'PING' | nc localhost 3310 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
@@ -170,7 +265,7 @@ services:
       - transport.host=127.0.0.1
       - network.host=0.0.0.0
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
     volumes:
@@ -185,9 +280,16 @@ services:
       memlock:
         soft: -1
         hard: -1
-    mem_limit: 2g
     networks:
       - app-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   mongo:
     image: mongo:latest
@@ -203,6 +305,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   graylog:
     image: graylog/graylog:6.0
@@ -230,6 +340,8 @@ services:
       GRAYLOG_HTTP_ENABLE_GZIP: true
       # Timezone
       TZ: Asia/Ho_Chi_Minh
+      # Memory limit
+      GRAYLOG_IS_MASTER: "true"
     entrypoint: >
       /usr/bin/tini --
       wait-for-it mongo:27017 --timeout=60 --
@@ -250,6 +362,14 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
 networks:
   system-net:
@@ -263,3 +383,5 @@ volumes:
   graylog_data:
   graylog_journal:
   es_data:
+  clamav_data:
+  keycloak_data:

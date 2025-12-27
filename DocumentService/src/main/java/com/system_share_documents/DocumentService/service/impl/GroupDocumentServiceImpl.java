@@ -1,12 +1,14 @@
 package com.system_share_documents.DocumentService.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.system_share_documents.AppCommonService.rest.grantAccess.GrantAccessRest;
 import com.system_share_documents.AppCommonService.rest.group.GroupRest;
 import com.system_share_documents.AppCommonService.rest.userkey.UserKeyRest;
 import com.system_share_documents.AppCommonService.service.VaultTransitService;
 import com.system_share_documents.DocumentService.dto.request.AddDocumentToGroupRequest;
 import com.system_share_documents.DocumentService.dto.request.GetGroupDocumentsRequest;
 import com.system_share_documents.DocumentService.dto.request.RemoveDocumentFromGroupRequest;
+import com.system_share_documents.DocumentService.dto.request.UpdateDocumentAccessRoleRequest;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentDetailResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentResponse;
@@ -85,6 +87,9 @@ public class GroupDocumentServiceImpl implements GroupDocumentService {
 
     @Autowired
     private MapperUtils mapperUtils;
+
+    @Autowired
+    private GrantAccessRest grantAccessRest;
 
     private final ExecutorService encryptionExecutor = Executors.newFixedThreadPool(4);
 
@@ -416,6 +421,54 @@ public class GroupDocumentServiceImpl implements GroupDocumentService {
                 .filter(accessibleDocumentIds::contains)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public GroupDocumentResponse updateDocumentAccessRoleInternal(UpdateDocumentAccessRoleRequest request) {
+        UUID documentId = UUID.fromString(request.getDocumentId());
+        String groupId = request.getGroupId();
+        if (groupId == null || groupId.isBlank()) {
+            throw new AppException(ValidationError.INVALID_PARAM, "groupId is required");
+        }
+
+        if (request.getAccessRole() == null) {
+            throw new AppException(ValidationError.INVALID_PARAM, "accessRole is required");
+        }
+
+        GroupDocument groupDocument = groupDocumentRepository
+                .findByDocumentIdAndGroupIdAndNotDeleted(documentId, groupId)
+                .orElseThrow(() -> new AppException(NotExistError.GROUP_DOCUMENT_NOT_FOUND));
+
+        Document document = documentRepository.findByIdAndNotDeleted(documentId)
+                .orElseThrow(() -> new AppException(NotExistError.DOCUMENT_NOT_FOUND));
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        String accessRole = String.valueOf(request.getAccessRole());
+        groupDocument.setAccessRole(accessRole);
+        groupDocument.setUpdatedAt(now);
+
+        GroupDocument saved = groupDocumentRepository.save(groupDocument);
+
+        // Cập nhật DocumentRecipient cho group
+        try {
+            grantAccessRest.upsertGroupDocumentRecipient(documentId.toString(), groupId, accessRole);
+        } catch (Exception e) {
+            // Log error nhưng không throw để không fail việc cập nhật role
+            System.err.println("Warning: Failed to upsert group document recipient: " + e.getMessage());
+        }
+
+        return GroupDocumentResponse.builder()
+                .id(saved.getId())
+                .documentId(saved.getDocumentId())
+                .documentName(document.getOriginalFilename())
+                .groupId(saved.getGroupId())
+                .addedBy(saved.getAddedBy())
+                .accessRole(saved.getAccessRole())
+                .createdAt(saved.getCreatedAt())
+                .updatedAt(saved.getUpdatedAt())
+                .build();
+    }
+
 
     /**
      * Mã hóa CEK cho tất cả members trong group

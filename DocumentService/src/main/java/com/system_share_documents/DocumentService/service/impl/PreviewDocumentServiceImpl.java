@@ -16,6 +16,7 @@ import com.system_share_documents.DocumentService.exception.errorcode.BusinessEr
 import com.system_share_documents.DocumentService.exception.errorcode.NotExistError;
 import com.system_share_documents.DocumentService.repository.DocumentRepository;
 import com.system_share_documents.DocumentService.repository.DocumentVersionRepository;
+import com.system_share_documents.DocumentService.service.DocumentKeyService;
 import com.system_share_documents.DocumentService.service.PreviewDocumentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -50,6 +52,9 @@ public class PreviewDocumentServiceImpl implements PreviewDocumentService {
 
     @Autowired
     private AuditLogProducer auditLogProducer;
+
+    @Autowired
+    private DocumentKeyService documentKeyService;
 
     private final int presignExpiryMinutes = 15;
 
@@ -87,32 +92,36 @@ public class PreviewDocumentServiceImpl implements PreviewDocumentService {
             if (doc.getOwnerId().equals(userId)) {
                 hasAccess = true;
             } else {
-                // 2. Check direct access
+                // 2. Check direct access - chỉ cần có access (không cần check canDownload)
+                // Preview chỉ cần quyền VIEW, không cần quyền DOWNLOAD
                 CheckAccessRequest accessRequest = CheckAccessRequest.builder()
                         .documentId(String.valueOf(request.getDocumentId()))
                         .userId(userId)
+                        .isGroup(request.getIsGroup() != null ? request.getIsGroup() : false)
                         .build();
                 HashMap<String, Object> accessResponse = grantAccessRest.checkGrantAccess(accessRequest);
                 HashMap<String, Object> data = (HashMap<String, Object>) accessResponse.get(DATA);
-                if (data.get(CAN_DOWNLOAD) != null && Boolean.TRUE.equals(data.get(CAN_DOWNLOAD))) {
-                    hasAccess = true;
+                // Nếu có accessRole trong data nghĩa là user có access (dù canDownload là true hay false)
+                // Nếu không có accessRole hoặc message là "User không có quyền truy cập" thì không có access
+                if (data != null) {
+                    String accessRole = (String) data.get("accessRole");
+                    String message = (String) data.get("message");
+                    // Có access nếu có accessRole và không phải là message "không có quyền"
+                    if (accessRole != null && !accessRole.isEmpty() &&
+                            (message == null || !message.contains("không có quyền"))) {
+                        hasAccess = true;
+                    }
                 }
-//                else {
-//                    // 3. Check group membership - nếu document có trong group mà user là member
-//                    List<com.system_share_documents.DocumentService.entity.GroupDocument> groupDocs =
-//                            groupDocumentRepository.findByDocumentIdAndNotDeleted(doc.getId());
-//                    for (com.system_share_documents.DocumentService.entity.GroupDocument gd : groupDocs) {
-//                        Map<String, Object> membership = groupRest.checkMembership(gd.getGroupId(), UUID.fromString(userId));
-//                        if (membership != null && Boolean.TRUE.equals(membership.get("isMember"))) {
-//                            hasAccess = true;
-//                            break;
-//                        }
-//                    }
-//                }
             }
 
             if (!hasAccess) {
                 throw new AppException(BusinessError.USER_NOT_PERMISSION);
+            }
+
+            // Lấy wrappedCek để decrypt file
+            byte[] wrappedCek = documentKeyService.getDocumentKeyForUser(version.getId(), userId);
+            if (wrappedCek == null) {
+                throw new AppException(NotExistError.DOCUMENT_KEY_NOT_FOUND);
             }
 
             if (!minioStorageRest.objectExists(version.getStorageObjectKey())) {
@@ -128,6 +137,7 @@ public class PreviewDocumentServiceImpl implements PreviewDocumentService {
                     .contentType(doc.getContentType())
                     .sizeBytes(version.getSizeBytes())
                     .expiresAt(Timestamp.from(Instant.now().plusSeconds(presignExpiryMinutes * 60L)))
+                    .wrappedCek(Base64.getEncoder().encodeToString(wrappedCek))
                     .build();
 
         } catch (AppException e) {

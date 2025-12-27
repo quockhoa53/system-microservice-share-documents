@@ -21,7 +21,8 @@ public enum ValidationError implements ErrorCode {
     FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", "File size exceeds maximum allowed size", HttpStatus.BAD_REQUEST),
     INVALID_FILE_CONTENT("INVALID_FILE_CONTENT", "File content is invalid or corrupted", HttpStatus.BAD_REQUEST),
     CONTENT_TYPE_REQUIRED("CONTENT_TYPE_REQUIRED", "Content type is required", HttpStatus.BAD_REQUEST),
-    GROUP_ID_EMPTY("GROUP_ID_EMPTY", "GroupId must not be empty", HttpStatus.BAD_REQUEST),;
+    GROUP_ID_EMPTY("GROUP_ID_EMPTY", "GroupId must not be empty", HttpStatus.BAD_REQUEST),
+    DOCUMENT_ALREADY_UPLOADED("DOCUMENT_ALREADY_UPLOADED", "This document has already been uploaded previously", HttpStatus.BAD_REQUEST),;
 
     private final String code;
     private final String message;

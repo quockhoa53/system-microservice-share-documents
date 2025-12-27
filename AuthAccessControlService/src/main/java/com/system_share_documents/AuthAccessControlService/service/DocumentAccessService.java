@@ -9,10 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
-//Thêm check chủ tài liệu mới được cấp và cập nhật quyền
 public interface DocumentAccessService {
     List<DocumentAccessResponse> grantAccessDocument(GrantAccessRequest request, HttpServletRequest httpRequest) throws Exception;
     List<DocumentAccessResponse> revokeGrantAccessDocument(RevokeAccessRequest request, HttpServletRequest httpRequest) throws Exception;
     List<DocumentAccessResponse> listRecipientsDocument(GetListRecipientsRequest request, HttpServletRequest httpRequest) throws Exception;
     DocumentAccessResponse checkAccessDocument(CheckAccessRequest request, HttpServletRequest httpRequest) throws Exception;
+    /**
+     * Internal API: Tạo hoặc cập nhật DocumentRecipient cho group document
+     * Được gọi từ DocumentService khi thêm/cập nhật document vào group
+     */
+    void upsertGroupDocumentRecipient(String documentId, String groupId, String accessRole) throws Exception;
 }

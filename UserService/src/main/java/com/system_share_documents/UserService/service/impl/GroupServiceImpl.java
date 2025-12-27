@@ -1,5 +1,6 @@
 package com.system_share_documents.UserService.service.impl;
 
+import com.system_share_documents.AppCommonService.kafka.producer.GroupEventProducer;
 import com.system_share_documents.UserService.dto.request.AddMemberRequest;
 import com.system_share_documents.UserService.dto.request.ChangeMemberRoleRequest;
 import com.system_share_documents.UserService.dto.request.CreateGroupRequest;
@@ -54,6 +55,7 @@ public class GroupServiceImpl implements GroupService {
     private final CacheService cacheService;
     private final CacheManager cacheManager;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final GroupEventProducer groupEventProducer;
     
     @Autowired
     @Qualifier("redisObjectMapper")
@@ -352,6 +354,14 @@ public class GroupServiceImpl implements GroupService {
         cacheService.evictGroupMemberCache(groupId);
         cacheService.evictUserGroupsCache(targetUserId);
         cacheService.evictGroupCache(groupId);
+
+//        // Publish event để Flink job mã hóa CEK cho member mới
+        groupEventProducer.publishMemberJoinedGroup(
+                groupId.toString(),
+                targetUserId.toString(),
+                role,
+                currentUserId.toString()
+        );
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.system_share_documents.AppCommonService.config.kafka;
 
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.event.MalwareScanJobEvent;
+import com.system_share_documents.AppCommonService.event.MemberJoinedGroupEvent;
 import com.system_share_documents.AppCommonService.event.WatermarkJobEvent;
 import com.system_share_documents.AppCommonService.event.WatermarkProcessEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -61,5 +63,27 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, WatermarkProcessEvent> kafkaTemplateWatermarkProcess() {
         return new KafkaTemplate<>(producerWatermarkProcessFactory() );
+    }
+
+    // Producer cho MemberJoinedGroupEvent
+    @Bean
+    public ProducerFactory<String, MemberJoinedGroupEvent> producerMemberJoinedGroupFactory() {
+        return new DefaultKafkaProducerFactory<>(baseConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, MemberJoinedGroupEvent> kafkaTemplateMemberJoinedGroup() {
+        return new KafkaTemplate<>(producerMemberJoinedGroupFactory());
+    }
+
+    // Producer cho MalwareScanJobEvent
+    @Bean
+    public ProducerFactory<String, MalwareScanJobEvent> producerMalwareScanJobFactory() {
+        return new DefaultKafkaProducerFactory<>(baseConfig());
+    }
+
+    @Bean
+    public KafkaTemplate<String, MalwareScanJobEvent> kafkaTemplateMalwareScanJob() {
+        return new KafkaTemplate<>(producerMalwareScanJobFactory());
     }
 }

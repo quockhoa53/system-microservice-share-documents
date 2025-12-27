@@ -28,7 +28,7 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -86,6 +86,7 @@ grant-access:
   url: lb://auth-access-control-service
   check-grant-access: /api/document-access/check-access
   create-grant-access: /api/document-access/grant
+  upsert-group-document-recipient: /api/document-access/upsert-group-recipient
 
 group:
   service-name: user-service

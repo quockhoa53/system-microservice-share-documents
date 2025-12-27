@@ -25,4 +25,5 @@ public class WatermarkJobEvent implements Serializable {
     private List<String> recipients;
     @Builder.Default
     private int attempt = 0;
+    private Boolean isWatermark;
 }

@@ -3,6 +3,7 @@ package com.system_share_documents.AuthAccessControlService.service.impl;
 import com.system_share_documents.AppCommonService.enums.ActionLog;
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
 import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
+import com.system_share_documents.AppCommonService.rest.group.GroupRest;
 import com.system_share_documents.AuthAccessControlService.dto.request.CheckAccessRequest;
 import com.system_share_documents.AuthAccessControlService.dto.request.GetListRecipientsRequest;
 import com.system_share_documents.AuthAccessControlService.dto.request.GrantAccessRequest;
@@ -10,10 +11,10 @@ import com.system_share_documents.AuthAccessControlService.dto.request.RevokeAcc
 import com.system_share_documents.AuthAccessControlService.dto.response.DocumentAccessResponse;
 import com.system_share_documents.AuthAccessControlService.entity.DocumentRecipient;
 import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
+import com.system_share_documents.AuthAccessControlService.enums.RecipientType;
 import com.system_share_documents.AuthAccessControlService.exception.AppException;
 import com.system_share_documents.AuthAccessControlService.exception.errorcode.AuthError;
 import com.system_share_documents.AuthAccessControlService.exception.errorcode.BusinessError;
-import com.system_share_documents.AuthAccessControlService.exception.errorcode.NotExistError;
 import com.system_share_documents.AuthAccessControlService.repository.DocumentRecipientRepository;
 import com.system_share_documents.AuthAccessControlService.service.DocumentAccessService;
 import com.system_share_documents.AuthAccessControlService.service.RecipientGrantService;
@@ -35,9 +36,9 @@ import static com.system_share_documents.AppCommonService.utils.AuthenticationUt
 import static com.system_share_documents.AppCommonService.utils.AuthenticationUtils.getUsername;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
-import static com.system_share_documents.AppCommonService.utils.DocumentUtils.checkExistDocument;
 import static com.system_share_documents.AppCommonService.utils.DocumentUtils.isDocumentOwnedByUser;
 import static com.system_share_documents.AppCommonService.utils.ProcessJsonUtils.convertJson;
+import static com.system_share_documents.AppCommonService.utils.UserCacheUtils.getUserFullName;
 
 @Service
 @Slf4j
@@ -50,6 +51,9 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
 
     @Autowired
     private DocumentRecipientRepository documentRecipientRepository;
+
+    @Autowired
+    private GroupRest groupRest;
 
     @Autowired
     private AuditLogProducer auditLogProducer;
@@ -226,6 +230,7 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
                 responses.add(DocumentAccessResponse.builder()
                         .documentId(request.getDocumentId())
                         .recipientUserId(recipient.getRecipientUserId())
+                        .fullName(getUserFullName(recipient.getRecipientUserId()))
                         .accessRole(String.valueOf(recipient.getAccessRole()))
                         .canDownload(recipient.getCanDownload())
                         .expiresAt(recipient.getExpiresAt())
@@ -267,24 +272,8 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
         String status = "OK";
         String errorReason = null;
         try {
-            Optional<DocumentRecipient> recipientOpt = documentRecipientRepository.findByDocumentIdAndRecipientUserId(request.getDocumentId(), request.getUserId());
-            if (recipientOpt.isEmpty()) {
-                return DocumentAccessResponse.builder()
-                                .documentId(request.getDocumentId())
-                                .recipientUserId(request.getUserId())
-                                .message("User không có quyền truy cập document này")
-                                .build();
-            }
-            DocumentRecipient recipient = recipientOpt.get();
-            return DocumentAccessResponse.builder()
-                    .documentId(recipient.getDocumentId())
-                    .recipientUserId(recipient.getRecipientUserId())
-                    .accessRole(String.valueOf(recipient.getAccessRole()))
-                    .canDownload(recipient.getCanDownload())
-                    .expiresAt(recipient.getExpiresAt())
-                    .grantedAt(recipient.getCreatedAt())
-                    .message("User có quyền truy cập document này")
-                    .build();
+            // Chỉ check DocumentRecipient (bỏ ACL)
+            return checkAccessFromDocumentRecipient(request);
         } catch (AppException e) {
             status = "FAIL";
             errorReason = e.getMessage();
@@ -310,6 +299,207 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
                     .build();
 
             auditLogProducer.sendAuditLog(logEvent, request.getDocumentId());
+        }
+    }
+
+    /**
+     * Check quyền từ DocumentRecipient
+     * Hỗ trợ cả USER và GROUP recipients
+     */
+    private DocumentAccessResponse checkAccessFromDocumentRecipient(CheckAccessRequest request) {
+        String documentId = request.getDocumentId();
+        String userId = request.getUserId();
+        Boolean isGroup = request.getIsGroup();
+
+        // Nếu isGroup = true: chỉ check GROUP recipients
+        if (Boolean.TRUE.equals(isGroup)) {
+            return checkGroupRecipients(documentId, userId);
+        }
+
+        // Nếu isGroup = false: chỉ check USER recipient
+        if (Boolean.FALSE.equals(isGroup)) {
+            return checkUserRecipient(documentId, userId);
+        }
+
+        // Nếu isGroup = null: check cả hai, ưu tiên USER trước
+        DocumentAccessResponse userResponse = checkUserRecipient(documentId, userId);
+        if (userResponse.getAccessRole() != null) {
+            return userResponse;
+        }
+
+        return checkGroupRecipients(documentId, userId);
+    }
+
+    /**
+     * Check quyền từ USER recipient (direct share)
+     */
+    private DocumentAccessResponse checkUserRecipient(String documentId, String userId) {
+        Optional<DocumentRecipient> userRecipientOpt = documentRecipientRepository.findByDocumentIdAndRecipientUserIdAndRecipientType(documentId, userId, RecipientType.USER);
+
+        if (userRecipientOpt.isEmpty()) {
+            return DocumentAccessResponse.builder()
+                    .documentId(documentId)
+                    .recipientUserId(userId)
+                    .message("User không có quyền truy cập document này (direct share)")
+                    .build();
+        }
+
+        DocumentRecipient recipient = userRecipientOpt.get();
+
+        // Nếu bị revoke, không có quyền
+        if (Boolean.TRUE.equals(recipient.getIsRevoke())) {
+            return DocumentAccessResponse.builder()
+                    .documentId(documentId)
+                    .recipientUserId(userId)
+                    .message("User bị chặn truy cập document này")
+                    .build();
+        }
+
+        // Check expiry
+        if (recipient.getExpiresAt() != null && recipient.getExpiresAt().before(new Timestamp(System.currentTimeMillis()))) {
+            return DocumentAccessResponse.builder()
+                    .documentId(documentId)
+                    .recipientUserId(userId)
+                    .message("Quyền truy cập đã hết hạn")
+                    .build();
+        }
+
+        return DocumentAccessResponse.builder()
+                .documentId(documentId)
+                .recipientUserId(userId)
+                .accessRole(String.valueOf(recipient.getAccessRole()))
+                .canDownload(recipient.getCanDownload())
+                .expiresAt(recipient.getExpiresAt())
+                .grantedAt(recipient.getCreatedAt())
+                .message("User có quyền truy cập document này (direct share)")
+                .build();
+    }
+
+    /**
+     * Check quyền từ GROUP recipients
+     */
+    private DocumentAccessResponse checkGroupRecipients(String documentId, String userId) {
+        List<DocumentRecipient> allRecipients = documentRecipientRepository.findAllByDocumentId(documentId);
+        List<DocumentRecipient> groupRecipients = allRecipients.stream()
+                .filter(r -> RecipientType.GROUP.equals(r.getRecipientType()))
+                .filter(r -> !Boolean.TRUE.equals(r.getIsRevoke()))
+                .filter(r -> r.getExpiresAt() == null || r.getExpiresAt().after(new Timestamp(System.currentTimeMillis())))
+                .collect(Collectors.toList());
+
+        if (groupRecipients.isEmpty()) {
+            return DocumentAccessResponse.builder()
+                    .documentId(documentId)
+                    .recipientUserId(userId)
+                    .message("Không có group nào được cấp quyền truy cập document này")
+                    .build();
+        }
+
+        // Check xem user có là member của group nào không
+        for (DocumentRecipient groupRecipient : groupRecipients) {
+            String groupId = groupRecipient.getRecipientGroupId();
+            if (groupId != null) {
+                try {
+                    UUID groupUuid = UUID.fromString(groupId);
+                    UUID userUuid = UUID.fromString(userId);
+                    Map<String, Object> membership = groupRest.checkMembership(groupUuid, userUuid);
+
+                    if (membership != null && Boolean.TRUE.equals(membership.get("member"))) {
+                        // User là member của group này, có quyền truy cập
+                        return DocumentAccessResponse.builder()
+                                .documentId(documentId)
+                                .recipientUserId(userId)
+                                .accessRole(String.valueOf(groupRecipient.getAccessRole()))
+                                .canDownload(groupRecipient.getCanDownload())
+                                .expiresAt(groupRecipient.getExpiresAt())
+                                .grantedAt(groupRecipient.getCreatedAt())
+                                .message("User có quyền truy cập document này (từ group)")
+                                .build();
+                    }
+                } catch (Exception e) {
+                    // Log error nhưng tiếp tục check các groups khác
+                    log.warn("Error checking membership for group {} and user {}: {}", groupId, userId, e.getMessage());
+                }
+            }
+        }
+
+        // Không có quyền truy cập từ bất kỳ group nào
+        return DocumentAccessResponse.builder()
+                .documentId(documentId)
+                .recipientUserId(userId)
+                .message("User không phải member của bất kỳ group nào được cấp quyền")
+                .build();
+    }
+
+    /**
+     * Internal API: Tạo hoặc cập nhật DocumentRecipient cho group document
+     * Được gọi từ DocumentService khi thêm/cập nhật document vào group
+     */
+    @Override
+    @Transactional
+    public void upsertGroupDocumentRecipient(String documentId, String groupId, String accessRole) throws Exception {
+        // Map AccessRoleGroupDocument sang DocumentAccessRole
+        DocumentAccessRole documentAccessRole = mapGroupAccessRoleToDocumentAccessRole(accessRole);
+
+        // Tìm DocumentRecipient hiện có cho group này
+        Optional<DocumentRecipient> existingRecipientOpt = documentRecipientRepository
+                .findByDocumentIdAndRecipientGroupIdAndRecipientType(documentId, groupId, RecipientType.GROUP);
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        if (existingRecipientOpt.isPresent()) {
+            // Cập nhật accessRole nếu đã tồn tại
+            DocumentRecipient recipient = existingRecipientOpt.get();
+            recipient.setAccessRole(documentAccessRole);
+            recipient.setUpdatedAt(now);
+            recipient.setIsRevoke(false); // Reset revoke flag nếu có
+            documentRecipientRepository.save(recipient);
+            log.debug("Updated DocumentRecipient for group {} and document {}", groupId, documentId);
+        } else {
+            // Tạo mới DocumentRecipient cho group
+            DocumentRecipient recipient = DocumentRecipient.builder()
+                    .documentId(documentId)
+                    .recipientType(RecipientType.GROUP)
+                    .recipientGroupId(groupId)
+                    .recipientUserId(null) // null cho GROUP type
+                    .accessRole(documentAccessRole)
+                    .canDownload(documentAccessRole == DocumentAccessRole.DOWNLOADER ||
+                            documentAccessRole == DocumentAccessRole.EDITOR ||
+                            documentAccessRole == DocumentAccessRole.OWNER)
+                    .isRevoke(false)
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .expiresAt(null) // Không có expiry cho group permissions
+                    .build();
+            documentRecipientRepository.save(recipient);
+            log.debug("Created DocumentRecipient for group {} and document {}", groupId, documentId);
+        }
+    }
+
+    /**
+     * Map AccessRoleGroupDocument (từ GroupDocument) sang DocumentAccessRole (cho DocumentRecipient)
+     */
+    private DocumentAccessRole mapGroupAccessRoleToDocumentAccessRole(String groupAccessRole) {
+        if (groupAccessRole == null || groupAccessRole.isBlank()) {
+            return DocumentAccessRole.VIEWER;
+        }
+
+        String role = groupAccessRole.toUpperCase().trim();
+        switch (role) {
+            case "VIEWER":
+                return DocumentAccessRole.VIEWER;
+            case "SHARE":
+                // SHARE có thể view và share, map sang VIEWER hoặc EDITOR
+                return DocumentAccessRole.VIEWER;
+            case "DOWNLOAD":
+                return DocumentAccessRole.DOWNLOADER;
+            case "ADMIN":
+                // ADMIN có thể edit, map sang EDITOR
+                return DocumentAccessRole.EDITOR;
+            case "REVOKE":
+                return DocumentAccessRole.REVOKED;
+            default:
+                log.warn("Unknown group access role: {}, defaulting to VIEWER", groupAccessRole);
+                return DocumentAccessRole.VIEWER;
         }
     }
 }

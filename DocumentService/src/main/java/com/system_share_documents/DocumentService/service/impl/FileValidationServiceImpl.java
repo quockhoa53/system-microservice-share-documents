@@ -19,7 +19,7 @@ public class FileValidationServiceImpl implements FileValidationService {
     private static final long MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024L;
 
     // Minimum file size để tránh file rỗng hoặc corrupted
-    private static final long MIN_FILE_SIZE_BYTES = 100L;
+    private static final long MIN_FILE_SIZE_BYTES = 1L;
 
     // Danh sách các content type được hỗ trợ
     private static final Set<String> SUPPORTED_CONTENT_TYPES = Set.of(

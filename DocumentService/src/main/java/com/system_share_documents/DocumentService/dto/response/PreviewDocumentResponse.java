@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,4 +20,5 @@ public class PreviewDocumentResponse {
     private String contentType;
     private Long sizeBytes;
     private Timestamp expiresAt;
+    private String wrappedCek;
 }

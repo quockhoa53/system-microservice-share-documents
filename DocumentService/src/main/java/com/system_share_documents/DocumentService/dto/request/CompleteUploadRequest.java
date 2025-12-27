@@ -20,4 +20,5 @@ public class CompleteUploadRequest {
     private String signature;
     private UUID signerUserId;
     private List<String> recipients;
+    private Boolean isWatermark;
 }

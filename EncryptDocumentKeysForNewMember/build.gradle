@@ -1,0 +1,74 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
+
+plugins {
+	id 'java'
+	id 'application'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.system_share_documents'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Flink core
+	implementation 'org.apache.flink:flink-streaming-java:1.18.1'
+	implementation 'org.apache.flink:flink-clients:1.18.1'
+
+	// Kafka connector for Flink
+	implementation 'org.apache.flink:flink-connector-kafka:3.0.1-1.18'
+
+	// JDBC connector for Flink 1.18
+	implementation 'org.apache.flink:flink-connector-jdbc:3.1.2-1.18'
+
+	// Jackson for JSON deserialization
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.17.0'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.0'
+
+	// PostgreSQL JDBC
+	implementation 'org.postgresql:postgresql:42.7.3'
+
+	// HTTP client for calling APIs
+	implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+
+	// BouncyCastle for OpenPGP encryption
+	implementation 'org.bouncycastle:bcpg-jdk18on:1.78.1'
+	implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+
+	// Lombok
+	implementation 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
+
+application {
+	mainClass = 'com.system_share_documents.EncryptDocumentKeysForNewMember.EncryptDocumentKeysForNewMemberApplication'
+}
+
+tasks.named('shadowJar') {
+	manifest {
+		attributes 'Main-Class': 'com.system_share_documents.EncryptDocumentKeysForNewMember.EncryptDocumentKeysForNewMemberApplication'
+	}
+	zip64 true
+	mergeServiceFiles()
+
+	transform(AppendingTransformer) { resource = 'reference.conf' }
+
+	exclude 'META-INF/*.RSA'
+	exclude 'META-INF/*.SF'
+	exclude 'META-INF/*.DSA'
+}
+
+tasks.withType(Test).configureEach {
+	jvmArgs = jvmArgs + ['--add-opens=java.base/java.util=ALL-UNNAMED']
+}
+

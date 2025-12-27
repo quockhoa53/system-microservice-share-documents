@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class PreviewDocumentRequest {
     private UUID documentId;
     private UUID versionId;
+    private Boolean isGroup;
 }

@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 public class DocumentAccessResponse {
     private String documentId;
     private String recipientUserId;
+    private String fullName;
     private String accessRole;
     private Boolean canDownload;
     private Timestamp expiresAt;

@@ -36,6 +36,9 @@ public class PreviewDocumentController {
             HttpServletRequest httpRequest
     ) throws Exception {
         String userId = auth.getName();
+        if(request.getIsGroup()==null){
+            return ApiResponse.error("FAILED", "isGroup not be must null");
+        }
         PreviewDocumentResponse response = previewDocumentService.previewDocument(request, userId, httpRequest);
         return ApiResponse.success("OK", "Preview URL generated successfully", response);
     }

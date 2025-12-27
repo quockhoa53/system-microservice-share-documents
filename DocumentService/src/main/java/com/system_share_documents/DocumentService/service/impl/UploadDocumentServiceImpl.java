@@ -2,8 +2,10 @@ package com.system_share_documents.DocumentService.service.impl;
 
 import com.system_share_documents.AppCommonService.enums.ActionLog;
 import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.event.MalwareScanJobEvent;
 import com.system_share_documents.AppCommonService.event.WatermarkJobEvent;
 import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
+import com.system_share_documents.AppCommonService.kafka.producer.MalwareScanJobProducer;
 import com.system_share_documents.AppCommonService.kafka.producer.WatermarkJobProducer;
 import com.system_share_documents.AppCommonService.rest.minio.MinioStorageRest;
 import com.system_share_documents.AppCommonService.rest.userkey.UserKeyRest;
@@ -82,6 +84,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
 
     @Autowired
     private WatermarkJobProducer watermarkJobProducer;
+
+    @Autowired
+    private MalwareScanJobProducer malwareScanJobProducer;
 
     private final int presignExpiryMinutes = 30;
 
@@ -216,6 +221,9 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                     .findFirst()
                     .orElseThrow(() -> new AppException(NotExistError.VERSION_NOT_FOUND));
 
+            doc.setChecksum(request.getChecksum());
+            documentRepository.save(doc);
+
             String singerPublicKey = userKeyRest.getUserPublicPrimaryKeyForUser(request.getSignerUserId().toString(), OPENPGP_ED25519);
             log.info(String.format("Digital signature public key for document %s is %s", version.getId(), singerPublicKey));
 
@@ -272,9 +280,26 @@ public class UploadDocumentServiceImpl implements UploadDocumentService {
                         .ownerId(doc.getOwnerId())
                         .recipients(request.getRecipients())
                         .checksum(request.getChecksum())
+                        .isWatermark(request.getIsWatermark())
                         .build();
                 watermarkJobProducer.sendWatermarkJob(jobEvent, doc.getId().toString());
             }
+
+//            // Send malware scan job for async full scan (ClamAV)
+            MalwareScanJobEvent scanEvent = MalwareScanJobEvent.builder()
+                    .requestId(UUID.randomUUID().toString())
+                    .documentId(String.valueOf(doc.getId()))
+                    .versionId(String.valueOf(version.getId()))
+                    .ownerId(doc.getOwnerId())
+                    .versionNumber(version.getVersionNumber())
+                    .uploadObjectKey(request.getUploadObjectKey())
+                    .originalFilename(doc.getOriginalFilename())
+                    .contentType(doc.getContentType())
+                    .sizeBytes(doc.getSizeBytes())
+                    .checksum(request.getChecksum()) // Thêm checksum để detect spam
+                    .attempt(0)
+                    .build();
+            malwareScanJobProducer.sendMalwareScanJob(scanEvent, doc.getId().toString());
 
             return new CompleteUploadResponse(
                     doc.getId(),

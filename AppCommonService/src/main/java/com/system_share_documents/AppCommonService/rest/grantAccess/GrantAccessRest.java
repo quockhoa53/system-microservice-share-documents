@@ -8,4 +8,5 @@ import java.util.HashMap;
 public interface GrantAccessRest {
     HashMap<String, Object> checkGrantAccess(CheckAccessRequest request) throws Exception;
     HashMap<String, Object> createGrantAccess(GrantAccessRequest request) throws Exception;
+    void upsertGroupDocumentRecipient(String documentId, String groupId, String accessRole) throws Exception;
 }

@@ -4,6 +4,7 @@ import com.system_share_documents.AuthAccessControlService.dto.request.GrantAcce
 import com.system_share_documents.AuthAccessControlService.dto.response.DocumentAccessResponse;
 import com.system_share_documents.AuthAccessControlService.entity.DocumentRecipient;
 import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
+import com.system_share_documents.AuthAccessControlService.enums.RecipientType;
 import com.system_share_documents.AuthAccessControlService.repository.DocumentRecipientRepository;
 import com.system_share_documents.AuthAccessControlService.service.RecipientGrantService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +27,12 @@ public class RecipientGrantServiceImpl implements RecipientGrantService {
     @Transactional
     public DocumentAccessResponse processGrantAccessForRecipient(String documentId, GrantAccessRequest.AccessRecipientRequest accessRecipient) {
         try {
+            // Tìm DocumentRecipient với recipientType = USER để đảm bảo đúng rule mới
             DocumentRecipient recipient = documentRecipientRepository
-                    .findByDocumentIdAndRecipientUserId(documentId, accessRecipient.getRecipientUserId())
+                    .findByDocumentIdAndRecipientUserIdAndRecipientType(
+                            documentId,
+                            accessRecipient.getRecipientUserId(),
+                            RecipientType.USER)
                     .orElse(null);
 
             Timestamp expiresAt = null;
@@ -52,14 +57,19 @@ public class RecipientGrantServiceImpl implements RecipientGrantService {
             if (recipient == null) {
                 recipient = DocumentRecipient.builder()
                         .documentId(documentId)
+                        .recipientType(RecipientType.USER) // Set recipientType = USER cho direct access
                         .recipientUserId(accessRecipient.getRecipientUserId())
+                        .recipientGroupId(null) // null cho USER type
                         .accessRole(DocumentAccessRole.valueOf(accessRecipient.getAccessRole() != null ? accessRecipient.getAccessRole() : DocumentAccessRole.VIEWER.name()))
                         .canDownload(isCanDownload)
                         .expiresAt(expiresAt)
+                        .isRevoke(false)
                         .createdAt(Timestamp.from(Instant.now()))
+                        .updatedAt(Timestamp.from(Instant.now()))
                         .build();
                 isNew = true;
             } else {
+                // Cập nhật recipient hiện có
                 if (accessRecipient.getAccessRole() != null) {
                     recipient.setAccessRole(DocumentAccessRole.valueOf(accessRecipient.getAccessRole()));
                 }
@@ -67,6 +77,7 @@ public class RecipientGrantServiceImpl implements RecipientGrantService {
                     recipient.setExpiresAt(expiresAt);
                 }
                 recipient.setCanDownload(isCanDownload);
+                recipient.setIsRevoke(false); // Reset revoke flag khi cập nhật quyền
                 recipient.setUpdatedAt(Timestamp.from(Instant.now()));
             }
 

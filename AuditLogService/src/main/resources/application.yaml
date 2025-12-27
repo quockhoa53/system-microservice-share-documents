@@ -28,8 +28,38 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+minio:
+  url: ${MINIO_URL}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET}
+
+keycloak:
+  token-base-url: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token
+  client-id: ${KEYCLOAK_TOKEN_CLIENT_ID}
+  client-secret: ${KEYCLOAK_TOKEN_CLIENT_SECRET}
+
+vault:
+  scheme: http
+  host: ${VAULT_HOST}
+  port: ${VAULT_PORT}
+  token: ${VAULT_TOKEN}
+  transit-key: ${VAULT_TRANSIT_KEY}
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: nguyenquockhoa5549@gmail.com
+  password: rums kdhs bvku eqqg
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true

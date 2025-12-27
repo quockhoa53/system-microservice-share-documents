@@ -4,6 +4,7 @@ import com.system_share_documents.DocumentService.dto.ApiResponse;
 import com.system_share_documents.DocumentService.dto.request.AddDocumentToGroupRequest;
 import com.system_share_documents.DocumentService.dto.request.GetGroupDocumentsRequest;
 import com.system_share_documents.DocumentService.dto.request.RemoveDocumentFromGroupRequest;
+import com.system_share_documents.DocumentService.dto.request.UpdateDocumentAccessRoleRequest;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentDetailResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentResponse;
 import com.system_share_documents.DocumentService.service.GroupDocumentService;
@@ -82,5 +83,20 @@ public class GroupDocumentController {
         UUID docId = UUID.fromString(documentId);
         List<GroupDocumentResponse> response = groupDocumentService.getDocumentGroups(docId, userId);
         return ApiResponse.success("OK", "Get document groups successfully", response);
+    }
+
+    /**
+     * Cập nhật quyền truy cập của document trong group
+     * PUT /api/documents/group-documents/update-access-role
+     */
+    @PutMapping("/update-access-role")
+    public ApiResponse<GroupDocumentResponse> updateDocumentAccessRole(
+            @RequestBody UpdateDocumentAccessRoleRequest request,
+            Authentication auth,
+            HttpServletRequest httpRequest
+    ) throws Exception {
+        String userId = auth.getName();
+        GroupDocumentResponse response = groupDocumentService.updateDocumentAccessRoleInternal(request);
+        return ApiResponse.success("OK", "Document access role updated successfully", response);
     }
 }

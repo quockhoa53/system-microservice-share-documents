@@ -81,6 +81,7 @@ public class DownLoadDocumentServiceImpl implements DownLoadDocumentService {
             CheckAccessRequest accessRequest = CheckAccessRequest.builder()
                     .documentId(String.valueOf(request.getDocumentId()))
                     .userId(userId)
+                    .isGroup(request.getIsGroup() != null ? request.getIsGroup() : false)
                     .build();
             HashMap<String, Object> response = grantAccessRest.checkGrantAccess(accessRequest);
             HashMap<String, Object> data = (HashMap<String, Object>) response.get(DATA);

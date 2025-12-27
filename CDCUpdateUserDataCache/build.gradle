@@ -44,6 +44,10 @@ dependencies {
 	implementation('org.springframework.data:spring-data-redis:3.3.2') {
 		exclude group: 'redis.clients', module: 'jedis'
 	}
+	// Keycloak Admin Client
+	implementation 'org.keycloak:keycloak-admin-client:26.0.2'
+	implementation 'org.jboss.resteasy:resteasy-client:6.2.8.Final'
+	implementation 'org.jboss.resteasy:resteasy-jackson2-provider:6.2.8.Final'
 }
 
 application {

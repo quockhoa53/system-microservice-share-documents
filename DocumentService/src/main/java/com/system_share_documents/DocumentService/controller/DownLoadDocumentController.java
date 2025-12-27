@@ -22,6 +22,9 @@ public class DownLoadDocumentController {
     @PostMapping("/get")
     public ApiResponse<DownLoadDocumentResponse> downloadController(@RequestBody DownLoadDocumentRequest request, Authentication auth, HttpServletRequest httpRequest) throws Exception {
         String ownerId = auth.getName();
+        if(request.getIsGroup()==null){
+            return ApiResponse.error("FAILED", "isGroup not be must null");
+        }
         DownLoadDocumentResponse response = downLoadDocumentService.getDownLoadDocument(request, ownerId, httpRequest);
         return ApiResponse.success("OK", "Download document success", response);
     }

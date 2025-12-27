@@ -10,4 +10,5 @@ public class GrantAccessProperties {
     private String url;
     private String checkGrantAccess;
     private String createGrantAccess;
+    private String upsertGroupDocumentRecipient;
 }

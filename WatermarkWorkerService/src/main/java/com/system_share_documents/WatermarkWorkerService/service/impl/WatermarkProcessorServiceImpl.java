@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,7 @@ import java.util.function.Supplier;
 import static com.system_share_documents.AppCommonService.constant.KeysConstant.OPENPGP_AES256;
 import static com.system_share_documents.AppCommonService.constant.ObjectTypeConstant.DOCUMENT_VERSION;
 import static com.system_share_documents.AppCommonService.utils.ClientUtils.*;
+import static com.system_share_documents.AppCommonService.utils.UserCacheUtils.getUserFullName;
 import static com.system_share_documents.WatermarkWorkerService.utils.TypeFileUtils.guessExtension;
 
 @Service
@@ -159,11 +161,9 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
         }
 
         Instant now = Instant.now();
-        String timeStr = now.toString();
-        String formattedTime = timeStr.contains("T")
-                ? timeStr.substring(0, timeStr.indexOf("T") + 6).replace("T", " ")
-                : timeStr.substring(0, Math.min(16, timeStr.length()));
-        String watermarkText = String.format("%s | %s", event.getOwnerId(), formattedTime);
+        String formattedTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .format(now.atZone(java.time.ZoneId.systemDefault()));
+        String watermarkText = String.format("%s | %s", getUserFullName(event.getOwnerId()), formattedTime);
 
         WatermarkJob job = WatermarkJob.builder()
                 .documentId(event.getDocumentId())
@@ -233,8 +233,13 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                 byte[] original = minio.getObjectBytes(event.getUploadObjectKey());
                 log.debug("[requestId={}] Downloaded original file, size: {} bytes", requestId, original.length);
 
-                byte[] watermarked = wmService.addWatermark(original, job.getWatermarkText());
-                log.debug("[requestId={}] Applied watermark, watermarked size: {} bytes", requestId, watermarked.length);
+                byte[] watermarked = original;
+                if(event.getIsWatermark()) {
+                    watermarked = wmService.addWatermark(original, job.getWatermarkText());
+                    log.debug("[requestId={}] Applied watermark, watermarked size: {} bytes for document {}", requestId, watermarked.length, event.getDocumentId());
+                } else {
+                    log.debug("[requestId={}] Skip applied watermark for document {}", requestId, event.getDocumentId());
+                }
 
                 SecretKey cek = crypto.generateAesKey();
                 byte[] encryptedFile = crypto.encryptFile(watermarked, cek.getEncoded());
@@ -320,14 +325,17 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
             GrantAccessRequest request = GrantAccessRequest.builder()
                     .documentId(event.getDocumentId())
                     .recipients(event.getRecipients().stream()
-                            .map(recipient -> GrantAccessRequest.AccessRecipientRequest.builder()
-                                    .recipientUserId(recipient)
-                                    .accessRole("VIEWER")
-                                    .canDownload(false)
-                                    .build())
+                            .map(recipient -> {
+                                boolean isOwner = recipient.equals(event.getOwnerId());
+                                return GrantAccessRequest.AccessRecipientRequest.builder()
+                                        .recipientUserId(recipient)
+                                        .accessRole(isOwner ? "OWNER" : "VIEWER")
+                                        .canDownload(false)
+                                        .expirationDays(null)
+                                        .build();
+                            })
                             .toList())
                     .build();
-
             grantAccessRest.createGrantAccess(request);
             log.info("[requestId={}] Created grant access for {} recipients",
                     requestId, event.getRecipients() != null ? event.getRecipients().size() : 0);

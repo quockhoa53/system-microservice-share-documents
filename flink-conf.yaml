@@ -1,10 +1,10 @@
 jobmanager.rpc.address: flink-jobmanager
 taskmanager.bind-host: 0.0.0.0
 
-jobmanager.memory.process.size: 1400m
-taskmanager.memory.process.size: 4000m
+jobmanager.memory.process.size: 2048m
+taskmanager.memory.process.size: 8192m
 
-taskmanager.numberOfTaskSlots: 10
+taskmanager.numberOfTaskSlots: 30
 
 heartbeat.timeout: 120000
 heartbeat.interval: 10000

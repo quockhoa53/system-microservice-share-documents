@@ -32,4 +32,20 @@ public interface DocumentRepository extends JpaRepository<Document, UUID> {
 
     @Query("SELECT d FROM Document d WHERE d.id = :documentId AND d.deletedAt IS NULL")
     Optional<Document> findByIdAndNotDeleted(@Param("documentId") UUID documentId);
+
+    @Query("""
+    SELECT CASE WHEN EXISTS (
+        SELECT 1
+        FROM Document d
+        WHERE d.checksum = :checksum
+          AND d.ownerId = :ownerId
+          AND d.deletedAt IS NULL
+    ) THEN true ELSE false END
+    """)
+    boolean existsByChecksumAndOwner(
+            @Param("checksum") String checksum,
+            @Param("ownerId") String ownerId
+    );
+
+
 }

@@ -14,4 +14,5 @@ import java.util.UUID;
 public class DownLoadDocumentRequest {
     private UUID documentId;
     private UUID versionId;
+    private Boolean isGroup;
 }

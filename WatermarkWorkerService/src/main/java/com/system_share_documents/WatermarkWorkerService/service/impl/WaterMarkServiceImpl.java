@@ -7,6 +7,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
@@ -23,6 +25,7 @@ import java.awt.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -79,6 +82,13 @@ public class WaterMarkServiceImpl implements WaterMarkService {
         try (PDDocument document = PDDocument.load(inputStream);
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
+            // Load Unicode font for Vietnamese characters
+            PDFont font = loadUnicodeFont(document);
+            if (font == null) {
+                log.warn("Could not load Unicode font, falling back to Helvetica (may not support Vietnamese characters)");
+                font = PDType1Font.HELVETICA_BOLD_OBLIQUE;
+            }
+
             for (PDPage page : document.getPages()) {
                 var mediaBox = page.getMediaBox();
                 float w = mediaBox.getWidth();
@@ -88,7 +98,7 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                         document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
                     float baseFontSize = Math.min(w, h) / 25f;
                     float fontSize = Math.max(24f, Math.min(48f, baseFontSize));
-                    cs.setFont(PDType1Font.HELVETICA_BOLD_OBLIQUE, fontSize);
+                    cs.setFont(font, fontSize);
                     cs.setNonStrokingColor(200, 200, 200);
 
                     float angle = (float) Math.toRadians(45);
@@ -305,17 +315,10 @@ public class WaterMarkServiceImpl implements WaterMarkService {
     }
 
     private String generateCopyrightHeader(String watermarkText) {
+        // Watermark text đã được format sẵn: "FULLNAME | THỜI GIAN"
         String[] parts = watermarkText.split("\\|");
-        String userId = parts.length > 0 ? parts[0].trim() : "Unknown";
+        String fullName = parts.length > 0 ? parts[0].trim() : "Unknown";
         String timestamp = parts.length > 1 ? parts[1].trim() : Instant.now().toString();
-
-        try {
-            Instant instant = Instant.parse(timestamp);
-            timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                    .format(instant.atZone(java.time.ZoneId.systemDefault()));
-        } catch (Exception e) {
-            // Keep original timestamp
-        }
 
         return String.format(
                 "/*\n" +
@@ -324,7 +327,7 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                         " * This file is protected by copyright. Unauthorized copying or distribution is prohibited.\n" +
                         " * Watermarked on: %s\n" +
                         " */",
-                java.time.Year.now(), userId, timestamp
+                java.time.Year.now(), fullName, timestamp
         );
     }
 
@@ -555,19 +558,8 @@ public class WaterMarkServiceImpl implements WaterMarkService {
             opcPackage = OPCPackage.open(bis);
             document = new XWPFDocument(opcPackage);
 
-            String[] parts = watermarkText.split("\\|");
-            String userId = parts.length > 0 ? parts[0].trim() : "Unknown";
-            String timestamp = parts.length > 1 ? parts[1].trim() : Instant.now().toString();
-
-            try {
-                Instant instant = Instant.parse(timestamp);
-                timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                        .format(instant.atZone(java.time.ZoneId.systemDefault()));
-            } catch (Exception e) {
-                // Keep original timestamp
-            }
-
-            String watermark = String.format("%s | %s", userId, timestamp);
+            // Watermark text đã được format sẵn: "FULLNAME | THỜI GIAN"
+            String watermark = watermarkText;
 
             for (XWPFHeader header : document.getHeaderList()) {
                 addWordHeaderWatermark(header, watermark);
@@ -636,19 +628,8 @@ public class WaterMarkServiceImpl implements WaterMarkService {
             opcPackage = OPCPackage.open(bis);
             workbook = new XSSFWorkbook(opcPackage);
 
-            String[] parts = watermarkText.split("\\|");
-            String userId = parts.length > 0 ? parts[0].trim() : "Unknown";
-            String timestamp = parts.length > 1 ? parts[1].trim() : Instant.now().toString();
-
-            try {
-                Instant instant = Instant.parse(timestamp);
-                timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                        .format(instant.atZone(java.time.ZoneId.systemDefault()));
-            } catch (Exception e) {
-                // Keep original timestamp
-            }
-
-            String watermark = String.format("%s | %s", userId, timestamp);
+            // Watermark text đã được format sẵn: "FULLNAME | THỜI GIAN"
+            String watermark = watermarkText;
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
@@ -694,19 +675,8 @@ public class WaterMarkServiceImpl implements WaterMarkService {
 
             slideShow = new XMLSlideShow(bis);
 
-            String[] parts = watermarkText.split("\\|");
-            String userId = parts.length > 0 ? parts[0].trim() : "Unknown";
-            String timestamp = parts.length > 1 ? parts[1].trim() : Instant.now().toString();
-
-            try {
-                Instant instant = Instant.parse(timestamp);
-                timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                        .format(instant.atZone(java.time.ZoneId.systemDefault()));
-            } catch (Exception e) {
-                // Keep original timestamp
-            }
-
-            String watermark = String.format("%s | %s", userId, timestamp);
+            // Watermark text đã được format sẵn: "FULLNAME | THỜI GIAN"
+            String watermark = watermarkText;
 
             for (XSLFSlide slide : slideShow.getSlides()) {
                 addPowerPointSlideWatermark(slide, watermark);
@@ -755,6 +725,125 @@ public class WaterMarkServiceImpl implements WaterMarkService {
             shape.setFillColor(null);
         } catch (Exception e) {
             log.warn("Failed to add watermark to PowerPoint slide. Error: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Load a Unicode-supporting font for PDF watermarking.
+     * Tries to load Arial or other common Unicode fonts from the system.
+     * Falls back to null if no suitable font is found.
+     */
+    private PDFont loadUnicodeFont(PDDocument document) {
+        String osName = System.getProperty("os.name").toLowerCase();
+        String[] fontPaths = getSystemFontPaths(osName);
+
+        // List of common font file names (Windows uses lowercase names like arial.ttf, arialbd.ttf)
+        String[] fontFileNames;
+        if (osName.contains("win")) {
+            fontFileNames = new String[]{
+                    "arialbd.ttf", "arial.ttf", "ARIALBD.TTF", "ARIAL.TTF",
+                    "calibrib.ttf", "calibri.ttf", "CALIBRIB.TTF", "CALIBRI.TTF",
+                    "timesbd.ttf", "times.ttf", "TIMESBD.TTF", "TIMES.TTF"
+            };
+        } else {
+            fontFileNames = new String[]{
+                    "Arial-Bold.ttf", "Arial.ttf", "Arial-Bold.TTF", "Arial.TTF",
+                    "DejaVuSans-Bold.ttf", "DejaVuSans.ttf",
+                    "LiberationSans-Bold.ttf", "LiberationSans.ttf"
+            };
+        }
+
+        // Try loading fonts from system font directories
+        for (String fontPath : fontPaths) {
+            File fontDir = new File(fontPath);
+            if (!fontDir.exists() || !fontDir.isDirectory()) {
+                continue;
+            }
+
+            for (String fontFileName : fontFileNames) {
+                try {
+                    File fontFile = new File(fontDir, fontFileName);
+                    if (fontFile.exists() && fontFile.canRead()) {
+                        PDFont font = PDType0Font.load(document, fontFile);
+                        log.debug("Loaded Unicode font: {}", fontFile.getAbsolutePath());
+                        return font;
+                    }
+                } catch (Exception e) {
+                    log.trace("Failed to load font {}: {}", fontFileName, e.getMessage());
+                }
+            }
+
+            // On Windows, also try searching all .ttf files in the font directory
+            if (osName.contains("win")) {
+                try {
+                    File[] fontFiles = fontDir.listFiles((dir, name) ->
+                            name.toLowerCase().endsWith(".ttf") &&
+                                    (name.toLowerCase().contains("arial") ||
+                                            name.toLowerCase().contains("calibri") ||
+                                            name.toLowerCase().contains("times")));
+                    if (fontFiles != null) {
+                        for (File fontFile : fontFiles) {
+                            try {
+                                // Try to load as bold font first
+                                if (fontFile.getName().toLowerCase().contains("bd") ||
+                                        fontFile.getName().toLowerCase().contains("bold")) {
+                                    PDFont font = PDType0Font.load(document, fontFile);
+                                    log.debug("Loaded Unicode font: {}", fontFile.getAbsolutePath());
+                                    return font;
+                                }
+                            } catch (Exception e) {
+                                // Continue to next file
+                            }
+                        }
+                        // If no bold font found, try any matching font
+                        for (File fontFile : fontFiles) {
+                            try {
+                                PDFont font = PDType0Font.load(document, fontFile);
+                                log.debug("Loaded Unicode font: {}", fontFile.getAbsolutePath());
+                                return font;
+                            } catch (Exception e) {
+                                // Continue to next file
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.trace("Error searching font directory {}: {}", fontPath, e.getMessage());
+                }
+            }
+        }
+
+        log.warn("Could not load any Unicode font from system. Vietnamese characters may not display correctly.");
+        return null;
+    }
+
+    /**
+     * Get system font paths based on operating system
+     */
+    private String[] getSystemFontPaths(String osName) {
+        if (osName.contains("win")) {
+            String windowsDir = System.getenv("WINDIR");
+            if (windowsDir == null) {
+                windowsDir = "C:\\Windows";
+            }
+            return new String[]{
+                    windowsDir + File.separator + "Fonts",
+                    "C:\\Windows\\Fonts"  // Fallback
+            };
+        } else if (osName.contains("mac")) {
+            return new String[]{
+                    System.getProperty("user.home") + "/Library/Fonts",
+                    "/Library/Fonts",
+                    "/System/Library/Fonts"
+            };
+        } else {
+            // Linux/Unix
+            return new String[]{
+                    System.getProperty("user.home") + "/.fonts",
+                    "/usr/share/fonts",
+                    "/usr/local/share/fonts",
+                    "/usr/share/fonts/truetype",
+                    "/usr/share/fonts/TTF"
+            };
         }
     }
 }

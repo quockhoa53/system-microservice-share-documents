@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class CheckAccessRequest {
     private String documentId;
     private String userId;
+    private Boolean isGroup;
 }

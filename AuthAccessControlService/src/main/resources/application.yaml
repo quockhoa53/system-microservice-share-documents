@@ -28,7 +28,7 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -51,3 +51,9 @@ vault:
   port: ${VAULT_PORT}
   token: ${VAULT_TOKEN}
   transit-key: ${VAULT_TRANSIT_KEY}
+
+group:
+  service-name: user-service
+  url: lb://user-service
+  check-membership: /internal/groups/{groupId}/membership?userId={userId}
+  get-group-members: /api/groups/{groupId}/members

@@ -2,6 +2,7 @@ package com.system_share_documents.AuthAccessControlService.repository;
 
 import com.system_share_documents.AuthAccessControlService.entity.DocumentRecipient;
 import com.system_share_documents.AuthAccessControlService.enums.DocumentAccessRole;
+import com.system_share_documents.AuthAccessControlService.enums.RecipientType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,12 @@ public interface DocumentRecipientRepository extends JpaRepository<DocumentRecip
                          @Param("userIds") List<String> userIds,
                          @Param("role") DocumentAccessRole role,
                          @Param("updatedAt") Timestamp updatedAt);
+
+    // Tìm DocumentRecipient cho group
+    Optional<DocumentRecipient> findByDocumentIdAndRecipientGroupIdAndRecipientType(
+            String documentId, String recipientGroupId, RecipientType recipientType);
+
+    // Tìm DocumentRecipient cho USER (recipientType = USER)
+    Optional<DocumentRecipient> findByDocumentIdAndRecipientUserIdAndRecipientType(
+            String documentId, String recipientUserId, RecipientType recipientType);
 }

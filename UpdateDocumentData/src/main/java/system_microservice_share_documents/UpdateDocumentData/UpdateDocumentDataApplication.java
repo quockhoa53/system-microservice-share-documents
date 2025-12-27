@@ -12,6 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import system_microservice_share_documents.UpdateDocumentData.entity.WatermarkProcessEvent;
 
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Properties;
@@ -71,8 +76,21 @@ public class UpdateDocumentDataApplication {
 				})
 				.filter(event -> event != null);
 
-		// JDBC Sink
-		eventStream.addSink(
+		// THÊM: Map để check status trước khi sink - skip nếu QUARANTINED
+		DataStream<WatermarkProcessEvent> filteredEventStream = eventStream
+				.map(event -> {
+					String currentStatus = getCurrentStatus(dbUrl, dbUser, dbPass, event.getVersionId());
+					if ("QUARANTINED".equals(currentStatus)) {
+						System.err.println("⚠️ [Watermark] Skip update: versionId=" + event.getVersionId() + " already QUARANTINED (status=" + currentStatus + ")");
+						return null;  // Skip event
+					}
+					System.err.println("🔄 [Watermark] Proceed update: versionId=" + event.getVersionId() + ", current status=" + currentStatus);
+					return event;
+				})
+				.filter(event -> event != null);  // Filter null (skipped events)
+
+		// JDBC Sink (chỉ cho events không bị skip)
+		filteredEventStream.addSink(
 				JdbcSink.sink(
 						"UPDATE public.document_versions " +  // add schema
 								"SET watermarked = true, " +
@@ -110,6 +128,32 @@ public class UpdateDocumentDataApplication {
 		);
 
 		env.execute("update-data-after-watermark-documents");
+	}
+
+	/**
+	 * THÊM: Helper method để query current status của version
+	 * @param dbUrl JDBC URL
+	 * @param dbUser Username
+	 * @param dbPass Password
+	 * @param versionId Version UUID string
+	 * @return Current status, or null if not found
+	 */
+	private static String getCurrentStatus(String dbUrl, String dbUser, String dbPass, String versionId) {
+		try (Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+			 PreparedStatement ps = conn.prepareStatement("SELECT status FROM public.document_versions WHERE id = ?")) {
+			ps.setObject(1, UUID.fromString(versionId));
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return rs.getString("status");
+				}
+			}
+		} catch (SQLException e) {
+			System.err.println("❌ Failed to query status for versionId=" + versionId + ": " + e.getMessage());
+			e.printStackTrace();
+			// Fail-open: Assume not QUARANTINED, proceed update
+			return null;
+		}
+		return null;
 	}
 
 	private static Properties loadProperties(String filename) throws Exception {

@@ -18,6 +18,9 @@ public enum ActionLog {
 
     // Document Version
     DELETE_VERSIONS,
+
+    // Group
+    DISSOLVE_GROUP,
     
     // Access Control
     GRANT_ACCESS,

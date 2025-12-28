@@ -122,6 +122,7 @@ public class WaterMarkServiceImpl implements WaterMarkService {
                 }
             }
 
+            document.setAllSecurityToBeRemoved(true);
             document.save(outputStream);
             return outputStream.toByteArray();
         } catch (Exception e) {

@@ -60,15 +60,28 @@ public class JsonToEventMapper extends RichMapFunction<String, MemberJoinedGroup
     public MemberJoinedGroupEvent map(String json) throws Exception {
         try {
             if (json == null || json.trim().isEmpty()) {
-                System.err.println("⚠️ Received empty JSON record from Kafka, skipping");
+                System.out.println("[KAFKA_CONSUME] Received empty or null JSON message, skipping...");
                 return null;
             }
+
+            System.out.println("[KAFKA_CONSUME] Received JSON message from Kafka, length: " + json.length() + " bytes");
             MemberJoinedGroupEvent event = objectMapper.readValue(json, MemberJoinedGroupEvent.class);
-            System.out.println("📥 Received MemberJoinedGroupEvent - groupId: " + event.getGroupId() +
-                    ", userId: " + event.getUserId());
+
+            if (event != null) {
+                System.out.println("[KAFKA_CONSUME] Successfully parsed event - RequestId: " + event.getRequestId() +
+                        ", GroupId: " + event.getGroupId() +
+                        ", UserId: " + event.getUserId() +
+                        ", Role: " + event.getRole() +
+                        ", Timestamp: " + event.getTimestamp());
+            } else {
+                System.out.println("[KAFKA_CONSUME] Parsed event is null");
+            }
+
             return event;
         } catch (Exception e) {
-            System.err.println("❌ Failed to parse JSON: " + json);
+            System.err.println("[KAFKA_CONSUME] ERROR - Failed to parse JSON: " + e.getMessage());
+            System.err.println("[KAFKA_CONSUME] JSON content (first 500 chars): " +
+                    (json != null && json.length() > 500 ? json.substring(0, 500) + "..." : json));
             e.printStackTrace();
             return null;
         }

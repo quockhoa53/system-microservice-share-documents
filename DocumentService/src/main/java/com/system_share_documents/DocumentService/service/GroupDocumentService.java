@@ -1,9 +1,6 @@
 package com.system_share_documents.DocumentService.service;
 
-import com.system_share_documents.DocumentService.dto.request.AddDocumentToGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.GetGroupDocumentsRequest;
-import com.system_share_documents.DocumentService.dto.request.RemoveDocumentFromGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.UpdateDocumentAccessRoleRequest;
+import com.system_share_documents.DocumentService.dto.request.*;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentDetailResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,4 +48,6 @@ public interface GroupDocumentService {
     void ensureDocumentKeyExists(UUID documentId, UUID versionId, String userId, HttpServletRequest httpRequest) throws Exception;
 
     GroupDocumentResponse updateDocumentAccessRoleInternal(UpdateDocumentAccessRoleRequest request);
+
+    void dissolveGroup(DissolveGroupRequest request, String userId, HttpServletRequest httpRequest) throws Exception;
 }

@@ -38,6 +38,8 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}
+          audiences:
+            - account
   kafka:
     bootstrap-servers: localhost:9092
     producer:

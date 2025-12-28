@@ -92,6 +92,21 @@ public interface GroupDocumentRepository extends JpaRepository<GroupDocument, UU
      */
     @Query("SELECT DISTINCT gd.documentId FROM GroupDocument gd WHERE gd.groupId IN :groupIds AND gd.deletedAt IS NULL")
     List<UUID> findDocumentIdsByGroupIds(@Param("groupIds") List<String> groupIds);
+
+    /**
+     * Lấy danh sách document IDs trong một group (chưa bị xóa)
+     */
+    @Query("SELECT DISTINCT gd.documentId FROM GroupDocument gd WHERE gd.groupId = :groupId AND gd.deletedAt IS NULL")
+    List<UUID> findDocumentIdsByGroupId(@Param("groupId") String groupId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE GroupDocument gd SET gd.deletedAt = :deletedAt, gd.updatedAt = :updatedAt WHERE gd.groupId = :groupId AND gd.deletedAt IS NULL")
+    int softDeleteByGroupId(
+            @Param("groupId") String groupId,
+            @Param("deletedAt") Timestamp deletedAt,
+            @Param("updatedAt") Timestamp updatedAt
+    );
 }
 
 

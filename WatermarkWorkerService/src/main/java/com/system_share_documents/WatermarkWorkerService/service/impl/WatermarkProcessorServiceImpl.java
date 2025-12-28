@@ -249,9 +249,14 @@ public class WatermarkProcessorServiceImpl implements WatermarkProcessorService 
                 log.debug("[requestId={}] Calculated checksum: {}", requestId, checksum);
 
                 String ext = guessExtension(event.getContentType());
-                String objKey = "final/%s/v1/%s_wm.%s".formatted(event.getDocumentId(), event.getDocumentId(), ext);
+                String objKey = "final/%s/%s/%s_wm.%s".formatted(
+                        event.getDocumentId(),
+                        event.getVersionId(),
+                        event.getDocumentId(),
+                        ext);
                 minio.putObjectBytes(objKey, encryptedFile, event.getContentType());
-                log.info("[requestId={}] Uploaded watermarked file to MinIO, objectKey={}", requestId, objKey);
+                log.info("[requestId={}] Uploaded watermarked file to MinIO, objectKey={}, versionId={}, versionNumber={}",
+                        requestId, objKey, event.getVersionId(), event.getVersionNumber());
 
                 String base64Plaintext = Base64.getEncoder().encodeToString(cek.getEncoded());
                 String wrappedCEKMaster = vaultTransitService.encrypt(base64Plaintext);

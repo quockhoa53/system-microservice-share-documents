@@ -113,28 +113,30 @@ public class DocumentVersionServiceImpl implements DocumentVersionService {
                 throw new AppException(AuthError.FORBIDDEN_ACTION_DELETE);
             }
 
-            List<DocumentVersion> versionsToDelete = documentVersionRepository
-                    .findAllByDocumentIdAndIdInAndNotDeleted(request.getDocumentId(), request.getVersionIds());
+            List<UUID> versionIdsToDelete = documentVersionRepository
+                    .findIdsByDocumentIdAndIdInAndNotDeleted(request.getDocumentId(), request.getVersionIds());
 
-            if (versionsToDelete.isEmpty()) {
+            if (versionIdsToDelete.isEmpty()) {
                 throw new AppException(NotExistError.VERSION_NOT_FOUND);
             }
 
             Timestamp now = Timestamp.from(Instant.now());
-            List<UUID> versionIdsToDelete = versionsToDelete.stream()
-                    .map(DocumentVersion::getId)
-                    .collect(Collectors.toList());
 
             try {
                 int updated = documentVersionRepository.batchSoftDeleteByIds(versionIdsToDelete, now);
                 deletedVersionIds.addAll(versionIdsToDelete.subList(0, Math.min(updated, versionIdsToDelete.size())));
                 failedCount = versionIdsToDelete.size() - updated;
             } catch (Exception e) {
-                for (DocumentVersion version : versionsToDelete) {
+                // Fallback: xóa từng version một nếu batch delete thất bại
+                // Sử dụng update query trực tiếp để tránh load entity (tránh lỗi LOB stream)
+                for (UUID versionId : versionIdsToDelete) {
                     try {
-                        version.setDeletedAt(now);
-                        documentVersionRepository.save(version);
-                        deletedVersionIds.add(version.getId());
+                        int updated = documentVersionRepository.softDeleteById(versionId, now);
+                        if (updated > 0) {
+                            deletedVersionIds.add(versionId);
+                        } else {
+                            failedCount++;
+                        }
                     } catch (Exception ex) {
                         failedCount++;
                     }

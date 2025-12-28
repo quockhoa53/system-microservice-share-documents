@@ -1,14 +1,14 @@
 package com.system_share_documents.DocumentService.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.system_share_documents.AppCommonService.enums.ActionLog;
+import com.system_share_documents.AppCommonService.event.AuditLogEvent;
+import com.system_share_documents.AppCommonService.kafka.producer.AuditLogProducer;
 import com.system_share_documents.AppCommonService.rest.grantAccess.GrantAccessRest;
 import com.system_share_documents.AppCommonService.rest.group.GroupRest;
 import com.system_share_documents.AppCommonService.rest.userkey.UserKeyRest;
 import com.system_share_documents.AppCommonService.service.VaultTransitService;
-import com.system_share_documents.DocumentService.dto.request.AddDocumentToGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.GetGroupDocumentsRequest;
-import com.system_share_documents.DocumentService.dto.request.RemoveDocumentFromGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.UpdateDocumentAccessRoleRequest;
+import com.system_share_documents.DocumentService.dto.request.*;
 import com.system_share_documents.DocumentService.dto.response.DocumentResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentDetailResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentResponse;
@@ -49,6 +49,10 @@ import java.util.*;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getClientIp;
+import static com.system_share_documents.AppCommonService.utils.ClientUtils.getUserAgent;
+import static com.system_share_documents.AppCommonService.utils.ProcessJsonUtils.convertJson;
+
 @Service
 public class GroupDocumentServiceImpl implements GroupDocumentService {
 
@@ -68,28 +72,16 @@ public class GroupDocumentServiceImpl implements GroupDocumentService {
     private GroupRest groupRest;
 
     @Autowired
-    private UserKeyRest userKeyRest;
-
-    @Autowired
-    private VaultTransitService vaultTransitService;
-
-    @Autowired
-    private OpenPgpService openPgpService;
-
-    @Autowired
     private DocumentKeyService documentKeyService;
-
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private org.springframework.transaction.PlatformTransactionManager transactionManager;
 
     @Autowired
     private MapperUtils mapperUtils;
 
     @Autowired
     private GrantAccessRest grantAccessRest;
+
+    @Autowired
+    private AuditLogProducer auditLogProducer;
 
     private final ExecutorService encryptionExecutor = Executors.newFixedThreadPool(4);
 
@@ -191,7 +183,7 @@ public class GroupDocumentServiceImpl implements GroupDocumentService {
                 .findByDocumentIdAndGroupIdAndNotDeleted(documentId, groupId)
                 .orElseThrow(() -> new AppException(NotExistError.GROUP_DOCUMENT_NOT_FOUND));
 
-        Document document = documentRepository.findByIdAndNotDeleted(documentId)
+        Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new AppException(NotExistError.DOCUMENT_NOT_FOUND));
 
         UUID groupUuid = UUID.fromString(groupId);
@@ -619,6 +611,84 @@ public class GroupDocumentServiceImpl implements GroupDocumentService {
         // Tạo DocumentKey (lazy encryption)
         createDocumentKeyForMember(versionCEK, userId, httpRequest);
     }
+
+    @Override
+    @Transactional
+    public void dissolveGroup(DissolveGroupRequest request, String userId, HttpServletRequest httpRequest) throws Exception {
+        String status = "OK";
+        String errorReason = null;
+        String groupId = null;
+        int deletedCount = 0;
+
+        try {
+            if (userId == null || userId.isBlank()) {
+                throw new AppException(AuthError.UNAUTHORIZED, "User not authenticated");
+            }
+
+            groupId = request.getGroupId();
+            if (groupId == null || groupId.isBlank()) {
+                throw new AppException(ValidationError.INVALID_PARAM, "groupId is required");
+            }
+
+            UUID groupUuid = UUID.fromString(groupId);
+
+            // Kiểm tra user có quyền giải tán nhóm (chỉ owner/admin)
+            Map<String, Object> membership = groupRest.checkMembership(groupUuid, UUID.fromString(userId));
+            if (membership == null || !Boolean.TRUE.equals(membership.get("member"))) {
+                throw new AppException(AuthError.FORBIDDEN, "You are not a member of this group");
+            }
+
+            String role = (String) membership.get("role");
+            if (role == null || (!role.equalsIgnoreCase("owner") && !role.equalsIgnoreCase("admin"))) {
+                throw new AppException(AuthError.FORBIDDEN, "Only group owner/admin can dissolve group");
+            }
+
+            // Lấy danh sách tất cả documents trong group để xóa DocumentRecipient
+            List<UUID> documentIds = groupDocumentRepository.findDocumentIdsByGroupId(groupId);
+
+            // Soft delete tất cả GroupDocument trong group
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            deletedCount = groupDocumentRepository.softDeleteByGroupId(groupId, now, now);
+
+            // Xóa DocumentRecipient cho tất cả documents trong group
+
+            // Log thông tin
+            System.out.println("Dissolved group " + groupId + ": deleted " + deletedCount + " group documents");
+
+        } catch (AppException e) {
+            status = "FAIL";
+            errorReason = e.getMessage();
+            throw e;
+        } catch (Exception e) {
+            status = "FAIL";
+            errorReason = e.getMessage();
+            throw new AppException(BusinessError.FAILED_DISSOLVE_GROUP, e.getMessage());
+        } finally {
+            // Gửi audit log
+            if (groupId != null) {
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("deletedCount", deletedCount);
+                metadata.put("groupId", groupId);
+
+                AuditLogEvent logEvent = AuditLogEvent.builder()
+                        .requestId(UUID.randomUUID().toString())
+                        .userId(userId)
+                        .action(String.valueOf(ActionLog.DISSOLVE_GROUP))
+                        .documentId(null)
+                        .objectType("group")
+                        .status(status)
+                        .errorReason(errorReason)
+                        .ip(getClientIp(httpRequest))
+                        .userAgent(getUserAgent(httpRequest))
+                        .metadata(convertJson(metadata))
+                        .request(convertJson(request))
+                        .build();
+
+                auditLogProducer.sendAuditLog(logEvent, groupId);
+            }
+        }
+    }
+
 
     /**
      * DTO để chứa versionId và wrappedCEKMaster đã được materialize

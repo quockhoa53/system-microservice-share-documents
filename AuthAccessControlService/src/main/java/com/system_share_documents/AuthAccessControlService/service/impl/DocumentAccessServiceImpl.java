@@ -449,9 +449,11 @@ public class DocumentAccessServiceImpl implements DocumentAccessService {
         if (existingRecipientOpt.isPresent()) {
             // Cập nhật accessRole nếu đã tồn tại
             DocumentRecipient recipient = existingRecipientOpt.get();
+            boolean canDownload = documentAccessRole == DocumentAccessRole.DOWNLOADER || documentAccessRole == DocumentAccessRole.EDITOR || documentAccessRole == DocumentAccessRole.OWNER;
             recipient.setAccessRole(documentAccessRole);
             recipient.setUpdatedAt(now);
-            recipient.setIsRevoke(false); // Reset revoke flag nếu có
+            recipient.setIsRevoke(false);// Reset revoke flag nếu có
+            recipient.setCanDownload(canDownload);
             documentRecipientRepository.save(recipient);
             log.debug("Updated DocumentRecipient for group {} and document {}", groupId, documentId);
         } else {

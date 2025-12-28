@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends BaseSecurityConfig {
 
     @Override
@@ -26,8 +28,8 @@ public class SecurityConfig extends BaseSecurityConfig {
                 // Endpoint internal cho các microservice khác (gateway, document-service...) gọi
                 .requestMatchers("/internal/audit/**").permitAll()
 
-                // Admin endpoints - chỉ ADMIN role
-                .requestMatchers("/admin/audit/**").hasRole("ADMIN")
+                // Admin endpoints: cần ROLE_ADMIN (Keycloak realm/client role ADMIN)
+                .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 // Các API public bên ngoài (nếu có) thì yêu cầu JWT
                 .requestMatchers("/api/audit/**").authenticated()

@@ -27,13 +27,18 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
             @Param("offset") int offset
     );
 
-    @Query("SELECT v FROM DocumentVersion v WHERE v.document.id = :documentId AND v.id IN :versionIds AND v.deletedAt IS NULL")
-    List<DocumentVersion> findAllByDocumentIdAndIdInAndNotDeleted(@Param("documentId") UUID documentId, @Param("versionIds") List<UUID> versionIds);
+    @Query("SELECT v.id FROM DocumentVersion v WHERE v.document.id = :documentId AND v.id IN :versionIds AND v.deletedAt IS NULL")
+    List<UUID> findIdsByDocumentIdAndIdInAndNotDeleted(@Param("documentId") UUID documentId, @Param("versionIds") List<UUID> versionIds);
 
     @Modifying
     @Transactional
     @Query("UPDATE DocumentVersion v SET v.deletedAt = :deletedAt WHERE v.id IN :versionIds AND v.deletedAt IS NULL")
     int batchSoftDeleteByIds(@Param("versionIds") List<UUID> versionIds, @Param("deletedAt") Timestamp deletedAt);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE DocumentVersion v SET v.deletedAt = :deletedAt WHERE v.id = :versionId AND v.deletedAt IS NULL")
+    int softDeleteById(@Param("versionId") UUID versionId, @Param("deletedAt") Timestamp deletedAt);
 
     @Query("SELECT COUNT(v) FROM DocumentVersion v WHERE v.document.id = :documentId AND v.deletedAt IS NULL") long countByDocumentIdAndDeletedAtIsNull(@Param("documentId") UUID documentId);
 

@@ -23,7 +23,8 @@ public enum BusinessError implements ErrorCode {
     FAILED_REINIT_UPLOAD("FAILED_REINIT_UPLOAD" , "Failed to reinit upload document", HttpStatus.BAD_REQUEST),
     USER_IS_OWNER("USER_IS_OWNER" , "User is already the owner of this document", HttpStatus.BAD_REQUEST),
     USER_ALREADY_HAS_ACCESS("USER_ALREADY_HAS_ACCESS" , "User already has access to this document", HttpStatus.BAD_REQUEST),
-    FAILED_REQUEST_ACCESS("FAILED_REQUEST_ACCESS" , "Failed to request access to document", HttpStatus.BAD_REQUEST);;
+    FAILED_REQUEST_ACCESS("FAILED_REQUEST_ACCESS" , "Failed to request access to document", HttpStatus.BAD_REQUEST),
+    FAILED_DISSOLVE_GROUP("FAILED_DISSOLVE_GROUP" , "Failed to dissolve group documents", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

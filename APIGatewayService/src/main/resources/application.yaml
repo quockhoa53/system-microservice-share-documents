@@ -23,7 +23,7 @@ spring:
         - id: audit-log-service-admin
           uri: lb://audit-log-service
           predicates:
-            - Path=/admin/audit/**
+            - Path=/admin/audit/**, /admin/malware-alerts/**
           filters:
             - PreserveHostHeader
         - id: user-service

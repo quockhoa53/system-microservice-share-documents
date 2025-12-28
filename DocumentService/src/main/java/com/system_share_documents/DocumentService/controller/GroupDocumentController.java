@@ -1,10 +1,7 @@
 package com.system_share_documents.DocumentService.controller;
 
 import com.system_share_documents.DocumentService.dto.ApiResponse;
-import com.system_share_documents.DocumentService.dto.request.AddDocumentToGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.GetGroupDocumentsRequest;
-import com.system_share_documents.DocumentService.dto.request.RemoveDocumentFromGroupRequest;
-import com.system_share_documents.DocumentService.dto.request.UpdateDocumentAccessRoleRequest;
+import com.system_share_documents.DocumentService.dto.request.*;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentDetailResponse;
 import com.system_share_documents.DocumentService.dto.response.GroupDocumentResponse;
 import com.system_share_documents.DocumentService.service.GroupDocumentService;
@@ -98,5 +95,20 @@ public class GroupDocumentController {
         String userId = auth.getName();
         GroupDocumentResponse response = groupDocumentService.updateDocumentAccessRoleInternal(request);
         return ApiResponse.success("OK", "Document access role updated successfully", response);
+    }
+
+    /**
+     * Giải tán nhóm: xóa tất cả documents khỏi group
+     * POST /api/documents/group-documents/dissolve-group
+     */
+    @PostMapping("/dissolve-group")
+    public ApiResponse<Void> dissolveGroup(
+            @RequestBody DissolveGroupRequest request,
+            Authentication auth,
+            HttpServletRequest httpRequest
+    ) throws Exception {
+        String userId = auth.getName();
+        groupDocumentService.dissolveGroup(request, userId, httpRequest);
+        return ApiResponse.success("OK", "Group dissolved successfully", null);
     }
 }

@@ -64,7 +64,6 @@ public class EncryptDocumentKeysForNewMemberApplication {
                 .keyBy(MemberJoinedGroupEvent::getGroupId) // Group by groupId để xử lý theo thứ tự
                 .map(new EncryptionProcessorMapper());
 
-        System.out.println("🚀 Starting Flink job: EncryptDocumentKeysForNewMember");
         env.execute("encrypt-document-keys-for-new-member");
     }
 
@@ -80,22 +79,3 @@ public class EncryptDocumentKeysForNewMemberApplication {
         return props;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

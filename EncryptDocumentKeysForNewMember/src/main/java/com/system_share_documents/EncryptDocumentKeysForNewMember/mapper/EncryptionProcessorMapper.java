@@ -18,25 +18,70 @@ public class EncryptionProcessorMapper extends RichMapFunction<MemberJoinedGroup
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-        // Load properties và khởi tạo encryption service
-        Properties props = loadProperties("application.properties");
-        encryptionService = new DocumentKeyEncryptionService(props);
+        try {
+            Properties props = loadProperties("application.properties");
+            encryptionService = new DocumentKeyEncryptionService(props);
+        } catch (Exception e) {
+            System.err.println("Failed to initialize EncryptionProcessorMapper: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize EncryptionProcessorMapper", e);
+        }
     }
 
     @Override
     public MemberJoinedGroupEvent map(MemberJoinedGroupEvent event) throws Exception {
+        if (event == null) {
+            System.out.println("[ENCRYPTION_PROCESSOR] Received null event, skipping...");
+            return null;
+        }
+
+        if (encryptionService == null) {
+            System.err.println("[ENCRYPTION_PROCESSOR] ERROR - EncryptionService is not initialized");
+            throw new RuntimeException("EncryptionService is not initialized");
+        }
+
+        String userId = event.getUserId();
+        String groupId = event.getGroupId();
+        String requestId = event.getRequestId();
+
+        System.out.println("=================================================================");
+        System.out.println("[ENCRYPTION_PROCESSOR] Starting encryption process");
+        System.out.println("[ENCRYPTION_PROCESSOR] RequestId: " + requestId);
+        System.out.println("[ENCRYPTION_PROCESSOR] GroupId: " + groupId);
+        System.out.println("[ENCRYPTION_PROCESSOR] UserId: " + userId);
+        System.out.println("[ENCRYPTION_PROCESSOR] Role: " + event.getRole());
+        System.out.println("[ENCRYPTION_PROCESSOR] Timestamp: " + event.getTimestamp());
+        System.out.println("=================================================================");
+
         try {
-            System.out.println("🔐 Processing encryption for member " + event.getUserId() +
-                    " in group " + event.getGroupId());
+            if (userId == null || groupId == null) {
+                System.out.println("[ENCRYPTION_PROCESSOR] WARNING - Missing required fields (userId or groupId is null), skipping event");
+                return event; // Skip this event
+            }
+
+            long startTime = System.currentTimeMillis();
             encryptionService.encryptCEKForNewMember(event);
-            System.out.println("✅ Successfully encrypted CEK for member " + event.getUserId() +
-                    " in group " + event.getGroupId());
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+
+            System.out.println("=================================================================");
+            System.out.println("[ENCRYPTION_PROCESSOR] Completed encryption process successfully");
+            System.out.println("[ENCRYPTION_PROCESSOR] RequestId: " + requestId);
+            System.out.println("[ENCRYPTION_PROCESSOR] GroupId: " + groupId);
+            System.out.println("[ENCRYPTION_PROCESSOR] UserId: " + userId);
+            System.out.println("[ENCRYPTION_PROCESSOR] Processing time: " + duration + " ms");
+            System.out.println("=================================================================");
+
             return event;
         } catch (Exception e) {
-            System.err.println("❌ Failed to encrypt CEK for member " + event.getUserId() +
-                    " in group " + event.getGroupId() + ": " + e.getMessage());
+            System.err.println("=================================================================");
+            System.err.println("[ENCRYPTION_PROCESSOR] ERROR - Failed to encrypt CEK for member");
+            System.err.println("[ENCRYPTION_PROCESSOR] RequestId: " + requestId);
+            System.err.println("[ENCRYPTION_PROCESSOR] UserId: " + userId);
+            System.err.println("[ENCRYPTION_PROCESSOR] GroupId: " + groupId);
+            System.err.println("[ENCRYPTION_PROCESSOR] Error message: " + e.getMessage());
+            System.err.println("[ENCRYPTION_PROCESSOR] Error type: " + e.getClass().getName());
             e.printStackTrace();
-            // Không throw để không làm chết job, sẽ retry sau
+            System.err.println("=================================================================");
             return event;
         }
     }
